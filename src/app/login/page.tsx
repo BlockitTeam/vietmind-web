@@ -30,7 +30,7 @@ export default function Login() {
             <Input
               id="email"
               className="border-regal-green"
-              placeholder="projectmayhem@fc.com"
+              placeholder="Congtv@gmail.com"
               type="email"
             />
           </LabelInputContainer>
