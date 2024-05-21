@@ -1,10 +1,10 @@
 import { cookies } from "next/headers"
 import Image from "next/image"
+import { ChatLayout } from "./components/chat-layout"
+import HeaderChat from "@/components/headerChat"
 
-import { accounts, mails } from "./data"
-import { Mail } from "./components/mail"
 
-export default function MailPage() {
+export default function Chat2Page() {
   const layout = cookies().get("react-resizable-panels:layout")
   const collapsed = cookies().get("react-resizable-panels:collapsed")
 
@@ -12,16 +12,9 @@ export default function MailPage() {
   // const defaultCollapsed = collapsed && collapsed.value ? JSON.parse(collapsed.value) : undefined;
 
   return (
-    <>
-      <div className="hidden flex-col md:flex">
-        <Mail
-          accounts={accounts}
-          mails={mails}
-          defaultLayout={defaultLayout}
-          defaultCollapsed={false}
-          navCollapsedSize={4}
-        />
-      </div>
-    </>
+   <div className="z-10 max-w-5xl w-full h-full  lg:flex flex-col">
+    <HeaderChat />
+      <ChatLayout defaultLayout={defaultLayout} navCollapsedSize={8} />
+   </div>
   )
 }

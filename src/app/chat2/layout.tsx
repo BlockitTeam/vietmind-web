@@ -5,8 +5,7 @@ export default function Layout({ children }: Readonly<{
   }>) {
   return (
     <div className="flex min-h-screen w-full flex-col">
-      <HeaderChat />
-      <main className="flex flex-1 flex-col">{children}</main>
+      <main className="flex h-[calc(100dvh)] flex-col justify-center">{children}</main>
     </div>
   )
 }

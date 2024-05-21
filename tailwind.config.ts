@@ -29,6 +29,8 @@ const config = {
       },
       colors: {
         'regal-green': '#C2F8CB',
+        'neutral-ternary': "#5F7581",
+        'neutral-primary': "#172832",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
