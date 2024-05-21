@@ -75,8 +75,8 @@ export default function ChatBottombar({
   };
 
   return (
-    <div className="p-2 flex justify-between w-full items-center gap-2">
-      <div className="flex">
+    <div className="p-2 flex justify-between w-full items-center gap-2 mb-16">
+      {/* <div className="flex">
         <Popover>
           <PopoverTrigger asChild>
             <Link
@@ -148,7 +148,7 @@ export default function ChatBottombar({
             ))}
           </div>
         )}
-      </div>
+      </div> */}
 
       <AnimatePresence initial={false}>
         <motion.div
@@ -174,7 +174,7 @@ export default function ChatBottombar({
             onChange={handleInputChange}
             name="message"
             placeholder="Aa"
-            className=" w-full border rounded-full flex items-center h-9 resize-none overflow-hidden bg-background"
+            className="w-full border flex items-center h-9 resize-none overflow-hidden bg-background border-regal-green"
           ></Textarea>
           {/* <div className="absolute right-2 bottom-0.5  ">
             <EmojiPicker
