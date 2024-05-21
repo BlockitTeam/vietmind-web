@@ -336,7 +336,7 @@ export function ChatLayout({
           )}
         >
           <div className="flex items-center gap-2">
-            <Button className="text-neutral-primary border-regal-green bg-regal-green w-[45px] h-[45px]">
+            <Button className="text-neutral-primary border-regal-green bg-regal-green w-[45px] h-[45px] hover:bg-regal-green">
               VT
             </Button>
             <p className="text-md font-bold text-neutral-primary">Việt Trinh</p>
