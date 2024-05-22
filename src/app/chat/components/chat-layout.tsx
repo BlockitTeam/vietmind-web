@@ -368,6 +368,48 @@ export function ChatLayout({
           </Button>
         </div>
         <Separator />
+        <div className="w-full m-4">
+          <p className="font-bold text-md mb-4">Thông tin người dùng</p>
+          <div className="flex gap-2 flex-col">
+            <div className="flex gap-4">
+              <p className="text-neutral-ternary text-sm">Ngày sinh</p>
+              <p className="text-neutral-primary text-sm font-bold">
+                20/06/2000
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <p className="text-neutral-ternary text-sm">Tuổi</p>
+              <p className="text-neutral-primary text-sm font-bold">23</p>
+            </div>
+            <div className="flex gap-4">
+              <p className="text-neutral-ternary text-sm">Giới tính</p>
+              <p className="text-neutral-primary text-sm font-bold">Nữ</p>
+            </div>
+          </div>
+        </div>
+        <Separator />
+        <div className="w-full m-4">
+          <div className="flex justify-between items-center cursor-pointer">
+            <p className="font-bold text-md mb-4">Thông tin người dùng</p>
+            <a className="font-bold text-md mb-4 underline">Xem chi tiết</a>
+          </div>
+          <div className="flex gap-2 flex-col">
+            <div className="flex gap-4">
+              <p className="text-neutral-ternary text-sm">Ngày sinh</p>
+              <p className="text-neutral-primary text-sm font-bold">
+                20/06/2000
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <p className="text-neutral-ternary text-sm">Tuổi</p>
+              <p className="text-neutral-primary text-sm font-bold">23</p>
+            </div>
+            <div className="flex gap-4">
+              <p className="text-neutral-ternary text-sm">Giới tính</p>
+              <p className="text-neutral-primary text-sm font-bold">Nữ</p>
+            </div>
+          </div>
+        </div>
       </ResizablePanel>
     </ResizablePanelGroup>
   );
