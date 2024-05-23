@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calendar, Search } from "lucide-react";
+import { Calendar, PlusCircleIcon, Search } from "lucide-react";
 import { Chat } from "@/app/chat/components/chat";
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
@@ -418,23 +418,28 @@ export function ChatLayout({
             <p className="font-bold text-md mb-4">Ghi chú</p>
             {/* <a className="font-bold text-md mb-4 underline">Xem chi tiết</a> */}
           </div>
-          <div className="flex gap-2 flex-col">
-            <div className="flex gap-4">
-              <p className="text-neutral-ternary text-sm">Stress:</p>
-              <p className="text-neutral-primary text-sm">5/10</p>
+          <div className="flex gap-4 flex-col">
+            <div className="flex flex-col gap-2">
+              <p className="text-neutral-primary text-md font-bold">
+                17/06/2023
+              </p>
+              <ul className="list-disc ml-4">
+                <li>Stress nhẹ do áp lực công việc quá nhiều. </li>
+                <li>Hiện tại đang ở một mình, không có người thân bên cạnh </li>
+                <li>Khó ngủ, giờ ngủ không cố định </li>
+              </ul>
             </div>
-            <div className="flex gap-4">
-              <p className="text-neutral-ternary text-sm">Lo âu:</p>
-              <p className="text-neutral-primary text-sm">6/10</p>
+            <div className="flex flex-col gap-2">
+              <p className="text-neutral-primary text-md font-bold">
+                17/06/2023
+              </p>
+              <ul className="list-disc ml-4">
+                <li>Stress nhẹ do áp lực công việc quá nhiều. </li>
+                <li>Hiện tại đang ở một mình, không có người thân bên cạnh </li>
+                <li>Khó ngủ, giờ ngủ không cố định </li>
+              </ul>
             </div>
-            <div className="flex gap-4">
-              <p className="text-neutral-ternary text-sm">Trầm cảm:</p>
-              <p className="text-neutral-primary text-sm ">7/10</p>
-            </div>
-            <div className="flex gap-4">
-              <p className="text-neutral-ternary text-sm">Tự hại:</p>
-              <p className="text-neutral-primary text-sm ">2/10</p>
-            </div>
+            <Button variant={"outline"} className="border-regal-green mt-4"> <PlusCircleIcon size={15} className="mr-2" /> Thêm ghi chú</Button>
           </div>
         </div>
       </ResizablePanel>
