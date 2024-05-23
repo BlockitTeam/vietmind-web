@@ -368,7 +368,7 @@ export function ChatLayout({
           </Button>
         </div>
         <Separator />
-        <div className="w-full m-4">
+        <div className="m-4">
           <p className="font-bold text-md mb-4">Thông tin người dùng</p>
           <div className="flex gap-2 flex-col">
             <div className="flex gap-4">
@@ -388,25 +388,52 @@ export function ChatLayout({
           </div>
         </div>
         <Separator />
-        <div className="w-full m-4">
+        <div className="m-4">
           <div className="flex justify-between items-center cursor-pointer">
-            <p className="font-bold text-md mb-4">Thông tin người dùng</p>
+            <p className="font-bold text-md mb-4">Kết quả sàng lọc</p>
             <a className="font-bold text-md mb-4 underline">Xem chi tiết</a>
           </div>
           <div className="flex gap-2 flex-col">
             <div className="flex gap-4">
-              <p className="text-neutral-ternary text-sm">Ngày sinh</p>
-              <p className="text-neutral-primary text-sm font-bold">
-                20/06/2000
-              </p>
+              <p className="text-neutral-ternary text-sm">Stress:</p>
+              <p className="text-neutral-primary text-sm">5/10</p>
             </div>
             <div className="flex gap-4">
-              <p className="text-neutral-ternary text-sm">Tuổi</p>
-              <p className="text-neutral-primary text-sm font-bold">23</p>
+              <p className="text-neutral-ternary text-sm">Lo âu:</p>
+              <p className="text-neutral-primary text-sm">6/10</p>
             </div>
             <div className="flex gap-4">
-              <p className="text-neutral-ternary text-sm">Giới tính</p>
-              <p className="text-neutral-primary text-sm font-bold">Nữ</p>
+              <p className="text-neutral-ternary text-sm">Trầm cảm:</p>
+              <p className="text-neutral-primary text-sm ">7/10</p>
+            </div>
+            <div className="flex gap-4">
+              <p className="text-neutral-ternary text-sm">Tự hại:</p>
+              <p className="text-neutral-primary text-sm ">2/10</p>
+            </div>
+          </div>
+        </div>
+        <Separator />
+        <div className="m-4">
+          <div className="flex justify-between items-center cursor-pointer">
+            <p className="font-bold text-md mb-4">Ghi chú</p>
+            {/* <a className="font-bold text-md mb-4 underline">Xem chi tiết</a> */}
+          </div>
+          <div className="flex gap-2 flex-col">
+            <div className="flex gap-4">
+              <p className="text-neutral-ternary text-sm">Stress:</p>
+              <p className="text-neutral-primary text-sm">5/10</p>
+            </div>
+            <div className="flex gap-4">
+              <p className="text-neutral-ternary text-sm">Lo âu:</p>
+              <p className="text-neutral-primary text-sm">6/10</p>
+            </div>
+            <div className="flex gap-4">
+              <p className="text-neutral-ternary text-sm">Trầm cảm:</p>
+              <p className="text-neutral-primary text-sm ">7/10</p>
+            </div>
+            <div className="flex gap-4">
+              <p className="text-neutral-ternary text-sm">Tự hại:</p>
+              <p className="text-neutral-primary text-sm ">2/10</p>
             </div>
           </div>
         </div>
