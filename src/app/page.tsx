@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { useForm } from "react-hook-form";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const {
@@ -22,27 +22,17 @@ export default function Home() {
       password: "",
     },
   });
-  const router = useRouter()
+  const router = useRouter();
 
   const onSubmit = async (data: any) => {
     console.log(data);
-    const {email, password} = data;
-    // Here you would typically send the data to your API
-    // For example, using fetch or axios:
-    // const response = await fetch('/api/login', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify(data)
-    // });
-    // const result = await response.json();
-    // Handle the response from your API
+    const { email, password } = data;
 
-    if (email === 'admin@gmail.com' && password === 'admin') {
-      router.push('/chat')
+    if (email === "admin@gmail.com" && password === "admin") {
+      router.push("/chat");
     }
   };
+
   return (
     <div className="flex justify-center align-middle h-screen items-center">
       <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl  p-4 md:p-8 shadow-input bg-white dark:bg-black border-regal-green">
@@ -63,7 +53,9 @@ export default function Home() {
               type="email"
               {...register("email", { required: "Email is required" })}
             />
-            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
+            )}
           </LabelInputContainer>
           <LabelInputContainer className="mb-4">
             <Label htmlFor="password">Password</Label>
@@ -74,7 +66,9 @@ export default function Home() {
               type="password"
               {...register("password", { required: "Password is required" })}
             />
-            {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password.message}</p>
+            )}
           </LabelInputContainer>
 
           <button

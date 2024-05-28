@@ -13,6 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar, PlusCircleIcon, Search } from "lucide-react";
 import { Chat } from "@/app/chat/components/chat";
+import { appointmentAtom } from "@/lib/jotai";
+import { useAtom } from "jotai";
+import { IconArrowLeft } from "@tabler/icons-react";
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
   defaultCollapsed?: boolean;
@@ -27,6 +30,7 @@ export function ChatLayout({
   const [selectedUser, setSelectedUser] = React.useState(userData[0]);
   const [isMobile, setIsMobile] = useState(false);
   const [tab, setTab] = React.useState("chat");
+  const [appointment, setAppointment] = useAtom(appointmentAtom);
 
   return (
     <ResizablePanelGroup
@@ -358,17 +362,31 @@ export function ChatLayout({
       <ResizablePanel defaultSize={defaultLayout[2]}>
         <div
           className={cn(
-            "flex h-[56px] items-center justify-center",
-            isCollapsed ? "h-[56px]" : "px-2"
+            "flex h-[56px] items-center ",
+            isCollapsed ? "h-[56px]" : "px-2",
+            !appointment ? 'justify-start' : 'justify-center'
+
           )}
         >
-          <Button className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full">
-            Đặt lịch hẹn
-            <Calendar className="ml-2" size={20} />
-          </Button>
+          {!appointment ? (
+            <Button
+              className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
+              onClick={() => setAppointment(true)}
+            >
+              Đặt lịch hẹn
+              <Calendar className="ml-2" size={20} />
+            </Button>
+          ) : (
+            <div className="font-bold flex items-center w-full cursor-pointer" onClick={() => setAppointment(false)}>
+              <IconArrowLeft size={20} className="mr-2" /> Quay lại
+            </div>
+          )}
         </div>
         <Separator />
-        <div className="m-4">
+        <div className="w-full">
+          {!appointment && (
+            <>
+              <div className="m-4">
           <p className="font-bold text-md mb-4">Thông tin người dùng</p>
           <div className="flex gap-2 flex-col">
             <div className="flex gap-4">
@@ -439,8 +457,20 @@ export function ChatLayout({
                 <li>Khó ngủ, giờ ngủ không cố định </li>
               </ul>
             </div>
-            <Button variant={"outline"} className="border-regal-green mt-4"> <PlusCircleIcon size={15} className="mr-2" /> Thêm ghi chú</Button>
+            <Button variant={"outline"} className="border-regal-green mt-4">
+              {" "}
+              <PlusCircleIcon size={15} className="mr-2" /> Thêm ghi chú
+            </Button>
           </div>
+        </div>
+            </>
+          )}
+
+          {appointment && (
+            <div className="m-4">
+              <p className="font-bold text-2xl">Đặt lịch hẹn</p>
+            </div>
+          )}
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>
