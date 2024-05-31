@@ -17,6 +17,8 @@ import { appointmentAtom } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { Form, useForm } from "react-hook-form";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { EndChat } from "./chat-modal-end";
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
   defaultCollapsed?: boolean;
@@ -365,9 +367,7 @@ export function ChatLayout({
             <p className="text-md font-bold text-neutral-primary">Việt Trinh</p>
           </div>
           <div>
-            <Button className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px]">
-              Kết thúc tư vấn
-            </Button>
+            <EndChat />
           </div>
         </div>
         <Separator />
@@ -404,9 +404,9 @@ export function ChatLayout({
           )}
         </div>
         <Separator />
-        <div className="w-full">
+        <div className="w-full h-full">
           {!appointment && (
-            <>
+            <ScrollArea className="w-full h-full">
               <div className="m-4">
                 <p className="font-bold text-md mb-4">Thông tin người dùng</p>
                 <div className="flex gap-2 flex-col">
@@ -493,7 +493,7 @@ export function ChatLayout({
                   </Button>
                 </div>
               </div>
-            </>
+            </ScrollArea>
           )}
 
           {appointment && (
@@ -511,11 +511,11 @@ export function ChatLayout({
                     Nội dung buổi hẹn *
                   </label>
                   <input
-                  placeholder="hi..."
+                    placeholder="hi..."
                     id="appointmentContent"
                     {...register("appointmentContent", {
                       required: "Nội dung là bắt buộc",
-                      minLength: 3
+                      minLength: 3,
                     })}
                     className="mt-1 block w-full border border-regal-green rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"
                   />
@@ -594,7 +594,7 @@ export function ChatLayout({
                     Ghi chú *
                   </label>
                   <input
-                  placeholder="hi..."
+                    placeholder="hi..."
                     id="notes"
                     {...register("notes", { required: "Ghi chú là bắt buộc" })}
                     className="mt-1 block w-full border border-regal-green rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"
@@ -630,8 +630,11 @@ export function ChatLayout({
                   <button
                     disabled={!isValid}
                     type="submit"
-                    className={cn('py-2 px-4 text-white font-semibold rounded-md shadow-md  focus:outline-none focus:ring-2 focus:ring-opacity-75',
-                    isValid ? 'bg-green-500 focus:ring-green-400 hover:bg-green-600' : 'bg-gray-400 focus:ring-gray-400 hover:bg-gray-600'
+                    className={cn(
+                      "py-2 px-4 text-white font-semibold rounded-md shadow-md  focus:outline-none focus:ring-2 focus:ring-opacity-75",
+                      isValid
+                        ? "bg-green-500 focus:ring-green-400 hover:bg-green-600"
+                        : "bg-gray-400 focus:ring-gray-400 hover:bg-gray-600"
                     )}
                   >
                     Đặt lịch
