@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { FormEvent } from "react";
 import { cn } from "@/utils/cn";
 import {
   IconBrandGithub,
@@ -24,6 +24,10 @@ export default function Home() {
   });
   const router = useRouter();
 
+  const customSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    await handleSubmit(onSubmit)(e);
+  };
   const onSubmit = async (data: any) => {
     console.log(data);
     const { email, password } = data;
@@ -42,7 +46,7 @@ export default function Home() {
 
         <form
           className="my-8 justify-center align-middle"
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={customSubmit}
         >
           <LabelInputContainer className="mb-4">
             <Label htmlFor="email">Email</Label>
