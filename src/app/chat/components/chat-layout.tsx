@@ -16,6 +16,9 @@ import { Chat } from "@/app/chat/components/chat";
 import { appointmentAtom, appointmentDetailAtom } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { IconArrowLeft } from "@tabler/icons-react";
+import { Form, useForm } from "react-hook-form";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { EndChat } from "./chat-modal-end";
 import { Appointment } from "./appointment";
 import { ChatInformation } from "./chat-information";
 interface ChatLayoutProps {
@@ -349,9 +352,7 @@ export function ChatLayout({
             <p className="text-md font-bold text-neutral-primary">Việt Trinh</p>
           </div>
           <div>
-            <Button className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px]">
-              Kết thúc tư vấn
-            </Button>
+            <EndChat />
           </div>
         </div>
         <Separator />
@@ -389,9 +390,12 @@ export function ChatLayout({
           )}
         </div>
         <Separator />
-        <div className="w-full">
+        <div className="w-full h-full">
           {!appointment && (
+            <ScrollArea className="w-full h-full">
+
             <ChatInformation />
+            </ScrollArea>
           )}
 
           {appointment && (
