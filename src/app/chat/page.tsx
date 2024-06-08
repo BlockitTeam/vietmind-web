@@ -1,12 +1,6 @@
 import { cookies } from "next/headers";
-import Image from "next/image";
 import { ChatLayout } from "./components/chat-layout";
 import HeaderChat from "@/components/headerChat";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
 export default function ChatPage() {
   const layout = cookies().get("react-resizable-panels:layout");
   const collapsed = cookies().get("react-resizable-panels:collapsed");

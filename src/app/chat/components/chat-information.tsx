@@ -4,6 +4,7 @@ import { PlusCircleIcon } from "lucide-react";
 import { useAtom } from "jotai";
 import { appointmentDetailAtom } from "@/lib/jotai";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { WatchDetail } from "./watch-detail";
 
 export function ChatInformation() {
   const [appointmentDetail, setAppointmentDetail] = useAtom(
@@ -60,9 +61,9 @@ export function ChatInformation() {
       </div>
       <Separator />
       <div className="m-4">
-        <div className="flex justify-between items-center cursor-pointer">
+        <div className="flex justify-between cursor-pointer ">
           <p className="font-bold text-md mb-4">Kết quả sàng lọc</p>
-          <a className="font-bold text-md mb-4 underline">Xem chi tiết</a>
+          <WatchDetail />
         </div>
         <div className="flex gap-2 flex-col">
           <div className="flex gap-4">
@@ -86,7 +87,7 @@ export function ChatInformation() {
       <Separator />
       <div className="m-4">
         <div className="flex justify-between items-center cursor-pointer">
-          <p className="font-bold text-md mb-4">Ghi chú</p>
+          <p className="font-bold text-lg mb-4">Ghi chú</p>
           {/* <a className="font-bold text-md mb-4 underline">Xem chi tiết</a> */}
         </div>
         <div className="flex gap-4 flex-col">

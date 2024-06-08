@@ -12,6 +12,7 @@ const fontSans = FontSans({
 });
 
 import { Provider } from "jotai";
+import QueryClientProvider from "@/lib/queryClientProvider";
 
 export const metadata: Metadata = {
   title: "Vietmind tư vấn tâm lý",
@@ -30,8 +31,11 @@ export default function RootLayout({
           "min-h-screen bg-background font-sans antialiased",
           fontSans.variable
         )}
+        suppressHydrationWarning={true}
       >
-        <Provider>{children}</Provider>
+        <Provider>
+          <QueryClientProvider>{children}</QueryClientProvider>
+        </Provider>
       </body>
     </html>
   );
