@@ -36,8 +36,10 @@ export function ChatLayout({
   const [isMobile, setIsMobile] = useState(false);
   const [tab, setTab] = React.useState("chat");
   const [appointment, setAppointment] = useAtom(appointmentAtom);
-  const [appointmentDetail, setAppointmentDetail] = useAtom(appointmentDetailAtom);
- 
+  const [appointmentDetail, setAppointmentDetail] = useAtom(
+    appointmentDetailAtom
+  );
+
   return (
     <ResizablePanelGroup
       direction="horizontal"
@@ -393,8 +395,7 @@ export function ChatLayout({
         <div className="w-full h-full">
           {!appointment && (
             <ScrollArea className="w-full h-full">
-
-            <ChatInformation />
+              <ChatInformation />
             </ScrollArea>
           )}
 

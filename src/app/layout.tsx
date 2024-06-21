@@ -10,6 +10,7 @@ const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
+import { Toaster } from "@/components/ui/toaster"
 
 import { Provider } from "jotai";
 import QueryClientProvider from "@/lib/queryClientProvider";
@@ -35,6 +36,7 @@ export default function RootLayout({
       >
         <Provider>
           <QueryClientProvider>{children}</QueryClientProvider>
+          <Toaster />
         </Provider>
       </body>
     </html>

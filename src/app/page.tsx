@@ -1,27 +1,44 @@
 "use client";
-import React, { FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 import { cn } from "@/utils/cn";
-import {
-  IconBrandGithub,
-  IconBrandGoogle,
-  IconBrandOnlyfans,
-} from "@tabler/icons-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
+import * as z from "zod";
+import { ToastAction } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
+import { useSetAtom } from "jotai";
+import { sessionAtom } from "@/lib/jotai";
+
+const loginSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters long" }),
+});
+
+type LoginSchema = z.infer<typeof loginSchema>;
 
 export default function Home() {
+  const { toast } = useToast();
+  const setSession = useSetAtom(sessionAtom);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
 
   const customSubmit = async (e: FormEvent) => {
@@ -29,12 +46,34 @@ export default function Home() {
     await handleSubmit(onSubmit)(e);
   };
   const onSubmit = async (data: any) => {
-    console.log(data);
+    setLoading(true);
     const { email, password } = data;
+    const res = await fetch("api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-    if (email === "admin@gmail.com" && password === "admin") {
+    if (res && res.ok) {
+      const cookies = res.headers.get("set-cookie");
+      const jsessionId = cookies?.match(/JSESSIONID=([^;]+)/)?.[1];
+
+      if (jsessionId) {
+        setSession(jsessionId);
+      }
       router.push("/chat");
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
+      // alert("Login failed");
     }
+    setLoading(false);
   };
 
   return (
