@@ -13,15 +13,25 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (authRes.ok) {
-    console.log("🚀 ~ onSubmit ~ res:", res)
+    // Get the Set-Cookie header from the backend response
+    const setCookieHeader = authRes.headers.get("set-cookie");
+    if (setCookieHeader) {
+      // Extract JSESSIONID from the setCookieHeader if necessary
+      const jsessionidMatch = setCookieHeader.match(/JSESSIONID=([^;]+);/);
+      if (jsessionidMatch) {
+        console.log("🚀 ~ POST ~ jsessionidMatch:", jsessionidMatch)
+        const jsessionid = jsessionidMatch[1];
 
-    const cookies = authRes.headers.get("set-cookie");
-    if (cookies) {
-      res.setHeader("Set-Cookie", cookies);
+        // Set the JSESSIONID cookie in the response to the client
+        res.setHeader(
+          "Set-Cookie",
+          `JSESSIONID=${jsessionid}; Path=/; HttpOnly`
+        );
+      }
     }
     return new Response(
       JSON.stringify({
-        data: cookies ? cookies : [],
+        data: authRes ? authRes : [],
       }),
       { status: 200 }
     );
