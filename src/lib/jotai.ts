@@ -27,4 +27,4 @@ export const appointmentDetailAtom = atom<TAppointmentDetail>({
 });
 
 export const sessionAtom = atom<string | null>(null);
-
+export const currentUserAtom = atom<any>(null);

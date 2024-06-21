@@ -11,7 +11,7 @@ import * as z from "zod";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import { useSetAtom } from "jotai";
-import { sessionAtom } from "@/lib/jotai";
+import { currentUserAtom, sessionAtom } from "@/lib/jotai";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -25,6 +25,7 @@ type LoginSchema = z.infer<typeof loginSchema>;
 export default function Home() {
   const { toast } = useToast();
   const setSession = useSetAtom(sessionAtom);
+  const setCurrentUser = useSetAtom(currentUserAtom);
 
   const {
     register,
@@ -62,8 +63,24 @@ export default function Home() {
 
       if (jsessionId) {
         setSession(jsessionId);
+        const userRes = await fetch('/api/current-user', {
+          headers: {
+            'Cookie': `JSESSIONID=${jsessionId}`,
+          },
+        });
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          setCurrentUser(userData);
+          router.push("/chat");
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Uh oh! Something went wrong.",
+            description: "Failed to fetch current user.",
+            action: <ToastAction altText="Try again">Try again</ToastAction>,
+          });
+        }
       }
-      router.push("/chat");
     } else {
       toast({
         variant: "destructive",
