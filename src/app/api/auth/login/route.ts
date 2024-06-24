@@ -3,14 +3,16 @@ import { cookies } from "next/headers";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export async function POST(req: NextApiRequest, res: NextApiResponse) {
-  const { email, password } = req.body;
-  const authRes = await fetch("http://localhost:9001/login", {
+  const { username, password } = req.body;
+  const authRes = await fetch("http://91.108.104.57:9001/api/v1/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ username, password }),
+    credentials: "include"
   });
+  console.log("🚀 ~ POST ~ authRes:", authRes.json())
 
   if (authRes.ok) {
     // Get the Set-Cookie header from the backend response

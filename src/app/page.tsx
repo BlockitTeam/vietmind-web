@@ -11,10 +11,15 @@ import * as z from "zod";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import { useSetAtom } from "jotai";
-import { currentUserAtom, sessionAtom } from "@/lib/jotai";
+import { TCurrentUser, currentUserAtom, sessionAtom } from "@/lib/jotai";
+import axios from "axios";
+import axiosInstance from "@/config/axios/axiosInstance";
+import { QueryClient } from "@tanstack/react-query";
+import { useCurrentUserHook } from "@/hooks/currentUser";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
+  username: z.string().email({ message: "Invalid email address" }),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters long" }),
@@ -25,8 +30,8 @@ type LoginSchema = z.infer<typeof loginSchema>;
 export default function Home() {
   const { toast } = useToast();
   const setSession = useSetAtom(sessionAtom);
-  const setCurrentUser = useSetAtom(currentUserAtom);
-
+  // const setCurrentUser = useSetAtom(currentUserAtom);
+  const queryClient = new QueryClient()
   const {
     register,
     handleSubmit,
@@ -34,11 +39,12 @@ export default function Home() {
   } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
   const [loading, setLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useLocalStorage<TCurrentUser | null>('currentUser', null);
 
   const router = useRouter();
 
@@ -48,50 +54,36 @@ export default function Home() {
   };
   const onSubmit = async (data: any) => {
     setLoading(true);
-    const { email, password } = data;
-    const res = await fetch("api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    const { username, password } = data;
 
-    if (res && res.ok) {
-      const cookies = res.headers.get("set-cookie");
-      const jsessionId = cookies?.match(/JSESSIONID=([^;]+)/)?.[1];
+    try {
+      const response = await axiosInstance.post(
+        "api/v1/auth/login",
+        data,
+      );
 
-      if (jsessionId) {
-        setSession(jsessionId);
-        const userRes = await fetch('/api/current-user', {
-          headers: {
-            'Cookie': `JSESSIONID=${jsessionId}`,
-          },
-        });
-        if (userRes.ok) {
-          const userData = await userRes.json();
-          setCurrentUser(userData);
-          router.push("/chat");
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Uh oh! Something went wrong.",
-            description: "Failed to fetch current user.",
-            action: <ToastAction altText="Try again">Try again</ToastAction>,
-          });
+      if (response.status === 200) {
+        const respUser = await axiosInstance.get('api/v1/user/current-user');
+        if (respUser.status === 200) {
+          setCurrentUser(respUser.data);
+          router.push('/chat');
         }
+      } else {
+        console.log("Login failed with status code:", response.status);
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "There was a problem with your request.",
+          action: <ToastAction altText="Try again">Try again</ToastAction>,
+        });
       }
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
-        action: <ToastAction altText="Try again">Try again</ToastAction>,
-      });
-      // alert("Login failed");
+    } catch (error) {
+      console.error("Error during login:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
+
 
   return (
     <div className="flex justify-center align-middle h-screen items-center">
@@ -111,10 +103,10 @@ export default function Home() {
               className="border-regal-green"
               placeholder="Congtv@gmail.com"
               type="email"
-              {...register("email", { required: "Email is required" })}
+              {...register("username", { required: "Email is required" })}
             />
-            {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
+            {errors.username && (
+              <p className="text-sm text-red-500">{errors.username.message}</p>
             )}
           </LabelInputContainer>
           <LabelInputContainer className="mb-4">
