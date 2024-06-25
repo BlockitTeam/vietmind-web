@@ -30,7 +30,7 @@ type LoginSchema = z.infer<typeof loginSchema>;
 export default function Home() {
   const { toast } = useToast();
   const setSession = useSetAtom(sessionAtom);
-  // const setCurrentUser = useSetAtom(currentUserAtom);
+  const setCurrentUser = useSetAtom(currentUserAtom);
   const queryClient = new QueryClient()
   const {
     register,
@@ -44,7 +44,7 @@ export default function Home() {
     },
   });
   const [loading, setLoading] = useState(false);
-  const [currentUser, setCurrentUser] = useLocalStorage<TCurrentUser | null>('currentUser', null);
+  const [currentUser, setCurrentUserStorage] = useLocalStorage<TCurrentUser | null>('currentUser', null);
 
   const router = useRouter();
 
@@ -66,6 +66,7 @@ export default function Home() {
         const respUser = await axiosInstance.get('api/v1/user/current-user');
         if (respUser.status === 200) {
           setCurrentUser(respUser.data);
+          setCurrentUserStorage(respUser.data);
           router.push('/chat');
         }
       } else {

@@ -4,6 +4,7 @@ import React, { useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import ChatBottombar from "./chat-bottombar";
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 
 interface ChatListProps {
   messages?: Message[];
@@ -19,6 +20,14 @@ export function ChatList({
   isMobile
 }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+
+  const { sendMessage: sendMessageWs, lastMessage, readyState } = useWebSocket('ws://192.168.1.32:9001/ws', {
+    onOpen: () => console.log('WebSocket connection established'),
+    queryParams: {
+      userId: 1
+    }
+  });
 
   React.useEffect(() => {
     if (messagesContainerRef.current) {
