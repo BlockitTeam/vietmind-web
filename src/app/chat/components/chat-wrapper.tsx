@@ -349,8 +349,6 @@ export function ChatWrapper({
         </div>
         <Separator />
         <Chat
-          messages={selectedUser.messages}
-          selectedUser={selectedUser}
           isMobile={isMobile}
         />
       </ResizablePanel>

@@ -51,12 +51,20 @@ export default function ChatBottombar({
   };
 
   const handleThumbsUp = () => {
-    const newMessage: Message = {
-      id: message.length + 1,
-      name: loggedInUserData.name,
-      avatar: loggedInUserData.avatar,
+    const newMessageWS = {
+      type: "message",
+      conversationId: 5,
       message: "👍",
     };
+    sendMessageWS(JSON.stringify(newMessageWS));
+    // @ts-ignore
+    setMessagesWS((prevMessages: IChatMessage[]) => [
+      ...prevMessages,
+      {
+        fromMe: true,
+        message: "👍",
+      },
+    ]);
     setMessage("");
   };
 
@@ -80,7 +88,7 @@ export default function ChatBottombar({
         {
           fromMe: true,
           message: message.trim(),
-        }
+        },
       ]);
       setMessage("");
 

@@ -6,19 +6,24 @@ import { useCurrentUserHook } from "@/hooks/currentUser";
 import {
   dehydrate,
   HydrationBoundary,
-  QueryClient
 } from '@tanstack/react-query'
-export default async function ChatPage() {
+import { useContentMessageHook } from "@/hooks/getContentMessage";
+export default function ChatPage() {
   const layout = cookies().get("react-resizable-panels:layout");
   const collapsed = cookies().get("react-resizable-panels:collapsed");
 
   const defaultLayout = layout ? JSON.parse(layout?.value) : undefined;
   const defaultCollapsed =
     collapsed && collapsed.value ? JSON.parse(collapsed.value) : undefined;
-    const queryClient = new QueryClient()
-    await queryClient.prefetchQuery({
+    const queryClient = getQueryClient()
+    void queryClient.prefetchQuery({
       queryKey: ['user'],
       queryFn: () => useCurrentUserHook(),
+    })
+
+    void queryClient.prefetchQuery({
+      queryKey: ['contentConversationId'],
+      queryFn: () => useContentMessageHook(),
     })
 
   return (

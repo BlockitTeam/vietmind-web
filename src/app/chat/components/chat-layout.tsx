@@ -23,6 +23,7 @@ import { Appointment } from "./appointment";
 import { ChatInformation } from "./chat-information";
 import axiosInstance from "@/config/axios/axiosInstance";
 import { useCurrentUserHook } from "@/hooks/currentUser";
+import { useContentMessageHook } from "@/hooks/getContentMessage";
 
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
@@ -44,7 +45,8 @@ export function ChatLayout({
     appointmentDetailAtom
   );
 
-  const { data: user, error: userError, ...queryUser } = useCurrentUserHook();
+  const { data: user, ...queryUser } = useCurrentUserHook();
+  const { data: contentConversationId, ...queryConversationId } = useContentMessageHook();
 
   return (
     queryUser.isSuccess && (
