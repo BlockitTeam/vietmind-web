@@ -14,18 +14,34 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Message, loggedInUserData } from "../data";
 import { buttonVariants } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
+type INewMessageWS = {
+  type: "message";
+  conversationId: string;
+  message: string;
+};
+
+interface IChatMessage {
+  fromMe: boolean;
+  message: string;
+}
 interface ChatBottombarProps {
-  sendMessage: (newMessage: Message) => void;
   isMobile: boolean;
+  sendMessageWS: (newMessageWS: string) => void;
+  setMessagesWS: (newMessage: IChatMessage[]) => void;
 }
 
 export const BottombarIcons = [{ icon: FileImage }, { icon: Paperclip }];
 
 export default function ChatBottombar({
-  sendMessage,
   isMobile,
+  sendMessageWS,
+  setMessagesWS,
 }: ChatBottombarProps) {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -41,7 +57,6 @@ export default function ChatBottombar({
       avatar: loggedInUserData.avatar,
       message: "👍",
     };
-    sendMessage(newMessage);
     setMessage("");
   };
 
@@ -53,7 +68,20 @@ export default function ChatBottombar({
         avatar: loggedInUserData.avatar,
         message: message.trim(),
       };
-      sendMessage(newMessage);
+      const newMessageWS = {
+        type: "message",
+        conversationId: 5,
+        message: message.trim(),
+      };
+      sendMessageWS(JSON.stringify(newMessageWS));
+      // @ts-ignore
+      setMessagesWS((prevMessages: IChatMessage[]) => [
+        ...prevMessages,
+        {
+          fromMe: true,
+          message: message.trim(),
+        }
+      ]);
       setMessage("");
 
       if (inputRef.current) {

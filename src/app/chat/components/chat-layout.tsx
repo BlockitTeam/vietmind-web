@@ -390,8 +390,6 @@ export function ChatLayout({
           </div>
           <Separator />
           <Chat
-            messages={selectedUser.messages}
-            selectedUser={selectedUser}
             isMobile={isMobile}
           />
         </ResizablePanel>
