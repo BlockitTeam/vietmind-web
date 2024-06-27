@@ -5,6 +5,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import ChatBottombar from "./chat-bottombar";
 import useWebSocket, { ReadyState } from "react-use-websocket";
+import NodeRSA from "node-rsa";
+import CryptoJS from "crypto-js";
+import { useAtom } from "jotai";
+import { aesKeyAtom, privateKeyAtom, publicKeyAtom } from "@/lib/jotai";
+import axiosInstance from "@/config/axios/axiosInstance";
+import { JSEncrypt } from "jsencrypt";
+import { useGetEASHook } from "@/hooks/getContentMessage";
 
 interface ChatListProps {
   isMobile: boolean;
@@ -15,11 +22,15 @@ interface IChatMessage {
   message: string;
 }
 
-export function ChatList({
-  isMobile,
-}: ChatListProps) {
+export function ChatList({ isMobile }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [messagesWS, setMessagesWS] = useState<IChatMessage[]>([]);
+  const [privateKey, setPrivateKey] = useState<string | null>("");
+  const [privateKeyAtomStorage, setPrivateKeyAtom] = useAtom(privateKeyAtom);
+  const [publicKeyAtomStorage, setPublicKeyAtom] = useAtom(publicKeyAtom);
+  const [aesKey, setAesKey] = useAtom(aesKeyAtom);
+
+  const getAES = useGetEASHook("5");
 
   const {
     sendMessage: sendMessageWS,
@@ -27,10 +38,80 @@ export function ChatList({
     readyState,
   } = useWebSocket("ws://localhost:9001/ws", {
     onOpen: () => console.log("WebSocket connection established"),
+    onMessage: (message) => {
+      if (aesKey) {
+        const decryptedMessage = CryptoJS.AES.decrypt(
+          message.data,
+          aesKey
+        ).toString(CryptoJS.enc.Utf8);
+        setMessagesWS((prevMessages) => [
+          ...prevMessages,
+          {
+            fromMe: false,
+            message: decryptedMessage,
+          },
+        ]);
+      }
+    },
     queryParams: {
       targetUserId: "a7d40ae2-3387-43d3-87dc-030b12adff47",
     },
   });
+
+  React.useEffect(() => {
+    // Generate RSA keys
+    const encrypt = new JSEncrypt({ default_key_size: "512" });
+
+    // Generate key pair
+    encrypt.getKey();
+
+    // Get private and public keys
+    const privateKey = encrypt.getPrivateKeyB64();
+    console.log("🚀 ~ React.useEffect ~ privateKey:", privateKey);
+    const publicKey = encrypt.getPublicKeyB64();
+    console.log("🚀 ~ React.useEffect ~ publicKey:", publicKey);
+    setPrivateKeyAtom(privateKey);
+    setPrivateKey(privateKey);
+
+    // const fetchData = async () => {
+    //   const data = {
+    //     publicKey,
+    //     id: 2
+    //   };
+    //   try {
+    //     const response = await fetch('api/conversation', {
+    //       method: 'POST',
+    //       credentials: 'include',
+    //       body: JSON.stringify(data)
+    //     });
+    //     if (!response.ok) {
+    //       throw new Error('Network response was not ok');
+    //     }
+    //     const result = await response.json();
+    //     console.log("🚀 ~ fetchData ~ result:", result)
+    //   } catch (error) {
+    //     console.log(error)
+    //   } finally {
+    //     console.log('heelo');
+    //   }
+    // };
+
+    // fetchData();
+
+    getAES.mutate(publicKey, {
+      onSuccess: async (resp) => {
+        if (resp.statusCode === 200) {
+          // aesKeyDecrypted
+          const aesKeyDecrypted = await encrypt.decrypt(resp.data);
+          setAesKey(aesKeyDecrypted);
+        }
+        console.log(resp, "datatata");
+      },
+      onError(error, variables, context) {
+        console.log(error);
+      },
+    });
+  }, []);
 
   React.useEffect(() => {
     if (messagesContainerRef.current) {
@@ -38,19 +119,6 @@ export function ChatList({
         messagesContainerRef.current.scrollHeight;
     }
   }, [messagesWS]);
-
-  React.useEffect(() => {
-    if (lastMessage !== null) {
-      const { type, key, message, encrypted } = JSON.parse(lastMessage.data);
-      setMessagesWS((prevMessages) => [
-        ...prevMessages,
-        {
-          fromMe: false,
-          message,
-        },
-      ]);
-    }
-  }, [lastMessage]);
 
   return (
     <div className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col">

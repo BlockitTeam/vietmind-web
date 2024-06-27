@@ -19,6 +19,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { aesKeyAtom, privateKeyAtom, publicKeyAtom } from "@/lib/jotai";
+import { useAtom } from "jotai";
+import CryptoJS from 'crypto-js';
 
 type INewMessageWS = {
   type: "message";
@@ -45,41 +48,24 @@ export default function ChatBottombar({
 }: ChatBottombarProps) {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [privateKeyAtomStorage, setPrivateKeyAtom] = useAtom(privateKeyAtom);
+  const [publicKeyAtomStorage, setPublicKeyAtom] = useAtom(publicKeyAtom);
+  const [aesKey, setAesKey] = useAtom(aesKeyAtom);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(event.target.value);
   };
 
   const handleThumbsUp = () => {
-    const newMessageWS = {
-      type: "message",
-      conversationId: 5,
-      message: "👍",
-    };
-    sendMessageWS(JSON.stringify(newMessageWS));
-    // @ts-ignore
-    setMessagesWS((prevMessages: IChatMessage[]) => [
-      ...prevMessages,
-      {
-        fromMe: true,
-        message: "👍",
-      },
-    ]);
-    setMessage("");
-  };
+    if (aesKey) {
+      const encryptedMessage = CryptoJS.AES.encrypt("👍", aesKey, {
+        mode: CryptoJS.mode.ECB
+      }).toString();
 
-  const handleSend = () => {
-    if (message.trim()) {
-      const newMessage: Message = {
-        id: message.length + 1,
-        name: loggedInUserData.name,
-        avatar: loggedInUserData.avatar,
-        message: message.trim(),
-      };
       const newMessageWS = {
         type: "message",
         conversationId: 5,
-        message: message.trim(),
+        message: encryptedMessage,
       };
       sendMessageWS(JSON.stringify(newMessageWS));
       // @ts-ignore
@@ -87,13 +73,38 @@ export default function ChatBottombar({
         ...prevMessages,
         {
           fromMe: true,
-          message: message.trim(),
+          message: "👍",
         },
       ]);
       setMessage("");
+    }
+  };
 
-      if (inputRef.current) {
-        inputRef.current.focus();
+  const handleSend = () => {
+    if (message.trim()) {
+      if (aesKey) {
+        const encryptedMessage = CryptoJS.AES.encrypt(message.trim(), aesKey, {
+          mode: CryptoJS.mode.ECB
+        }).toString();
+        const newMessageWS = {
+          type: "message",
+          conversationId: 5,
+          message: encryptedMessage,
+        };
+        sendMessageWS(JSON.stringify(newMessageWS));
+        // @ts-ignore
+        setMessagesWS((prevMessages: IChatMessage[]) => [
+          ...prevMessages,
+          {
+            fromMe: true,
+            message: message.trim(),
+          },
+        ]);
+        setMessage("");
+
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
       }
     }
   };
