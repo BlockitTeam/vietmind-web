@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/popover";
 import { aesKeyAtom, privateKeyAtom, publicKeyAtom } from "@/lib/jotai";
 import { useAtom } from "jotai";
-import CryptoJS from 'crypto-js';
+import CryptoJS from "crypto-js";
 
 type INewMessageWS = {
   type: "message";
@@ -52,20 +52,26 @@ export default function ChatBottombar({
   const [publicKeyAtomStorage, setPublicKeyAtom] = useAtom(publicKeyAtom);
   const [aesKey, setAesKey] = useAtom(aesKeyAtom);
 
+  const encryptMessage = (m: string): string => {
+    if (aesKey) {
+      let messEn = CryptoJS.AES.encrypt(m, aesKey, {
+        mode: CryptoJS.mode.ECB,
+      }).toString();
+      return messEn;
+    }
+    throw "Error";
+  };
+
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(event.target.value);
   };
 
   const handleThumbsUp = () => {
     if (aesKey) {
-      const encryptedMessage = CryptoJS.AES.encrypt("👍", aesKey, {
-        mode: CryptoJS.mode.ECB
-      }).toString();
-
       const newMessageWS = {
         type: "message",
         conversationId: 5,
-        message: encryptedMessage,
+        message: encryptMessage("👍"),
       };
       sendMessageWS(JSON.stringify(newMessageWS));
       // @ts-ignore
@@ -83,13 +89,10 @@ export default function ChatBottombar({
   const handleSend = () => {
     if (message.trim()) {
       if (aesKey) {
-        const encryptedMessage = CryptoJS.AES.encrypt(message.trim(), aesKey, {
-          mode: CryptoJS.mode.ECB
-        }).toString();
         const newMessageWS = {
           type: "message",
-          conversationId: 5,
-          message: encryptedMessage,
+          conversationId: 1,
+          message: encryptMessage(message.trim()),
         };
         sendMessageWS(JSON.stringify(newMessageWS));
         // @ts-ignore

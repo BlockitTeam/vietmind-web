@@ -30,8 +30,7 @@ export const appointmentDetailAtom = atom<TAppointmentDetail>({
 export const sessionAtom = atom<string | null>(null);
 export const privateKeyAtom = atom<string | null>(null);
 export const publicKeyAtom = atom<string | null>(null);
-export const aesKeyAtom = atom<string | false>('');
-
+export const aesKeyAtom = atom<CryptoJS.lib.WordArray | null>(null);
 
 export type TCurrentUser = {
   birthYear: number;

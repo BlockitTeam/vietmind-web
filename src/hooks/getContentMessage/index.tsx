@@ -9,18 +9,17 @@ export const useContentMessageHook = (conversationId?: string) => {
   });
 };
 
-
 export const useGetEASHook = (conversationId?: string) => {
-  const url = "api/v1/conversation/encrypt-key/2/encrypt-key-v2";
+  const url = "api/v1/conversation/1/encrypt-key";
   return useMutation({
     mutationKey: ["getAES"],
     mutationFn: (publicKey: string) => {
       return mutationPost<IResponse<string>>({
         url,
         body: {
-          publicKey
-        }
-      })
-    }
-  })
+          publicKey,
+        },
+      });
+    },
+  });
 };
