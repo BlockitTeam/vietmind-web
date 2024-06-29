@@ -24,6 +24,9 @@ import { ChatInformation } from "./chat-information";
 import axiosInstance from "@/config/axios/axiosInstance";
 import { useCurrentUserHook } from "@/hooks/currentUser";
 import { useContentMessageHook } from "@/hooks/getContentMessage";
+import { useGetConversation } from "@/hooks/conversation";
+import CryptoJS from "crypto-js";
+import { JSEncrypt } from "jsencrypt";
 
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
@@ -35,7 +38,6 @@ export function ChatLayout({
   defaultCollapsed = false,
   navCollapsedSize,
 }: ChatLayoutProps) {
-
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
   const [selectedUser, setSelectedUser] = React.useState(userData[0]);
   const [isMobile, setIsMobile] = useState(false);
@@ -45,8 +47,27 @@ export function ChatLayout({
     appointmentDetailAtom
   );
 
+  const decryptMessage = (m: string, key: string) => {
+    if (key) {
+
+      if (typeof key === "string") {
+        const decodedKey: any = CryptoJS.enc.Base64.parse(key);
+        const messDecrypt = CryptoJS.AES.decrypt(m, decodedKey, {
+          mode: CryptoJS.mode.ECB,
+        }).toString(CryptoJS.enc.Utf8);
+
+        return messDecrypt;
+      }
+      return "11111";
+    } else {
+      return "Error";
+    }
+  };
+
   const { data: user, ...queryUser } = useCurrentUserHook();
-  const { data: contentConversationId, ...queryConversationId } = useContentMessageHook();
+  const { data: contentConversationId, ...queryConversationId } =
+    useContentMessageHook();
+  const { data: conversations, ...queryConversation } = useGetConversation();
 
   return (
     queryUser.isSuccess && (
@@ -118,29 +139,42 @@ export function ChatLayout({
             <div className="m-2 mt-6">
               {tab === "chat" && (
                 <>
-                  <div className="flex items-center mt-3 justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                      >
-                        VT
-                      </Button>
-                      <div className="cursor-pointer">
-                        <p className="text-sm text-neutral-primary">
-                          Việt Trinh
-                        </p>
-                        <p className="text-sm text-neutral-ternary">
-                          Bắt đầu kết nối
-                        </p>
-                      </div>
-                    </div>
-                    <div className="items-center">
-                      <p className="text-sm text-neutral-ternary">08/12</p>
-                      <p></p>
-                    </div>
-                  </div>
-                  <div className="flex items-center mt-3 justify-between">
+                  {queryConversation.isSuccess &&
+                    conversations?.data.map(
+                      (conversation: any, index: number) => {
+                        return (
+                          <div
+                            className="flex items-center mt-3 justify-between"
+                            key={index}
+                          >
+                            <div className="flex justify-center items-center gap-2">
+                              <Button
+                                variant="outline"
+                                className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                              >
+                                NT
+                              </Button>
+                              <div className="cursor-pointer">
+                                <p className="text-sm text-neutral-primary">
+                                  {conversation?.senderFullName}
+                                </p>
+                                <p className="text-sm text-neutral-ternary">
+                                 {
+                                  decryptMessage(conversation?.lastMessage?.encryptedMessage, conversation?.conversation?.conversationKey)
+                                 }
+                                </p>
+                              </div>
+                            </div>
+                            <div className="items-center">
+                              {/* <p className="text-sm text-neutral-ternary">{conversation?.lastMessage.createdAt}</p> */}
+                              <p></p>
+                            </div>
+                          </div>
+                        );
+                      }
+                    )}
+
+                  {/* <div className="flex items-center mt-3 justify-between">
                     <div className="flex justify-center items-center gap-2">
                       <Button
                         variant="outline"
@@ -189,7 +223,7 @@ export function ChatLayout({
                       </p>
                       <p></p>
                     </div>
-                  </div>
+                  </div> */}
                 </>
               )}
 
@@ -391,9 +425,7 @@ export function ChatLayout({
             </div>
           </div>
           <Separator />
-          <Chat
-            isMobile={isMobile}
-          />
+          <Chat isMobile={isMobile} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={defaultLayout[2]}>
