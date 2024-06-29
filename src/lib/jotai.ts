@@ -31,6 +31,9 @@ export const sessionAtom = atom<string | null>(null);
 export const privateKeyAtom = atom<string | null>(null);
 export const publicKeyAtom = atom<string | null>(null);
 export const aesKeyAtom = atom<CryptoJS.lib.WordArray | null>(null);
+export const conversationIdAtom = atom<number>(0);
+export const conversationIdContentAtom = atom([]);
+export const userIdTargetUserAtom = atom<string | number>('');
 
 export type TCurrentUser = {
   birthYear: number;

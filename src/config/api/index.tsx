@@ -40,8 +40,6 @@ export async function getDataWithParams<T, P>(
 
 export async function mutationPost<T>(obj: IMutation<object>): Promise<T> {
   const { url, body } = obj;
-  console.log("🚀 ~ body:", JSON.stringify(body));
-
   return await axiosInstance.post(url, body).then((response) => {
     return {
       data: response.data,

@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar, PlusCircleIcon, Search } from "lucide-react";
 import { Chat } from "@/app/chat/components/chat";
-import { appointmentAtom, appointmentDetailAtom } from "@/lib/jotai";
+import { appointmentAtom, appointmentDetailAtom, conversationIdAtom, conversationIdContentAtom, userIdTargetUserAtom } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { Form, useForm } from "react-hook-form";
@@ -47,6 +47,11 @@ export function ChatLayout({
     appointmentDetailAtom
   );
 
+  const [senderFullName, setSenderFullName] = useState('');
+  const [conversationId, setConversationId] = useAtom(conversationIdAtom);
+  const [conversationIdContent, setConversationIdContentAtom] = useAtom(conversationIdContentAtom);
+  const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
+
   const decryptMessage = (m: string, key: string) => {
     if (key) {
 
@@ -66,8 +71,22 @@ export function ChatLayout({
 
   const { data: user, ...queryUser } = useCurrentUserHook();
   const { data: contentConversationId, ...queryConversationId } =
-    useContentMessageHook();
+    useContentMessageHook(conversationId);
   const { data: conversations, ...queryConversation } = useGetConversation();
+
+
+  useEffect(() => {
+    if (queryConversationId.isSuccess) {
+      console.log(contentConversationId?.data, 'contentConversationId?.data)')
+      setConversationIdContentAtom(contentConversationId?.data);
+    }
+
+  }, [contentConversationId])
+
+  useEffect(() => {
+    queryConversationId.refetch();
+  }, [conversationId])
+
 
   return (
     queryUser.isSuccess && (
@@ -146,6 +165,11 @@ export function ChatLayout({
                           <div
                             className="flex items-center mt-3 justify-between"
                             key={index}
+                            onClick={() => {
+                              setSenderFullName(conversation?.senderFullName);
+                              setConversationId(conversation?.conversation?.conversationId)
+                              setUserIdTargetUser(conversation?.conversation?.userId)
+                            }}
                           >
                             <div className="flex justify-center items-center gap-2">
                               <Button
@@ -417,7 +441,7 @@ export function ChatLayout({
                 VT
               </Button>
               <p className="text-md font-bold text-neutral-primary">
-                Việt Trinh
+                {senderFullName && senderFullName}
               </p>
             </div>
             <div>
@@ -425,7 +449,7 @@ export function ChatLayout({
             </div>
           </div>
           <Separator />
-          <Chat isMobile={isMobile} />
+          <Chat isMobile={isMobile} refetchConversation={queryConversation.refetch} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={defaultLayout[2]}>

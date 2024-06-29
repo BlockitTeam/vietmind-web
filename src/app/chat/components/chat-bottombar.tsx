@@ -8,7 +8,7 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import Link from "next/link";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Message, loggedInUserData } from "../data";
@@ -19,7 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { aesKeyAtom, privateKeyAtom, publicKeyAtom } from "@/lib/jotai";
+import { aesKeyAtom, conversationIdAtom, privateKeyAtom, publicKeyAtom } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import CryptoJS from "crypto-js";
 
@@ -51,6 +51,7 @@ export default function ChatBottombar({
   const [privateKeyAtomStorage, setPrivateKeyAtom] = useAtom(privateKeyAtom);
   const [publicKeyAtomStorage, setPublicKeyAtom] = useAtom(publicKeyAtom);
   const [aesKey, setAesKey] = useAtom(aesKeyAtom);
+  const [conversationId, setConversationId] = useAtom(conversationIdAtom);
 
   const encryptMessage = (m: string): string => {
     if (aesKey) {
@@ -70,7 +71,7 @@ export default function ChatBottombar({
     if (aesKey) {
       const newMessageWS = {
         type: "message",
-        conversationId: 5,
+        conversationId: conversationId,
         message: encryptMessage("👍"),
       };
       sendMessageWS(JSON.stringify(newMessageWS));
@@ -87,11 +88,12 @@ export default function ChatBottombar({
   };
 
   const handleSend = () => {
+    console.log('conversationId', conversationId)
     if (message.trim()) {
       if (aesKey) {
         const newMessageWS = {
           type: "message",
-          conversationId: 1,
+          conversationId: conversationId,
           message: encryptMessage(message.trim()),
         };
         sendMessageWS(JSON.stringify(newMessageWS));
@@ -123,6 +125,10 @@ export default function ChatBottombar({
       setMessage((prev) => prev + "\n");
     }
   };
+
+  useEffect(() => {
+
+  }, [conversationId])
 
   return (
     <div className="p-2 flex justify-between w-full items-center gap-2 mb-16">

@@ -348,9 +348,9 @@ export function ChatWrapper({
           </div>
         </div>
         <Separator />
-        <Chat
+        {/* <Chat
           isMobile={isMobile}
-        />
+        /> */}
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={defaultLayout[2]}>

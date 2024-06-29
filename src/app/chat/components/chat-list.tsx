@@ -1,6 +1,6 @@
 import { Message, UserData } from "../data";
 import { cn } from "@/lib/utils";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import ChatBottombar from "./chat-bottombar";
@@ -8,13 +8,14 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import NodeRSA from "node-rsa";
 import CryptoJS from "crypto-js";
 import { useAtom } from "jotai";
-import { aesKeyAtom, privateKeyAtom, publicKeyAtom } from "@/lib/jotai";
+import { aesKeyAtom, conversationIdAtom, conversationIdContentAtom, privateKeyAtom, publicKeyAtom, userIdTargetUserAtom } from "@/lib/jotai";
 import axiosInstance from "@/config/axios/axiosInstance";
 import { JSEncrypt } from "jsencrypt";
 import { useGetEASHook } from "@/hooks/getContentMessage";
 
 interface ChatListProps {
   isMobile: boolean;
+  refetchConversation: () => void;
 }
 
 interface IChatMessage {
@@ -22,15 +23,24 @@ interface IChatMessage {
   message: string;
 }
 
-export function ChatList({ isMobile }: ChatListProps) {
+export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [messagesWS, setMessagesWS] = useState<IChatMessage[]>([]);
   const [privateKey, setPrivateKey] = useState<string | null>("");
+  const [publicKey, setPublicKey] = useState<string>("");
   const [privateKeyAtomStorage, setPrivateKeyAtom] = useAtom(privateKeyAtom);
   const [publicKeyAtomStorage, setPublicKeyAtom] = useAtom(publicKeyAtom);
   const [aesKey, setAesKey] = useAtom(aesKeyAtom);
+  const [conversationIdContent, setConversationIdContentAtom] = useAtom(conversationIdContentAtom);
+  const [conversationId, setConversationId] = useAtom(conversationIdAtom);
+  const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
 
-  const getAES = useGetEASHook("5");
+
+  useEffect(() => {
+    console.log(userIdTargetUser, '11')
+  }, [userIdTargetUser])
+
+  const getAES = useGetEASHook(conversationId);
 
   const decryptMessage = (m: string): string => {
     if (aesKey) {
@@ -54,6 +64,7 @@ export function ChatList({ isMobile }: ChatListProps) {
       if (aesKey) {
         const data = JSON.parse(message.data);
         if (data?.message) {
+          refetchConversation()
           setMessagesWS((prevMessages) => [
             ...prevMessages,
             {
@@ -65,7 +76,7 @@ export function ChatList({ isMobile }: ChatListProps) {
       }
     },
     queryParams: {
-      targetUserId: "a7d40ae2-3387-43d3-87dc-030b12adff47",
+      targetUserId: '07f63455-2831-4cb8-96b1-3f38185415ce',
     },
   });
 
@@ -81,15 +92,34 @@ export function ChatList({ isMobile }: ChatListProps) {
     const publicKey = JSEncryptLib.getPublicKeyB64();
     setPrivateKeyAtom(privateKey);
     setPrivateKey(privateKey);
+    setPublicKey(publicKey);
 
     getAES.mutate(publicKey, {
       onSuccess: async (resp) => {
+        setMessagesWS([]);
         if (resp.statusCode === 200) {
           const aesKeyDecrypted = await JSEncryptLib.decrypt(resp.data);
-
           if (typeof aesKeyDecrypted === "string") {
             const decodedKey: any = CryptoJS.enc.Base64.parse(aesKeyDecrypted);
+            console.log("🚀 ~ onSuccess: ~ decodedKey:", decodedKey)
             setAesKey(decodedKey);
+            if (conversationIdContent.length > 0 && decodedKey) {
+              const decryptMessageID = (m: string): string => {
+                  const messDecrypt = CryptoJS.AES.decrypt(m, decodedKey, {
+                    mode: CryptoJS.mode.ECB,
+                  }).toString(CryptoJS.enc.Utf8);
+                  return messDecrypt;
+              };
+              conversationIdContent.map((message: any) => {
+                setMessagesWS((prevMessages) => [
+                  ...prevMessages,
+                  {
+                    fromMe: false,
+                    message: decryptMessageID(message.encryptedMessage),
+                  },
+                ]);
+              })
+            }
             return;
           }
           setAesKey(null);
@@ -99,7 +129,9 @@ export function ChatList({ isMobile }: ChatListProps) {
         console.log(error);
       },
     });
-  }, []);
+
+  }, [conversationId]);
+
 
   React.useLayoutEffect(() => {
     if (messagesContainerRef.current) {
