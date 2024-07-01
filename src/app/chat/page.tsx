@@ -7,8 +7,11 @@ import {
   dehydrate,
   HydrationBoundary,
 } from '@tanstack/react-query';
-import { useContentMessageHook } from "@/hooks/getContentMessage";
+import { fetchContentMessage, useContentMessageHook } from "@/hooks/getContentMessage";
 import { useGetConversation } from "@/hooks/conversation";
+import { Suspense } from "react";
+
+
 export default function ChatPage() {
   const layout = cookies().get("react-resizable-panels:layout");
   const collapsed = cookies().get("react-resizable-panels:collapsed");
@@ -23,8 +26,8 @@ export default function ChatPage() {
     })
 
     void queryClient.prefetchQuery({
-      queryKey: ['contentConversationId'],
-      queryFn: () => useContentMessageHook(),
+      queryKey: ['contentConversationId', 1],
+      queryFn: () => fetchContentMessage(1),
     })
 
     void queryClient.prefetchQuery({

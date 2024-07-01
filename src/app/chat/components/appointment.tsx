@@ -27,7 +27,6 @@ export function Appointment() {
   });
 
   const onSubmit = (data: any) => {
-    console.log("🚀 ~ onSubmit ~ data:", data);
     setAppointmentDetail({
       status: "waitingForAccept",
       data,

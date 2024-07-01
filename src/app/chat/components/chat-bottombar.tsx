@@ -19,9 +19,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { aesKeyAtom, conversationIdAtom, privateKeyAtom, publicKeyAtom } from "@/lib/jotai";
+import { aesKeyAtom, conversationIdAtom, privateKeyAtom, publicKeyAtom, userIdTargetUserAtom } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import CryptoJS from "crypto-js";
+import { encryptMessage } from "@/servers/message";
 
 type INewMessageWS = {
   type: "message";
@@ -52,16 +53,7 @@ export default function ChatBottombar({
   const [publicKeyAtomStorage, setPublicKeyAtom] = useAtom(publicKeyAtom);
   const [aesKey, setAesKey] = useAtom(aesKeyAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
-
-  const encryptMessage = (m: string): string => {
-    if (aesKey) {
-      let messEn = CryptoJS.AES.encrypt(m, aesKey, {
-        mode: CryptoJS.mode.ECB,
-      }).toString();
-      return messEn;
-    }
-    throw "Error";
-  };
+  const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(event.target.value);
@@ -72,7 +64,8 @@ export default function ChatBottombar({
       const newMessageWS = {
         type: "message",
         conversationId: conversationId,
-        message: encryptMessage("👍"),
+        message: encryptMessage("👍", aesKey),
+        targetUserId: userIdTargetUser
       };
       sendMessageWS(JSON.stringify(newMessageWS));
       // @ts-ignore
@@ -88,14 +81,15 @@ export default function ChatBottombar({
   };
 
   const handleSend = () => {
-    console.log('conversationId', conversationId)
     if (message.trim()) {
       if (aesKey) {
         const newMessageWS = {
           type: "message",
           conversationId: conversationId,
-          message: encryptMessage(message.trim()),
+          message: encryptMessage(message.trim(), aesKey),
+          targetUserId: userIdTargetUser
         };
+        
         sendMessageWS(JSON.stringify(newMessageWS));
         // @ts-ignore
         setMessagesWS((prevMessages: IChatMessage[]) => [
@@ -132,80 +126,6 @@ export default function ChatBottombar({
 
   return (
     <div className="p-2 flex justify-between w-full items-center gap-2 mb-16">
-      {/* <div className="flex">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Link
-              href="#"
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "icon" }),
-                "h-9 w-9",
-                "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
-              )}
-            >
-              <PlusCircle size={20} className="text-muted-foreground" />
-            </Link>
-          </PopoverTrigger>
-          <PopoverContent side="top" className="w-full p-2">
-            {message.trim() || isMobile ? (
-              <div className="flex gap-2">
-                <Link
-                  href="#"
-                  className={cn(
-                    buttonVariants({ variant: "ghost", size: "icon" }),
-                    "h-9 w-9",
-                    "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
-                  )}
-                >
-                  <Mic size={20} className="text-muted-foreground" />
-                </Link>
-                {BottombarIcons.map((icon, index) => (
-                  <Link
-                    key={index}
-                    href="#"
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      "h-9 w-9",
-                      "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
-                    )}
-                  >
-                    <icon.icon size={20} className="text-muted-foreground" />
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <Link
-                href="#"
-                className={cn(
-                  buttonVariants({ variant: "ghost", size: "icon" }),
-                  "h-9 w-9",
-                  "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
-                )}
-              >
-                <Mic size={20} className="text-muted-foreground" />
-              </Link>
-            )}
-          </PopoverContent>
-        </Popover>
-        {!message.trim() && !isMobile && (
-          <div className="flex">
-            {BottombarIcons.map((icon, index) => (
-              <Link
-                key={index}
-                href="#"
-                className={cn(
-                  buttonVariants({ variant: "ghost", size: "icon" }),
-                  "h-9 w-9",
-                  "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
-                )}
-              >
-                <icon.icon size={20} className="text-muted-foreground" />
-              </Link>
-            ))}
-          </div>
-        )}
-      </div> */}
-
       <AnimatePresence initial={false}>
         <motion.div
           key="input"
@@ -232,16 +152,16 @@ export default function ChatBottombar({
             placeholder="Aa"
             className="w-full border flex items-center h-9 resize-none overflow-hidden bg-background border-regal-green"
           ></Textarea>
-          {/* <div className="absolute right-2 bottom-0.5  ">
-            <EmojiPicker
+          <div className="absolute right-2 bottom-0.5  ">
+            {/* <EmojiPicker
               onChange={(value) => {
                 setMessage(message + value);
                 if (inputRef.current) {
                   inputRef.current.focus();
                 }
               }}
-            />
-          </div> */}
+            /> */}
+          </div>
         </motion.div>
 
         {message.trim() ? (

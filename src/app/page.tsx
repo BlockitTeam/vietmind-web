@@ -61,7 +61,6 @@ export default function Home() {
         "api/v1/auth/login",
         data,
       );
-
       if (response.status === 200) {
         const respUser = await axiosInstance.get('api/v1/user/current-user');
         if (respUser.status === 200) {
@@ -70,7 +69,6 @@ export default function Home() {
           router.push('/chat');
         }
       } else {
-        console.log("Login failed with status code:", response.status);
         toast({
           variant: "destructive",
           title: "Uh oh! Something went wrong.",

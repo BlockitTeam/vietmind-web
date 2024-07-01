@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { userData } from "../data";
 import {
   ResizableHandle,
@@ -11,9 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calendar, PlusCircleIcon, Search } from "lucide-react";
+import { Calendar, Search } from "lucide-react";
 import { Chat } from "@/app/chat/components/chat";
-import { appointmentAtom, appointmentDetailAtom, conversationIdAtom, conversationIdContentAtom, userIdTargetUserAtom } from "@/lib/jotai";
+import { appointmentAtom, appointmentDetailAtom, conversationIdAtom, conversationIdContentAtom, currentUserAtom, userIdTargetUserAtom } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { Form, useForm } from "react-hook-form";
@@ -21,13 +21,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { EndChat } from "./chat-modal-end";
 import { Appointment } from "./appointment";
 import { ChatInformation } from "./chat-information";
-import axiosInstance from "@/config/axios/axiosInstance";
 import { useCurrentUserHook } from "@/hooks/currentUser";
 import { useContentMessageHook } from "@/hooks/getContentMessage";
 import { useGetConversation } from "@/hooks/conversation";
 import CryptoJS from "crypto-js";
-import { JSEncrypt } from "jsencrypt";
-
+import { decryptMessageWithKeyAES } from "@/servers/message";
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
   defaultCollapsed?: boolean;
@@ -43,50 +41,35 @@ export function ChatLayout({
   const [isMobile, setIsMobile] = useState(false);
   const [tab, setTab] = React.useState("chat");
   const [appointment, setAppointment] = useAtom(appointmentAtom);
-  const [appointmentDetail, setAppointmentDetail] = useAtom(
-    appointmentDetailAtom
-  );
+  const [appointmentDetail, setAppointmentDetail] = useAtom(appointmentDetailAtom);
 
   const [senderFullName, setSenderFullName] = useState('');
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
   const [conversationIdContent, setConversationIdContentAtom] = useAtom(conversationIdContentAtom);
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
-
-  const decryptMessage = (m: string, key: string) => {
-    if (key) {
-
-      if (typeof key === "string") {
-        const decodedKey: any = CryptoJS.enc.Base64.parse(key);
-        const messDecrypt = CryptoJS.AES.decrypt(m, decodedKey, {
-          mode: CryptoJS.mode.ECB,
-        }).toString(CryptoJS.enc.Utf8);
-
-        return messDecrypt;
-      }
-      return "11111";
-    } else {
-      return "Error";
-    }
-  };
+  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
 
   const { data: user, ...queryUser } = useCurrentUserHook();
-  const { data: contentConversationId, ...queryConversationId } =
-    useContentMessageHook(conversationId);
+  const { data: contentConversationId, ...queryConversationId } = useContentMessageHook(conversationId);
   const { data: conversations, ...queryConversation } = useGetConversation();
 
+  useEffect(() => {
+    if (queryUser.isSuccess) {
+      setCurrentUser(user?.data);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (queryConversationId.isSuccess) {
-      console.log(contentConversationId?.data, 'contentConversationId?.data)')
       setConversationIdContentAtom(contentConversationId?.data);
     }
-
-  }, [contentConversationId])
+  }, [contentConversationId]);
 
   useEffect(() => {
-    queryConversationId.refetch();
-  }, [conversationId])
-
+    if (conversationId > 0) {
+      queryConversationId.refetch();
+    }
+  }, [conversationId]);
 
   return (
     queryUser.isSuccess && (
@@ -158,7 +141,7 @@ export function ChatLayout({
             <div className="m-2 mt-6">
               {tab === "chat" && (
                 <>
-                  {queryConversation.isSuccess &&
+                  {queryConversation.isSuccess && conversations?.data !== null &&
                     conversations?.data.map(
                       (conversation: any, index: number) => {
                         return (
@@ -184,7 +167,7 @@ export function ChatLayout({
                                 </p>
                                 <p className="text-sm text-neutral-ternary">
                                  {
-                                  decryptMessage(conversation?.lastMessage?.encryptedMessage, conversation?.conversation?.conversationKey)
+                                  decryptMessageWithKeyAES(conversation?.lastMessage?.encryptedMessage, conversation?.conversation?.conversationKey)
                                  }
                                 </p>
                               </div>

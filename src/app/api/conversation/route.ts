@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 export async function POST(req: NextApiRequest, res: NextApiResponse) {
     const {publicKey, id} = req.body;
-    console.log("🚀 ~ POST ~ publicKey:", req.body)
 
   const userRes = await fetch(
     `/api/v1/conversation/${id}/encrypt-key`,

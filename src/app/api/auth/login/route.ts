@@ -12,7 +12,6 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
     body: JSON.stringify({ username, password }),
     credentials: "include"
   });
-  console.log("🚀 ~ POST ~ authRes:", authRes.json())
 
   if (authRes.ok) {
     // Get the Set-Cookie header from the backend response
@@ -21,7 +20,6 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
       // Extract JSESSIONID from the setCookieHeader if necessary
       const jsessionidMatch = setCookieHeader.match(/JSESSIONID=([^;]+);/);
       if (jsessionidMatch) {
-        console.log("🚀 ~ POST ~ jsessionidMatch:", jsessionidMatch)
         const jsessionid = jsessionidMatch[1];
 
         // Set the JSESSIONID cookie in the response to the client
