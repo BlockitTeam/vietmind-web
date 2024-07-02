@@ -17,12 +17,11 @@ import { useLogoutHook } from "@/hooks/logout";
 import Cookies from "universal-cookie";
 import { currentUserAtom } from "@/lib/jotai";
 import { useAtom } from "jotai";
-import { cookies } from "next/headers";
+import { deleteCookie } from 'cookies-next';
 
 export default function HeaderChat() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
-
   const useLogout = useLogoutHook();
 
   return (
@@ -125,6 +124,7 @@ export default function HeaderChat() {
                     console.log("🚀 ~ onSuccess ~ data:", data)
                     if (data.statusCode === 200) {
                       setCurrentUser(null);
+                      deleteCookie('jwt');
                       // Remove the cookie
                       // Redirect to the home page or any other page
                       router.push("/");

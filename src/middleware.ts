@@ -4,8 +4,7 @@ import type { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 
 export function middleware(req: NextRequest) {
-  const JSESSIONID = req.cookies.get('JSESSIONID')?.value;
-  const { pathname, searchParams } = req.nextUrl;
+  const JSESSIONID = req.cookies.get('JSESSIONID');
 
   if (!JSESSIONID) {
     // If there is no JSESSIONID and the user is trying to access a protected route, redirect to login
