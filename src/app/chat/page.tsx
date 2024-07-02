@@ -9,7 +9,6 @@ import {
 } from '@tanstack/react-query';
 import { fetchContentMessage, useContentMessageHook } from "@/hooks/getContentMessage";
 import { useGetConversation } from "@/hooks/conversation";
-import { Suspense } from "react";
 
 
 export default function ChatPage() {
@@ -19,6 +18,7 @@ export default function ChatPage() {
   const defaultLayout = layout ? JSON.parse(layout?.value) : undefined;
   const defaultCollapsed =
     collapsed && collapsed.value ? JSON.parse(collapsed.value) : undefined;
+
     const queryClient = getQueryClient()
     void queryClient.prefetchQuery({
       queryKey: ['user'],
@@ -39,11 +39,11 @@ export default function ChatPage() {
     <div className="hidden z-10 min-w-full w-full h-full flex-col md:flex">
       <HeaderChat />
       <HydrationBoundary state={dehydrate(queryClient)}>
-      <ChatLayout
-        defaultLayout={defaultLayout}
-        defaultCollapsed={defaultCollapsed}
-        navCollapsedSize={4}
-      />
+        <ChatLayout
+          defaultLayout={defaultLayout}
+          defaultCollapsed={defaultCollapsed}
+          navCollapsedSize={4}
+        />
       </HydrationBoundary>
     </div>
   );

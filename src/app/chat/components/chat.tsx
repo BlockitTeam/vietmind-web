@@ -1,6 +1,5 @@
 import { Message, UserData } from "../data";
 import React from "react";
-import ChatTopbar from "./chat-topbar";
 import { ChatList } from "./chat-list";
 
 interface ChatProps {

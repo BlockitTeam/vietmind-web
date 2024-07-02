@@ -34,6 +34,7 @@ export const aesKeyAtom = atom<CryptoJS.lib.WordArray | null>(null);
 export const conversationIdAtom = atom<number>(0);
 export const conversationIdContentAtom = atom([]);
 export const userIdTargetUserAtom = atom<string | number>('');
+export const TypingMessageAtom = atom<boolean>(false);
 
 export type TCurrentUser = {
   birthYear: number;

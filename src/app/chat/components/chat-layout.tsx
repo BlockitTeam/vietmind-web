@@ -37,7 +37,6 @@ export function ChatLayout({
   navCollapsedSize,
 }: ChatLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
-  const [selectedUser, setSelectedUser] = React.useState(userData[0]);
   const [isMobile, setIsMobile] = useState(false);
   const [tab, setTab] = React.useState("chat");
   const [appointment, setAppointment] = useAtom(appointmentAtom);
@@ -141,7 +140,7 @@ export function ChatLayout({
             <div className="m-2 mt-6">
               {tab === "chat" && (
                 <>
-                  {queryConversation.isSuccess && conversations?.data !== null &&
+                  {queryConversation.isSuccess && conversations?.data && Array.isArray(conversations?.data) &&
                     conversations?.data.map(
                       (conversation: any, index: number) => {
                         return (

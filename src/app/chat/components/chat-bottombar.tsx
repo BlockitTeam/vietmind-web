@@ -19,7 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { aesKeyAtom, conversationIdAtom, privateKeyAtom, publicKeyAtom, userIdTargetUserAtom } from "@/lib/jotai";
+import { TypingMessageAtom, aesKeyAtom, conversationIdAtom, privateKeyAtom, publicKeyAtom, userIdTargetUserAtom } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import CryptoJS from "crypto-js";
 import { encryptMessage } from "@/servers/message";
@@ -49,13 +49,32 @@ export default function ChatBottombar({
 }: ChatBottombarProps) {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [loadTyping, setLoadTyping] = useState(false);
   const [privateKeyAtomStorage, setPrivateKeyAtom] = useAtom(privateKeyAtom);
   const [publicKeyAtomStorage, setPublicKeyAtom] = useAtom(publicKeyAtom);
   const [aesKey, setAesKey] = useAtom(aesKeyAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
+  const [typingMessage, setTypingMessage] = useAtom(TypingMessageAtom);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    let newMessageWS = {};
+    if (event.target.value.toString().trim().length) {
+      newMessageWS = {
+        type: "typing",
+        conversationId: conversationId,
+        // message: encryptMessage(message.trim(), aesKey),
+        targetUserId: userIdTargetUser
+      };
+    } else {
+       newMessageWS = {
+        type: "unTyping",
+        conversationId: conversationId,
+        // message: encryptMessage(message.trim(), aesKey),
+        targetUserId: userIdTargetUser
+      };
+    }
+    sendMessageWS(JSON.stringify(newMessageWS));
     setMessage(event.target.value);
   };
 
@@ -89,7 +108,6 @@ export default function ChatBottombar({
           message: encryptMessage(message.trim(), aesKey),
           targetUserId: userIdTargetUser
         };
-        
         sendMessageWS(JSON.stringify(newMessageWS));
         // @ts-ignore
         setMessagesWS((prevMessages: IChatMessage[]) => [
@@ -142,6 +160,13 @@ export default function ChatBottombar({
             },
           }}
         >
+          {
+            typingMessage && (
+              <div className="my-2">
+                <span>Typing...</span>
+              </div>
+            )
+          }
           <Textarea
             autoComplete="off"
             value={message}

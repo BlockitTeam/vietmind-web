@@ -1,10 +1,6 @@
-"use client"
+"use client";
 import Link from "next/link";
-import {
-  CircleUser,
-  Menu,
-  Package2,
-} from "lucide-react";
+import { CircleUser, Menu, Package2 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   DropdownMenu,
@@ -17,8 +13,17 @@ import {
 import { Button } from "./ui/button";
 import axiosInstance from "@/config/axios/axiosInstance";
 import { useRouter } from "next/navigation";
+import { useLogoutHook } from "@/hooks/logout";
+import Cookies from "universal-cookie";
+import { currentUserAtom } from "@/lib/jotai";
+import { useAtom } from "jotai";
+import { cookies } from "next/headers";
+
 export default function HeaderChat() {
   const router = useRouter();
+  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
+
+  const useLogout = useLogoutHook();
 
   return (
     <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 w-screen">
@@ -115,10 +120,22 @@ export default function HeaderChat() {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={async () => {
-                const respUser = await axiosInstance.post("logout");
-                if (respUser.status === 200) {
-                  router.push('/')
-                }
+                useLogout.mutate(undefined, {
+                  onSuccess(data, variables, context) {
+                    console.log("🚀 ~ onSuccess ~ data:", data)
+                    if (data.statusCode === 200) {
+                      setCurrentUser(null);
+                      // Remove the cookie
+                      // Redirect to the home page or any other page
+                      router.push("/");
+                    } else {
+                      console.error("Logout failed");
+                    }
+                  },
+                  onError: (error) => {
+                    console.error("An error occurred:", error);
+                  },
+                });
               }}
             >
               Logout

@@ -9,6 +9,7 @@ import NodeRSA from "node-rsa";
 import CryptoJS from "crypto-js";
 import { useAtom } from "jotai";
 import {
+  TypingMessageAtom,
   aesKeyAtom,
   conversationIdAtom,
   conversationIdContentAtom,
@@ -48,6 +49,7 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
+  const [typingMessage, setTypingMessage] = useAtom(TypingMessageAtom)
 
   const getAES = useGetEASHook(conversationId);
   const {
@@ -59,6 +61,7 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
     onMessage: (message) => {
       if (aesKey) {
         const data = JSON.parse(message.data);
+        data?.type === 'typing' ? setTypingMessage(true) : setTypingMessage(false);
         if (data?.message) {
           refetchConversation();
           setMessagesWS((prevMessages) => [
