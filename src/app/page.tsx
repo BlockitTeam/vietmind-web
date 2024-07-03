@@ -57,25 +57,27 @@ export default function Home() {
     const { username, password } = data;
 
     try {
-      const response = await axiosInstance.post(
-        "api/v1/auth/login",
-        data,
-      );
-      if (response.status === 200) {
-        const respUser = await axiosInstance.get('api/v1/user/current-user');
-        if (respUser.status === 200) {
-          setCurrentUser(respUser.data);
-          setCurrentUserStorage(respUser.data);
-          router.push('/chat');
-        }
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: "There was a problem with your request.",
-          action: <ToastAction altText="Try again">Try again</ToastAction>,
-        });
-      }
+      const response = await axiosInstance.post("/api/v1/auth/test", data);
+      console.log(response);
+      // const response = await axiosInstance.post(
+      //   "api/v1/auth/login",
+      //   data,
+      // );
+      // if (response.status === 200) {
+      //   const respUser = await axiosInstance.get('api/v1/user/current-user');
+      //   if (respUser.status === 200) {
+      //     setCurrentUser(respUser.data);
+      //     setCurrentUserStorage(respUser.data);
+      //     router.push('/chat');
+      //   }
+      // } else {
+      //   toast({
+      //     variant: "destructive",
+      //     title: "Uh oh! Something went wrong.",
+      //     description: "There was a problem with your request.",
+      //     action: <ToastAction altText="Try again">Try again</ToastAction>,
+      //   });
+      // }
     } catch (error) {
       console.error("Error during login:", error);
     } finally {
