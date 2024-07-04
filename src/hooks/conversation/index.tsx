@@ -1,10 +1,15 @@
-import { IResponse, getData, mutationPost } from "@/config/api";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { IResponse, getData } from "@/config/api";
+import { useQuery } from "@tanstack/react-query";
+
+
+export const FetchConversation = () => {
+  const url = `conversation`;
+  return getData<IResponse<any>>(url);
+};
 
 export const useGetConversation = () => {
-  const url = "api/v1/conversation";
   return useQuery<IResponse<any>>({
     queryKey: ["conversation"],
-    queryFn: () => getData<IResponse<any>>(url),
+    queryFn: () => FetchConversation()
   });
 };

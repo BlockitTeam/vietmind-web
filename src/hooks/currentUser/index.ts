@@ -1,11 +1,15 @@
 import { IResponse, getData } from "@/config/api";
 import { useQuery } from "@tanstack/react-query";
-import queryString from "query-string";
+
+export const FetchCurrentUser = () => {
+  const url = `user/current-user`;
+  return getData<IResponse<any>>(url);
+};
 
 export const useCurrentUserHook = () => {
-  const url = "api/v1/user/current-user";
+  const url = "user/current-user";
   return useQuery<IResponse<any>>({
     queryKey: ["user"],
-    queryFn: () => getData<IResponse<any>>(url),
+    queryFn: () => FetchCurrentUser()
   });
 };

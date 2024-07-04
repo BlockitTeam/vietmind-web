@@ -2,13 +2,13 @@ import { cookies } from "next/headers";
 import { ChatLayout } from "./components/chat-layout";
 import HeaderChat from "@/components/headerChat";
 import { getQueryClient } from "@/lib/get-query-client";
-import { useCurrentUserHook } from "@/hooks/currentUser";
+import { FetchCurrentUser } from "@/hooks/currentUser";
 import {
   dehydrate,
   HydrationBoundary,
 } from '@tanstack/react-query';
-import { fetchContentMessage, useContentMessageHook } from "@/hooks/getContentMessage";
-import { useGetConversation } from "@/hooks/conversation";
+import { fetchContentMessage } from "@/hooks/getContentMessage";
+import { FetchConversation } from "@/hooks/conversation";
 
 
 export default function ChatPage() {
@@ -22,7 +22,7 @@ export default function ChatPage() {
     const queryClient = getQueryClient()
     void queryClient.prefetchQuery({
       queryKey: ['user'],
-      queryFn: () => useCurrentUserHook(),
+      queryFn: () => FetchCurrentUser(),
     })
 
     void queryClient.prefetchQuery({
@@ -32,7 +32,7 @@ export default function ChatPage() {
 
     void queryClient.prefetchQuery({
       queryKey: ['conversation'],
-      queryFn: () => useGetConversation(),
+      queryFn: () => FetchConversation(),
     })
 
   return (
