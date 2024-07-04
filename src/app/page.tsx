@@ -58,11 +58,11 @@ export default function Home() {
 
     try {
       const response = await axiosInstance.post(
-        "api/v1/auth/login",
+        "auth/login",
         data,
       );
       if (response.status === 200) {
-        const respUser = await axiosInstance.get('api/v1/user/current-user');
+        const respUser = await axiosInstance.get('user/current-user');
         if (respUser.status === 200) {
           setCurrentUser(respUser.data);
           setCurrentUserStorage(respUser.data);
