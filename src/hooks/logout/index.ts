@@ -2,7 +2,7 @@ import { IResponse, mutationPost } from "@/config/api";
 import { useMutation } from "@tanstack/react-query";
 
 export const useLogoutHook = () => {
-  const url = `api/v1/logout`;
+  const url = `auth/logout`;
   return useMutation({
     mutationKey: ["logout"],
     mutationFn: () => {
