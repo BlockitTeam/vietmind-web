@@ -2,13 +2,13 @@ import { IResponse, getData, mutationPost } from "@/config/api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const FetchContentMessage = (conversationId?: number) => {
-  const url = `api/v1/conversation/${conversationId}/content`;
+  const url = `conversation/${conversationId}/content`;
   return getData<IResponse<any>>(url);
 };
 
 
 export const useContentMessageHook = (conversationId?: number) => {
-  const url = `api/v1/conversation/${conversationId}/content`;
+  const url = `conversation/${conversationId}/content`;
   return useQuery<IResponse<any>>({
     queryKey: ["contentConversationId", conversationId],
     queryFn: () => FetchContentMessage(conversationId),
@@ -17,7 +17,7 @@ export const useContentMessageHook = (conversationId?: number) => {
 };
 
 export const useGetEASHook = (conversationId?: number) => {
-  const url = `api/v1/conversation/${conversationId}/encrypt-key`;
+  const url = `conversation/${conversationId}/encrypt-key`;
   return useMutation({
     mutationKey: ["getAES"],
     mutationFn: (publicKey: string) => {

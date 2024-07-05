@@ -2,14 +2,13 @@ import { cookies } from "next/headers";
 import { ChatLayout } from "./components/chat-layout";
 import HeaderChat from "@/components/headerChat";
 import { getQueryClient } from "@/lib/get-query-client";
-import { FetchCurrentUser } from "@/hooks/currentUser";
+import { FetchCurrentUser, useCurrentUserHook } from "@/hooks/currentUser";
 import {
   dehydrate,
   HydrationBoundary,
 } from '@tanstack/react-query';
 import { FetchContentMessage } from "@/hooks/getContentMessage";
 import { FetchConversation } from "@/hooks/conversation";
-
 
 export default function ChatPage() {
   const layout = cookies().get("react-resizable-panels:layout");
