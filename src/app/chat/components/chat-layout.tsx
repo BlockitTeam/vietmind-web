@@ -179,57 +179,6 @@ export function ChatLayout({
                         );
                       }
                     )}
-
-                  {/* <div className="flex items-center mt-3 justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                      >
-                        HH
-                      </Button>
-                      <div className="cursor-pointer">
-                        <p className="text-sm text-neutral-primary">
-                          Huy Hoang
-                        </p>
-                        <p className="text-sm text-neutral-ternary">
-                          Cháu bị lo âu
-                        </p>
-                      </div>
-                    </div>
-                    <div className="items-center justify-end">
-                      <p className="text-sm text-neutral-ternary">08/12</p>
-                      <p className="text-sm text-neutral-ternary h-[25px] w-[25px] rounded-full bg-regal-green border-regal-green border-2 text-center">
-                        2
-                      </p>
-                      <p></p>
-                    </div>
-                  </div>
-                  <div className="flex items-center mt-3 justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                      >
-                        TTL
-                      </Button>
-                      <div className="cursor-pointer">
-                        <p className="text-sm text-neutral-primary">
-                          Trần Thuỳ Linh
-                        </p>
-                        <p className="text-sm text-neutral-ternary">
-                          Cháu bị trầm cảm
-                        </p>
-                      </div>
-                    </div>
-                    <div className="items-center justify-end">
-                      <p className="text-sm text-neutral-ternary">08/12</p>
-                      <p className="text-sm text-neutral-ternary h-[25px] w-[25px] rounded-full bg-regal-green border-regal-green border-2 text-center">
-                        3
-                      </p>
-                      <p></p>
-                    </div>
-                  </div> */}
                 </>
               )}
 
