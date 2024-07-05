@@ -124,7 +124,7 @@ export default function HeaderChat() {
                     console.log("🚀 ~ onSuccess ~ data:", data)
                     if (data.statusCode === 200) {
                       setCurrentUser(null);
-                      deleteCookie('JSESSIONID', { path: '/chat', domain: 'http://localhost:3000' });
+                      deleteCookie('JSESSIONID', { path: '/chat', domain: 'http://91.108.104.57' });
                       // Remove the cookie
                       // Redirect to the home page or any other page
                       router.push("/");
