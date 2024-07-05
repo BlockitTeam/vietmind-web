@@ -7,7 +7,7 @@ import {
   dehydrate,
   HydrationBoundary,
 } from '@tanstack/react-query';
-import { fetchContentMessage } from "@/hooks/getContentMessage";
+import { FetchContentMessage } from "@/hooks/getContentMessage";
 import { FetchConversation } from "@/hooks/conversation";
 
 
@@ -27,7 +27,7 @@ export default function ChatPage() {
 
     void queryClient.prefetchQuery({
       queryKey: ['contentConversationId', 1],
-      queryFn: () => fetchContentMessage(1),
+      queryFn: () => FetchContentMessage(1),
     })
 
     void queryClient.prefetchQuery({

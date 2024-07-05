@@ -1,7 +1,7 @@
 import { IResponse, getData, mutationPost } from "@/config/api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-export const fetchContentMessage = (conversationId?: number) => {
+export const FetchContentMessage = (conversationId?: number) => {
   const url = `api/v1/conversation/${conversationId}/content`;
   return getData<IResponse<any>>(url);
 };
@@ -11,7 +11,7 @@ export const useContentMessageHook = (conversationId?: number) => {
   const url = `api/v1/conversation/${conversationId}/content`;
   return useQuery<IResponse<any>>({
     queryKey: ["contentConversationId", conversationId],
-    queryFn: () => fetchContentMessage(conversationId),
+    queryFn: () => FetchContentMessage(conversationId),
     enabled: !!conversationId && conversationId > 0, // Only enable the query if conversationId is greater than 0
   });
 };
