@@ -56,7 +56,7 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
     sendMessage: sendMessageWS,
     lastMessage,
     readyState,
-  } = useWebSocket("ws://localhost:9001/ws", {
+  } = useWebSocket(process.env.NEXT_PUBLIC_SOCKET_URL as string, {
     onOpen: () => console.log("WebSocket connection established"),
     onMessage: (message) => {
       if (aesKey) {
