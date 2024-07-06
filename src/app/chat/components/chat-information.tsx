@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { PlusCircleIcon } from "lucide-react";
@@ -8,12 +8,12 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { WatchDetail } from "./watch-detail";
 import { useGetUserBasicHook } from "@/hooks/user";
 import { useGetScreeningTestUserIdHook } from "@/hooks/screeningTest";
-import { useEditor, EditorContent } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import Document from '@tiptap/extension-document'
-import Paragraph from '@tiptap/extension-paragraph'
-import Text from '@tiptap/extension-text'
-import Heading from '@tiptap/extension-heading'
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Document from "@tiptap/extension-document";
+import Paragraph from "@tiptap/extension-paragraph";
+import Text from "@tiptap/extension-text";
+import Heading from "@tiptap/extension-heading";
 
 export function ChatInformation() {
   const [appointmentDetail, setAppointmentDetail] = useAtom(
@@ -23,24 +23,25 @@ export function ChatInformation() {
 
   const { data: userBasic, ...queryUserBasic } =
     useGetUserBasicHook(userIdTargetUser);
-    const { data: screeningTest, ...queryScreeningTest } =
+  const { data: screeningTest, ...queryScreeningTest } =
     useGetScreeningTestUserIdHook(userIdTargetUser);
-    const editor = useEditor({
-      extensions: [
-        Document,
-        Paragraph,
-        Text,
-        Heading.configure({
-          levels: [1, 2, 3],
-        }),
-      ],
-      editorProps: {
-        attributes: {
-          class: 'focus:outline-none',
-        },
+
+  const editor = useEditor({
+    extensions: [
+      Document,
+      Paragraph,
+      Text,
+      Heading.configure({
+        levels: [1, 2, 3],
+      }),
+    ],
+    editorProps: {
+      attributes: {
+        class: "focus:outline-none",
       },
-      content: '<p>Hello World! 🌎️</p>',
-    })
+    },
+    content: "<p>Hello World! 🌎️</p>",
+  });
   return (
     <div className="m-4">
       {appointmentDetail.status !== null && (
@@ -78,58 +79,54 @@ export function ChatInformation() {
         queryUserBasic.isSuccess && (
           <>
             <div className="m-4">
-            <p className="font-bold text-md mb-4">Thông tin người dùng</p>
-            <div className="flex gap-2 flex-col">
-              <div className="flex gap-4">
-                <p className="text-neutral-ternary text-sm">Ngày sinh</p>
-                <p className="text-neutral-primary text-sm font-bold">
-                  {userBasic.data.birthYear}
-                </p>
-              </div>
-              <div className="flex gap-4">
-                <p className="text-neutral-ternary text-sm">Tuổi</p>
-                <p className="text-neutral-primary text-sm font-bold">
-                  {userBasic.data.age}
-                </p>
-              </div>
-              <div className="flex gap-4">
-                <p className="text-neutral-ternary text-sm">Giới tính</p>
-                <p className="text-neutral-primary text-sm font-bold">
-                  {userBasic.data.gender}
-                </p>
+              <p className="font-bold text-md mb-4">Thông tin người dùng</p>
+              <div className="flex gap-2 flex-col">
+                <div className="flex gap-4">
+                  <p className="text-neutral-ternary text-sm">Ngày sinh</p>
+                  <p className="text-neutral-primary text-sm font-bold">
+                    {userBasic.data.birthYear}
+                  </p>
+                </div>
+                <div className="flex gap-4">
+                  <p className="text-neutral-ternary text-sm">Tuổi</p>
+                  <p className="text-neutral-primary text-sm font-bold">
+                    {userBasic.data.age}
+                  </p>
+                </div>
+                <div className="flex gap-4">
+                  <p className="text-neutral-ternary text-sm">Giới tính</p>
+                  <p className="text-neutral-primary text-sm font-bold">
+                    {userBasic.data.gender}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-      <Separator />
+            <Separator />
           </>
-
         )}
 
-      <div className="m-4">
-        <div className="flex justify-between cursor-pointer ">
-          <p className="font-bold text-md mb-4">Kết quả sàng lọc</p>
-          {/* <WatchDetail /> */}
-        </div>
-        <div className="flex gap-2 flex-col">
-          <div className="flex gap-4">
-            <p className="text-neutral-ternary text-sm">Stress:</p>
-            <p className="text-neutral-primary text-sm">5/10</p>
-          </div>
-          <div className="flex gap-4">
-            <p className="text-neutral-ternary text-sm">Lo âu:</p>
-            <p className="text-neutral-primary text-sm">6/10</p>
-          </div>
-          <div className="flex gap-4">
-            <p className="text-neutral-ternary text-sm">Trầm cảm:</p>
-            <p className="text-neutral-primary text-sm ">7/10</p>
-          </div>
-          <div className="flex gap-4">
-            <p className="text-neutral-ternary text-sm">Tự hại:</p>
-            <p className="text-neutral-primary text-sm ">2/10</p>
-          </div>
-        </div>
-      </div>
-      <Separator />
+      {userIdTargetUser &&
+        screeningTest !== undefined &&
+        queryScreeningTest.isSuccess && (
+          <>
+            <div className="m-4">
+              <div className="flex justify-between cursor-pointer ">
+                <p className="font-bold text-md mb-4">Kết quả sàng lọc</p>
+                {/* <WatchDetail /> */}
+              </div>
+              <div className="flex gap-2 flex-col">
+                {Object.entries(screeningTest.data).map(([key, value]) => (
+                  <div className="flex gap-4">
+                    <p className="text-neutral-ternary text-sm">{key}:</p>
+                    <p className="text-neutral-primary text-sm ">{value as any}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <Separator />
+          </>
+        )}
+
       <div className="m-4">
         <div className="flex justify-between items-center cursor-pointer">
           <p className="font-bold text-lg mb-4">Ghi chú</p>
@@ -152,7 +149,7 @@ export function ChatInformation() {
             </ul>
           </div>
           <div className="border-spacing-2 border-l-yellow-300 border p-2 rounded-md	">
-          <EditorContent editor={editor} style={{padding: '10px'}} />
+            <EditorContent editor={editor} style={{ padding: "10px" }} />
           </div>
           <Button variant={"outline"} className="border-regal-green mt-4">
             <PlusCircleIcon size={15} className="mr-2" /> Thêm ghi chú

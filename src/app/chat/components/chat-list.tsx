@@ -59,11 +59,12 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
   } = useWebSocket(process.env.NEXT_PUBLIC_SOCKET_URL as string, {
     onOpen: () => console.log("WebSocket connection established"),
     onMessage: (message) => {
+      const data = JSON.parse(message.data);
+      console.log(data, 'data')
+
       if (aesKey) {
-        const data = JSON.parse(message.data);
         data?.type === 'typing' ? setTypingMessage(true) : setTypingMessage(false);
         if (data?.message) {
-          refetchConversation();
           setMessagesWS((prevMessages) => [
             ...prevMessages,
             {
@@ -72,6 +73,9 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
             },
           ]);
         }
+      }
+      if (data?.type == 'message') {
+        refetchConversation();
       }
     },
     queryParams: {
