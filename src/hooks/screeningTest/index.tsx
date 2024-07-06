@@ -8,7 +8,7 @@ export const fetchScreeningTestUserId = (id: string | number) => {
 
 export const useGetScreeningTestUserIdHook = (id: string | number) => {
   return useQuery<IResponse<any>>({
-    queryKey: ["screening-testUserId"],
+    queryKey: ["screening-testUserId", id],
     queryFn: () => fetchScreeningTestUserId(id),
     enabled: !!id
   });
