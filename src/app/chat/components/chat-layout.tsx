@@ -143,9 +143,14 @@ export function ChatLayout({
                   {queryConversation.isSuccess && conversations?.data && Array.isArray(conversations?.data) &&
                     conversations?.data.map(
                       (conversation: any, index: number) => {
+                        const isActive = conversation?.conversation?.conversationId === conversationId;
+
                         return (
                           <div
-                            className="flex items-center mt-3 justify-between"
+                          className={cn(
+                            "flex items-center mt-2 justify-between cursor-pointer p-2",
+                            isActive && "bg-[#E0E9ED] text-white"
+                          )}
                             key={index}
                             onClick={() => {
                               setSenderFullName(conversation?.senderFullName);
