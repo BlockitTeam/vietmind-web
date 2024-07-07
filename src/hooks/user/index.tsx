@@ -8,7 +8,7 @@ export const fetchBasicUser = (id: string | number) => {
 
 export const useGetUserBasicHook = (id: string | number) => {
   return useQuery<IResponse<any>>({
-    queryKey: ["user-basic"],
+    queryKey: ["user-basic", id],
     queryFn: () => fetchBasicUser(id),
     enabled: !!id
   });
