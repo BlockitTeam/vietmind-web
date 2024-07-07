@@ -164,7 +164,7 @@ export function ChatLayout({
                                 <p className="text-sm text-neutral-primary">
                                   {conversation?.senderFullName}
                                 </p>
-                                <p className="text-sm text-neutral-ternary">
+                                <p className="text-sm text-neutral-ternary whitespace-nowrap w-3">
                                  {
                                   decryptMessageWithKeyAES(conversation?.lastMessage?.encryptedMessage, conversation?.conversation?.conversationKey)
                                  }
