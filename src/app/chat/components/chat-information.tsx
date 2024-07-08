@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { PlusCircleIcon } from "lucide-react";
 import { useAtom } from "jotai";
-import { appointmentDetailAtom, userIdTargetUserAtom } from "@/lib/jotai";
+import { appointmentDetailAtom, conversationIdAtom, userIdTargetUserAtom } from "@/lib/jotai";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { WatchDetail } from "./watch-detail";
 import { useGetUserBasicHook } from "@/hooks/user";
@@ -14,17 +14,22 @@ import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import Heading from "@tiptap/extension-heading";
+import { useAppointmentIdHook } from "@/hooks/appointment";
 
 export function ChatInformation() {
   const [appointmentDetail, setAppointmentDetail] = useAtom(
     appointmentDetailAtom
   );
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
+  const [conversationId, setConversationId] = useAtom(conversationIdAtom);
 
   const { data: userBasic, ...queryUserBasic } =
     useGetUserBasicHook(userIdTargetUser);
   const { data: screeningTest, ...queryScreeningTest } =
     useGetScreeningTestUserIdHook(userIdTargetUser);
+
+    const {data: appointments, ...queryAppointment} = useAppointmentIdHook(conversationId);
+    console.log("🚀 ~ ChatInformation ~ appointments:", appointments)
 
   const editor = useEditor({
     extensions: [

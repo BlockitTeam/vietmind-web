@@ -84,7 +84,7 @@ export function ChatLayout({
         <ResizablePanel
           defaultSize={defaultLayout[0]}
           collapsedSize={navCollapsedSize}
-          collapsible={true}
+          collapsible={false}
           minSize={15}
           maxSize={20}
           onCollapse={(collapsed?: any) => {
@@ -365,7 +365,7 @@ export function ChatLayout({
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={defaultLayout[1]}>
+        <ResizablePanel defaultSize={defaultLayout[1]} collapsible={false}>
           <div
             className={cn(
               "flex h-[56px] items-center justify-between",
@@ -388,7 +388,8 @@ export function ChatLayout({
           <Chat isMobile={isMobile} refetchConversation={queryConversation.refetch} />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={defaultLayout[2]}>
+        <ResizablePanel defaultSize={defaultLayout[2]} collapsible={false} minSize={30}
+          maxSize={35}>
           <div
             className={cn(
               "flex h-[56px] items-center ",

@@ -1,37 +1,77 @@
-"use client"
+"use client";
 import { Form, useForm } from "react-hook-form";
-import { appointmentAtom, appointmentDetailAtom } from "@/lib/jotai";
+import {
+  appointmentAtom,
+  appointmentDetailAtom,
+  conversationIdAtom,
+  currentUserAtom,
+  userIdTargetUserAtom,
+} from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { cn } from "@/lib/utils";
+import { useMutationAppointment } from "@/hooks/appointment";
 
 export function Appointment() {
   const [appointmentDetail, setAppointmentDetail] = useAtom(
     appointmentDetailAtom
   );
   const [appointment, setAppointment] = useAtom(appointmentAtom);
+  const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
+  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
+  const [conversationId, setConversationId] = useAtom(conversationIdAtom);
+
+  const mutationAppointment = useMutationAppointment();
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      appointmentContent: "",
-      date: "",
-      from: "",
-      to: "",
-      notes: "",
-      user: "",
+      content: "",
+      appointmentDate: "",
+      startTime: "",
+      endTime: "",
+      note: "",
+      userId: "",
     },
   });
 
+  const watchFrom = watch("startTime");
+  const watchTo = watch("endTime");
+
+  const validateTime = (endTime: string) => {
+    const startTime = watchFrom;
+    if (!startTime || !endTime) return true;
+    return (
+      startTime < endTime || "Thời gian kết thúc phải lớn hơn thời gian bắt đầu"
+    );
+  };
+
   const onSubmit = (data: any) => {
-    setAppointmentDetail({
-      status: "waitingForAccept",
-      data,
+    const body = {
+      ...data,
+      conversationId,
+      doctorId: currentUser?.id,
+      status: "PENDING",
+      userId: userIdTargetUser,
+    };
+    // console.log("🚀 ~ onSubmit ~ body:", body);
+
+    mutationAppointment.mutate(body, {
+      onSuccess(data, variables, context) {
+        if (data.statusCode === 200) {
+          console.log(data.data, "hello");
+          setAppointmentDetail({
+            status: data.data.status,
+            data: data.data,
+          });
+          setAppointment(false);
+        }
+      },
     });
-    setAppointment(false);
   };
   return (
     <form
@@ -40,115 +80,118 @@ export function Appointment() {
     >
       <div>
         <label
-          htmlFor="appointmentContent"
+          htmlFor="content"
           className="block text-sm font-medium text-gray-700"
         >
           Nội dung buổi hẹn *
         </label>
         <input
           placeholder="hi..."
-          id="appointmentContent"
-          {...register("appointmentContent", {
+          id="content"
+          {...register("content", {
             required: "Nội dung là bắt buộc",
             minLength: 3,
           })}
           className="mt-1 block w-full border border-regal-green rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"
         />
-        {errors.appointmentContent && (
-          <p className="text-sm text-red-500">
-            {errors.appointmentContent.message}
-          </p>
+        {errors.content && (
+          <p className="text-sm text-red-500">{errors.content.message}</p>
         )}
       </div>
       <div>
         <label
-          htmlFor="date"
+          htmlFor="appointmentDate"
           className="block text-sm font-medium text-gray-700"
         >
           Ngày *
         </label>
         <input
           type="date"
-          id="date"
-          {...register("date", { required: "Ngày là bắt buộc" })}
+          id="appointmentDate"
+          {...register("appointmentDate", { required: "Ngày là bắt buộc" })}
           className="mt-1 block w-full border border-regal-green rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"
         />
-        {errors.date && (
-          <p className="text-sm text-red-500">{errors.date.message}</p>
+        {errors.appointmentDate && (
+          <p className="text-sm text-red-500">
+            {errors.appointmentDate.message}
+          </p>
         )}
       </div>
       <div className="flex space-x-4">
         <div className="flex-1">
           <label
-            htmlFor="from"
+            htmlFor="startTime"
             className="block text-sm font-medium text-gray-700"
           >
             Từ *
           </label>
           <input
             type="time"
-            id="from"
-            {...register("from", {
+            id="startTime"
+            {...register("startTime", {
               required: "Thời gian là bắt buộc",
             })}
             className="mt-1 block w-full border border-regal-green rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"
           />
-          {errors.from && (
-            <p className="text-sm text-red-500">{errors.from.message}</p>
+          {errors.startTime && (
+            <p className="text-sm text-red-500">{errors.startTime.message}</p>
           )}
         </div>
         <div className="flex-1">
           <label
-            htmlFor="to"
+            htmlFor="endTime"
             className="block text-sm font-medium text-gray-700"
           >
             Đến *
           </label>
           <input
             type="time"
-            id="to"
-            {...register("to", { required: "Thời gian là bắt buộc" })}
+            id="endTime"
+            {...register("endTime", {
+              required: "Thời gian là bắt buộc",
+              validate: validateTime,
+            })}
             className="mt-1 block w-full border border-regal-green rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"
           />
-          {errors.to && (
-            <p className="text-sm text-red-500">{errors.to.message}</p>
+          {errors.endTime && (
+            <p className="text-sm text-red-500">{errors.endTime.message}</p>
           )}
         </div>
       </div>
       <div>
         <label
-          htmlFor="notes"
+          htmlFor="note"
           className="block text-sm font-medium text-gray-700"
         >
           Ghi chú *
         </label>
         <input
           placeholder="hi..."
-          id="notes"
-          {...register("notes", { required: "Ghi chú là bắt buộc" })}
+          id="note"
+          {...register("note", { required: "Ghi chú là bắt buộc" })}
           className="mt-1 block w-full border border-regal-green rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"
         />
-        {errors.notes && (
-          <p className="text-sm text-red-500">{errors.notes.message}</p>
+        {errors.note && (
+          <p className="text-sm text-red-500">{errors.note.message}</p>
         )}
       </div>
       <div>
         <label
-          htmlFor="user"
+          htmlFor="userId"
           className="block text-sm font-medium text-gray-700"
         >
           Người dùng *
         </label>
         <input
-          id="user"
+          value={"Trần thuỷ"}
+          id="userId"
+          disabled
           placeholder="Trần thuỷ"
-          {...register("user", {
-            required: "Nguời dùng là bắt buộc",
-          })}
+          {...register("userId")}
           className="mt-1 block w-full border border-regal-green rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"
         />
-        {errors.user && (
-          <p className="text-sm text-red-500">{errors.user.message}</p>
+        {errors.userId && (
+          <p className="text-sm text-red-500">{errors.userId.message}</p>
         )}
       </div>
       <div className="flex justify-between">
