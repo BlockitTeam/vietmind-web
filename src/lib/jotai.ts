@@ -50,4 +50,13 @@ export type TCurrentUser = {
   surveyCompleted: string;
   username: string;
 };
+
+export type IUserConversationId = {
+  senderFullName: string,
+  conversationId: string | number,
+  userId: string
+}
 export const currentUserAtom = atom<TCurrentUser | null>(null);
+export const userConversationIdAtom = atom<IUserConversationId | null>(null);
+
+

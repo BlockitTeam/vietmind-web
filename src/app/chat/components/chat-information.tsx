@@ -3,7 +3,12 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { PlusCircleIcon } from "lucide-react";
 import { useAtom } from "jotai";
-import { appointmentDetailAtom, conversationIdAtom, userIdTargetUserAtom } from "@/lib/jotai";
+import {
+  appointmentDetailAtom,
+  conversationIdAtom,
+  userConversationIdAtom,
+  userIdTargetUserAtom,
+} from "@/lib/jotai";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { WatchDetail } from "./watch-detail";
 import { useGetUserBasicHook } from "@/hooks/user";
@@ -15,6 +20,8 @@ import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import Heading from "@tiptap/extension-heading";
 import { useAppointmentIdHook } from "@/hooks/appointment";
+import { displayStatusAppointment } from "@/helper";
+import { useWebSocketContext } from "./webSocketContext";
 
 export function ChatInformation() {
   const [appointmentDetail, setAppointmentDetail] = useAtom(
@@ -22,14 +29,18 @@ export function ChatInformation() {
   );
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
+  const [userConversationId, setUserConversationId] = useAtom(
+    userConversationIdAtom
+  );
+  const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
 
   const { data: userBasic, ...queryUserBasic } =
     useGetUserBasicHook(userIdTargetUser);
   const { data: screeningTest, ...queryScreeningTest } =
     useGetScreeningTestUserIdHook(userIdTargetUser);
 
-    const {data: appointments, ...queryAppointment} = useAppointmentIdHook(conversationId);
-    console.log("🚀 ~ ChatInformation ~ appointments:", appointments)
+  const { data: appointments, ...queryAppointment } =
+    useAppointmentIdHook(conversationId);
 
   const editor = useEditor({
     extensions: [
@@ -48,22 +59,25 @@ export function ChatInformation() {
     content: "<p>Hello World! 🌎️</p>",
   });
   return (
-    <div className="m-4">
-      {appointmentDetail.status !== null && (
+    <div className="m-4 mb-3">
+      {appointments && appointments.data && (
         <>
           <Card className="bg-regal-green-light mb-3">
             <CardContent className="flex gap-3 flex-col p-2">
               <p className="bg-neutral-ternary text-white w-fit rounded-md text-xs p-1">
-                Đang đợi xác nhận
+                {displayStatusAppointment(appointments?.data.status)}
               </p>
 
-              <p className="font-bold text-sm">Lịch hẹn : Trần Thuỷ</p>
+              <p className="font-bold text-sm">
+                Lịch hẹn : {userConversationId?.senderFullName}
+              </p>
               <p className="text-sm text-neutral-secondary">
-                10/12/2023 09:00 - 10:00
+                {appointments?.data?.appointmentDate}{" "}
+                {appointments?.data?.startTime}-{appointments?.data?.endTime}
               </p>
 
               <p className="text-sm text-neutral-secondary">
-                Ghi chú: Buổi tư vấn thứ 2
+                Ghi chú: {appointments?.data?.content}
               </p>
             </CardContent>
             <CardFooter className="grid grid-flow-col gap-3 p-2 items-center justify-stretch w-full">
@@ -123,7 +137,9 @@ export function ChatInformation() {
                 {Object.entries(screeningTest.data).map(([key, value]) => (
                   <div className="flex gap-4">
                     <p className="text-neutral-ternary text-sm">{key}:</p>
-                    <p className="text-neutral-primary text-sm ">{value as any}</p>
+                    <p className="text-neutral-primary text-sm ">
+                      {value as any}
+                    </p>
                   </div>
                 ))}
               </div>

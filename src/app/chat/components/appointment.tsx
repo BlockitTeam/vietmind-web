@@ -5,20 +5,25 @@ import {
   appointmentDetailAtom,
   conversationIdAtom,
   currentUserAtom,
+  userConversationIdAtom,
   userIdTargetUserAtom,
 } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { cn } from "@/lib/utils";
 import { useMutationAppointment } from "@/hooks/appointment";
+import { useWebSocketContext } from "./webSocketContext";
 
 export function Appointment() {
   const [appointmentDetail, setAppointmentDetail] = useAtom(
     appointmentDetailAtom
   );
+  const [userConversationId, setUserConversationId] = useAtom(userConversationIdAtom);
+
   const [appointment, setAppointment] = useAtom(appointmentAtom);
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
+  const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
 
   const mutationAppointment = useMutationAppointment();
 
@@ -35,7 +40,7 @@ export function Appointment() {
       startTime: "",
       endTime: "",
       note: "",
-      userId: "",
+      userId: userConversationId && userConversationId.senderFullName,
     },
   });
 
@@ -58,16 +63,20 @@ export function Appointment() {
       status: "PENDING",
       userId: userIdTargetUser,
     };
-    // console.log("🚀 ~ onSubmit ~ body:", body);
 
     mutationAppointment.mutate(body, {
       onSuccess(data, variables, context) {
         if (data.statusCode === 200) {
-          console.log(data.data, "hello");
           setAppointmentDetail({
             status: data.data.status,
             data: data.data,
           });
+          sendMessageWS(JSON.stringify({
+            type:"appointment",
+            appointmentId: data?.data?.appointmentId,
+            conversationId: data?.data?.conversationId,
+            status: "PENDING"
+          }))
           setAppointment(false);
         }
       },
@@ -108,6 +117,7 @@ export function Appointment() {
         <input
           type="date"
           id="appointmentDate"
+          data-date-format="DD MMMM YYYY"
           {...register("appointmentDate", { required: "Ngày là bắt buộc" })}
           className="mt-1 block w-full border border-regal-green rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"
         />
@@ -183,7 +193,6 @@ export function Appointment() {
           Người dùng *
         </label>
         <input
-          value={"Trần thuỷ"}
           id="userId"
           disabled
           placeholder="Trần thuỷ"
@@ -210,6 +219,7 @@ export function Appointment() {
         <button
           type="button"
           className="py-2 px-4 bg-gray-300 text-gray-700 font-semibold rounded-md shadow-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75"
+          onClick={() => setAppointment(false)}
         >
           Bỏ qua
         </button>

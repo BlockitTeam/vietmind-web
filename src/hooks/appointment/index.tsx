@@ -1,5 +1,5 @@
 import { IResponse, getData, mutationPost } from "@/config/api";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const FetchAppointment = (id: string | number) => {
   const url = `appointments/conversation/${id}`;
@@ -16,6 +16,8 @@ export const useAppointmentIdHook = (id: string | number) => {
 
 // POST
 export const useMutationAppointment = () => {
+  const queryClient = useQueryClient()
+
     const url = `appointments`;
     return useMutation({
         mutationKey: ['create-appointment'],
@@ -24,6 +26,11 @@ export const useMutationAppointment = () => {
                 url,
                 body
             })
-        }
+        },
+        onSuccess(data, variables, context) {
+          void queryClient.invalidateQueries({
+            queryKey: ['appointmentId', data.data.conversationId],
+          })
+        },
     })
 }

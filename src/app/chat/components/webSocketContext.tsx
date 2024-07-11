@@ -1,52 +1,39 @@
-// WebSocketContext.tsx
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import useWebSocket, { ReadyState, SendMessage, Options } from 'react-use-websocket';
+//@ts-nocheck
+import React, { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 
 interface WebSocketContextType {
-  sendMessage: SendMessage;
-  lastMessage: MessageEvent<any> | null;
+  sendMessageWS: (message: string) => void;
+  lastMessage: WebSocket.MessageEvent<any> | null;
   readyState: ReadyState;
-  updateUrl: (newParams: Record<string, string>) => void;
+  updateUrl: (targetUserId: string) => void;
 }
 
-const WebSocketContext = createContext<WebSocketContextType | null>(null);
+const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
 
-interface WebSocketProviderProps {
-  children: ReactNode;
-}
-
-export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
-  const [url, setUrl] = useState('wss://your-websocket-url');
-
-  const options: Options = {
+export const WebSocketProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [socketUrl, setSocketUrl] = useState("ws://localhost:9001/ws");
+  const { sendMessage: sendMessageWS, lastMessage, readyState } = useWebSocket(socketUrl, {
     onOpen: () => console.log("WebSocket connection established"),
+  });
+
+  const updateUrl = (targetUserId: string) => {
+    const updatedSocketUrl = `ws://localhost:9001/ws?targetUserId=${targetUserId}`;
+    setSocketUrl(updatedSocketUrl);
   };
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket(url, options);
-
-  const updateUrl = useCallback((newParams: Record<string, string>) => {
-    const urlObject = new URL(url);
-    Object.keys(newParams).forEach(key => {
-      urlObject.searchParams.set(key, newParams[key]);
-    });
-    setUrl(urlObject.toString());
-  }, [url]);
-
-  useEffect(() => {
-    // Trigger a re-connection when URL changes
-  }, [url]);
-
-  return (
-    <WebSocketContext.Provider value={{ sendMessage, lastMessage, readyState, updateUrl }}>
-      {children}
-    </WebSocketContext.Provider>
+  const value = useMemo(
+    () => ({ sendMessageWS, lastMessage, readyState, updateUrl }),
+    [sendMessageWS, lastMessage, readyState]
   );
+
+  return <WebSocketContext.Provider value={value}>{children}</WebSocketContext.Provider>;
 };
 
 export const useWebSocketContext = (): WebSocketContextType => {
   const context = useContext(WebSocketContext);
   if (!context) {
-    throw new Error('useWebSocketContext must be used within a WebSocketProvider');
+    throw new Error("useWebSocketContext must be used within a WebSocketProvider");
   }
   return context;
 };

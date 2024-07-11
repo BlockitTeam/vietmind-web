@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import ChatBottombar from "./chat-bottombar";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import NodeRSA from "node-rsa";
 import CryptoJS from "crypto-js";
 import { useAtom } from "jotai";
 import {
@@ -18,10 +17,10 @@ import {
   publicKeyAtom,
   userIdTargetUserAtom,
 } from "@/lib/jotai";
-import axiosInstance from "@/config/axios/axiosInstance";
 import { JSEncrypt } from "jsencrypt";
 import { useGetEASHook } from "@/hooks/getContentMessage";
 import { checkSenderFromDoctor, decryptMessage } from "@/servers/message";
+import { useWebSocketContext } from "./webSocketContext";
 
 interface ChatListProps {
   isMobile: boolean;
@@ -50,38 +49,39 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
   const [typingMessage, setTypingMessage] = useAtom(TypingMessageAtom)
+  const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
 
   const getAES = useGetEASHook(conversationId);
-  const {
-    sendMessage: sendMessageWS,
-    lastMessage,
-    readyState,
-  } = useWebSocket(process.env.NEXT_PUBLIC_SOCKET_URL as string, {
-    onOpen: () => console.log("WebSocket connection established"),
-    onMessage: (message) => {
-      const data = JSON.parse(message.data);
-      console.log(data, 'data')
+  // const {
+  //   sendMessage: sendMessageWS,
+  //   lastMessage,
+  //   readyState,
+  // } = useWebSocket(process.env.NEXT_PUBLIC_SOCKET_URL as string, {
+  //   onOpen: () => console.log("WebSocket connection established"),
+  //   onMessage: (message) => {
+  //     const data = JSON.parse(message.data);
+  //     console.log(data, 'data')
 
-      if (aesKey) {
-        data?.type === 'typing' ? setTypingMessage(true) : setTypingMessage(false);
-        if (data?.message) {
-          setMessagesWS((prevMessages) => [
-            ...prevMessages,
-            {
-              fromMe: false,
-              message: decryptMessage(data.message, aesKey),
-            },
-          ]);
-        }
-      }
-      if (data?.type == 'message') {
-        refetchConversation();
-      }
-    },
-    queryParams: {
-      targetUserId: userIdTargetUser,
-    },
-  });
+  //     if (aesKey) {
+  //       data?.type === 'typing' ? setTypingMessage(true) : setTypingMessage(false);
+  //       if (data?.message) {
+  //         setMessagesWS((prevMessages) => [
+  //           ...prevMessages,
+  //           {
+  //             fromMe: false,
+  //             message: decryptMessage(data.message, aesKey),
+  //           },
+  //         ]);
+  //       }
+  //     }
+  //     if (data?.type == 'message') {
+  //       refetchConversation();
+  //     }
+  //   },
+  //   queryParams: {
+  //     targetUserId: userIdTargetUser,
+  //   },
+  // });
 
   // Generate RSA keys
 
@@ -140,6 +140,21 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
       });
     }
   }, [conversationIdContent]);
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      const newMessage = JSON.parse(lastMessage.data);
+      console.log("🚀 ~ useEffect ~ newMessage:", newMessage)
+      const decryptedMessage = decryptMessage(newMessage.message, aesKey);
+      setMessagesWS((prevMessages) => [
+        ...prevMessages,
+        {
+          fromMe: false,
+          message: decryptedMessage,
+        },
+      ]);
+    }
+  }, [lastMessage, aesKey, currentUser]);
 
   React.useLayoutEffect(() => {
     if (messagesContainerRef.current) {

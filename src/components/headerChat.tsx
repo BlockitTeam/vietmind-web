@@ -121,7 +121,6 @@ export default function HeaderChat() {
               onClick={async () => {
                 useLogout.mutate(undefined, {
                   onSuccess(data, variables, context) {
-                    console.log("🚀 ~ onSuccess ~ data:", data)
                     if (data.statusCode === 200) {
                       setCurrentUser(null);
                       deleteCookie('JSESSIONID', { path: '/', domain: 'http://91.108.104.57' });

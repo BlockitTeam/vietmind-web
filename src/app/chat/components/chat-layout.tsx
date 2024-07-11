@@ -6,6 +6,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -13,7 +14,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar, Search } from "lucide-react";
 import { Chat } from "@/app/chat/components/chat";
-import { appointmentAtom, appointmentDetailAtom, conversationIdAtom, conversationIdContentAtom, currentUserAtom, userIdTargetUserAtom } from "@/lib/jotai";
+import {
+  appointmentAtom,
+  appointmentDetailAtom,
+  conversationIdAtom,
+  conversationIdContentAtom,
+  currentUserAtom,
+  userConversationIdAtom,
+  userIdTargetUserAtom,
+} from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { Form, useForm } from "react-hook-form";
@@ -26,6 +35,8 @@ import { useContentMessageHook } from "@/hooks/getContentMessage";
 import { useGetConversation } from "@/hooks/conversation";
 import CryptoJS from "crypto-js";
 import { decryptMessageWithKeyAES } from "@/servers/message";
+import { WebSocketProvider } from "./webSocketContext";
+
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
   defaultCollapsed?: boolean;
@@ -40,16 +51,25 @@ export function ChatLayout({
   const [isMobile, setIsMobile] = useState(false);
   const [tab, setTab] = React.useState("chat");
   const [appointment, setAppointment] = useAtom(appointmentAtom);
-  const [appointmentDetail, setAppointmentDetail] = useAtom(appointmentDetailAtom);
+  const [appointmentDetail, setAppointmentDetail] = useAtom(
+    appointmentDetailAtom
+  );
 
-  const [senderFullName, setSenderFullName] = useState('');
+  const [userConversationId, setUserConversationId] = useAtom(
+    userConversationIdAtom
+  );
+
+  const [senderFullName, setSenderFullName] = useState("");
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
-  const [conversationIdContent, setConversationIdContentAtom] = useAtom(conversationIdContentAtom);
+  const [conversationIdContent, setConversationIdContentAtom] = useAtom(
+    conversationIdContentAtom
+  );
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
 
   const { data: user, ...queryUser } = useCurrentUserHook();
-  const { data: contentConversationId, ...queryConversationId } = useContentMessageHook(conversationId);
+  const { data: contentConversationId, ...queryConversationId } =
+    useContentMessageHook(conversationId);
   const { data: conversations, ...queryConversation } = useGetConversation();
 
   useEffect(() => {
@@ -72,7 +92,8 @@ export function ChatLayout({
 
   return (
     queryUser.isSuccess && (
-      <ResizablePanelGroup
+      <WebSocketProvider>
+         <ResizablePanelGroup
         direction="horizontal"
         onLayout={(sizes: number[]) => {
           document.cookie = `react-resizable-panels:layout=${JSON.stringify(
@@ -140,22 +161,36 @@ export function ChatLayout({
             <div className="m-2 mt-6">
               {tab === "chat" && (
                 <>
-                  {queryConversation.isSuccess && conversations?.data && Array.isArray(conversations?.data) &&
+                  {queryConversation.isSuccess &&
+                    conversations?.data &&
+                    Array.isArray(conversations?.data) &&
                     conversations?.data.map(
                       (conversation: any, index: number) => {
-                        const isActive = conversation?.conversation?.conversationId === conversationId;
+                        const isActive =
+                          conversation?.conversation?.conversationId ===
+                          conversationId;
 
                         return (
                           <div
-                          className={cn(
-                            "flex items-center mt-2 justify-between cursor-pointer p-2",
-                            isActive && "bg-[#E0E9ED] text-white"
-                          )}
+                            className={cn(
+                              "flex items-center mt-2 justify-between cursor-pointer p-2",
+                              isActive && "bg-[#E0E9ED] text-white"
+                            )}
                             key={index}
                             onClick={() => {
                               setSenderFullName(conversation?.senderFullName);
-                              setConversationId(conversation?.conversation?.conversationId)
-                              setUserIdTargetUser(conversation?.conversation?.userId)
+                              setConversationId(
+                                conversation?.conversation?.conversationId
+                              );
+                              setUserIdTargetUser(
+                                conversation?.conversation?.userId
+                              );
+                              setUserConversationId({
+                                senderFullName: conversation?.senderFullName,
+                                conversationId:
+                                  conversation?.conversation?.conversationId,
+                                userId: conversation?.conversation?.userId,
+                              });
                             }}
                           >
                             <div className="flex justify-center items-center gap-2">
@@ -170,9 +205,10 @@ export function ChatLayout({
                                   {conversation?.senderFullName}
                                 </p>
                                 <p className="text-sm text-neutral-ternary whitespace-nowrap w-3">
-                                 {
-                                  decryptMessageWithKeyAES(conversation?.lastMessage?.encryptedMessage, conversation?.conversation?.conversationKey)
-                                 }
+                                  {decryptMessageWithKeyAES(
+                                    conversation?.lastMessage?.encryptedMessage,
+                                    conversation?.conversation?.conversationKey
+                                  )}
                                 </p>
                               </div>
                             </div>
@@ -366,72 +402,109 @@ export function ChatLayout({
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={defaultLayout[1]} collapsible={false}>
-          <div
-            className={cn(
-              "flex h-[56px] items-center justify-between",
-              isCollapsed ? "h-[56px]" : "px-2"
-            )}
-          >
-            <div className="flex items-center gap-2">
-              <Button className="text-neutral-primary border-regal-green bg-regal-green w-[45px] h-[45px] hover:bg-regal-green">
-                VT
-              </Button>
-              <p className="text-md font-bold text-neutral-primary">
-                {senderFullName && senderFullName}
-              </p>
+          {conversationId > 0 && (
+            <>
+              <div
+                className={cn(
+                  "flex h-[56px] items-center justify-between",
+                  isCollapsed ? "h-[56px]" : "px-2"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <Button className="text-neutral-primary border-regal-green bg-regal-green w-[45px] h-[45px] hover:bg-regal-green">
+                    VT
+                  </Button>
+                  <p className="text-md font-bold text-neutral-primary">
+                    {senderFullName && senderFullName}
+                  </p>
+                </div>
+                <div>
+                  <EndChat />
+                </div>
+              </div>
+              <Separator />
+              <Chat
+                isMobile={isMobile}
+                refetchConversation={queryConversation.refetch}
+              />
+            </>
+          )}
+          {!conversationId && (
+            <div className="flex flex-col align-middle items-center h-full justify-center">
+              <Image
+                src="/NoData.png"
+                width={500}
+                height={500}
+                alt="Picture of the author"
+              />
+              <p>Hãy chọn người bạn muốn trò chuyện</p>
             </div>
-            <div>
-              <EndChat />
-            </div>
-          </div>
-          <Separator />
-          <Chat isMobile={isMobile} refetchConversation={queryConversation.refetch} />
+          )}
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={defaultLayout[2]} collapsible={false} minSize={30}
-          maxSize={35}>
-          <div
-            className={cn(
-              "flex h-[56px] items-center ",
-              isCollapsed ? "h-[56px]" : "px-2",
-              !appointment ? "justify-start" : "justify-center"
-            )}
-          >
-            {!appointment ? (
-              <Button
-                className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
-                onClick={() => setAppointment(true)}
-                disabled={appointmentDetail.status !== null}
-              >
-                Đặt lịch hẹn
-                <Calendar className="ml-2" size={20} />
-              </Button>
-            ) : (
+        <ResizablePanel
+          defaultSize={defaultLayout[2]}
+          collapsible={false}
+          minSize={30}
+          maxSize={35}
+        >
+          {conversationId > 0 && (
+            <>
               <div
-                className="font-bold flex items-center w-full cursor-pointer"
-                onClick={() => setAppointment(false)}
+                className={cn(
+                  "flex h-[56px] items-center",
+                  isCollapsed ? "h-[56px]" : "px-2",
+                  !appointment ? "justify-start" : "justify-center"
+                )}
               >
-                <IconArrowLeft size={20} className="mr-2" /> Quay lại
+                {!appointment ? (
+                  <Button
+                    className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
+                    onClick={() => setAppointment(true)}
+                    disabled={appointmentDetail.status !== null}
+                  >
+                    Đặt lịch hẹn
+                    <Calendar className="ml-2" size={20} />
+                  </Button>
+                ) : (
+                  <div
+                    className="font-bold flex items-center w-full cursor-pointer"
+                    onClick={() => setAppointment(false)}
+                  >
+                    <IconArrowLeft size={20} className="mr-2" /> Quay lại
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          <Separator />
-          <div className="w-full h-full">
-            {!appointment && (
-              <ScrollArea className="w-full h-full">
-                <ChatInformation />
-              </ScrollArea>
-            )}
+              <Separator />
 
-            {appointment && (
-              <div className="m-4">
-                <p className="font-bold text-2xl">Đặt lịch hẹn</p>
-                <Appointment />
-              </div>
-            )}
-          </div>
+              <ScrollArea className="w-full h-full">
+                {!appointment && <ChatInformation />}
+
+                {appointment && (
+                  <div className="m-4">
+                    <p className="font-bold text-2xl">Đặt lịch hẹn</p>
+                    <Appointment />
+                  </div>
+                )}
+              </ScrollArea>
+            </>
+          )}
+
+          {!conversationId && (
+            <div className="flex flex-col align-middle items-center h-full justify-center">
+              <Image
+                src="/NoData.png"
+                width={500}
+                height={500}
+                alt="Picture of the author"
+              />
+              <p>Hãy chọn người bạn muốn trò chuyện</p>
+            </div>
+          )}
         </ResizablePanel>
       </ResizablePanelGroup>
+      </WebSocketProvider>
+     
     )
   );
 }
