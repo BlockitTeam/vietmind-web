@@ -35,7 +35,7 @@ import { useContentMessageHook } from "@/hooks/getContentMessage";
 import { useGetConversation } from "@/hooks/conversation";
 import CryptoJS from "crypto-js";
 import { decryptMessageWithKeyAES } from "@/servers/message";
-import { WebSocketProvider } from "./webSocketContext";
+import { useWebSocketContext, WebSocketProvider } from "./webSocketContext";
 
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
@@ -58,6 +58,7 @@ export function ChatLayout({
   const [userConversationId, setUserConversationId] = useAtom(
     userConversationIdAtom
   );
+  const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
 
   const [senderFullName, setSenderFullName] = useState("");
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
@@ -185,6 +186,7 @@ export function ChatLayout({
                               setUserIdTargetUser(
                                 conversation?.conversation?.userId
                               );
+                              updateUrl(conversation?.conversation?.userId);
                               setUserConversationId({
                                 senderFullName: conversation?.senderFullName,
                                 conversationId:
