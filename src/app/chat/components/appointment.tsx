@@ -10,39 +10,51 @@ import {
 } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { cn } from "@/lib/utils";
-import { useMutationAppointment } from "@/hooks/appointment";
+import { useAppointmentIdHook, useMutationAppointment, usePutMutationAppointmentIdHook } from "@/hooks/appointment";
 import { useWebSocketContext } from "./webSocketContext";
+import { useEffect } from "react";
 
 export function Appointment() {
-  const [appointmentDetail, setAppointmentDetail] = useAtom(
-    appointmentDetailAtom
-  );
   const [userConversationId, setUserConversationId] = useAtom(userConversationIdAtom);
 
   const [appointment, setAppointment] = useAtom(appointmentAtom);
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
+  //socket
   const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
-
+  //HOOK
+  const { data: appointments, ...queryAppointment } =
+  useAppointmentIdHook(conversationId);
   const mutationAppointment = useMutationAppointment();
+  const usePutMutationAppointmentId = usePutMutationAppointmentIdHook(appointments?.data.conversationId);
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      content: "",
-      appointmentDate: "",
-      startTime: "",
-      endTime: "",
-      note: "",
+      content: '',
+      appointmentDate: '',
+      startTime: '',
+      endTime: '',
+      note: '',
       userId: userConversationId && userConversationId.senderFullName,
     },
   });
+
+  useEffect(() => {
+    setValue('content',appointments?.data.status === 'PENDING' && appointments?.data.content);
+    setValue('appointmentDate', appointments?.data.status === 'PENDING' && appointments?.data.appointmentDate);
+    setValue('startTime', appointments?.data.status === 'PENDING' && appointments?.data.startTime);
+    setValue('endTime', appointments?.data.status === 'PENDING' && appointments?.data.endTime);
+    setValue('note',appointments?.data.status === 'PENDING' && appointments?.data.note);
+  }, [appointment])
+
 
   const watchFrom = watch("startTime");
   const watchTo = watch("endTime");
@@ -64,13 +76,32 @@ export function Appointment() {
       userId: userIdTargetUser,
     };
 
+
+    if (appointments?.data.status === 'PENDING') {
+      const bodyUpdate = {
+        ...appointments.data,
+        ...data
+      };
+      usePutMutationAppointmentId.mutate(bodyUpdate, {
+        onSuccess(data, variables, context) {
+          if (data.statusCode === 200) {
+            sendMessageWS(JSON.stringify({
+              type:"appointment",
+              appointmentId: data?.data?.appointmentId,
+              conversationId: data?.data?.conversationId,
+              status: "PENDING"
+            }))
+            setAppointment(false);
+          }
+        },
+      })
+
+      return;
+    }
+
     mutationAppointment.mutate(body, {
       onSuccess(data, variables, context) {
         if (data.statusCode === 200) {
-          setAppointmentDetail({
-            status: data.data.status,
-            data: data.data,
-          });
           sendMessageWS(JSON.stringify({
             type:"appointment",
             appointmentId: data?.data?.appointmentId,

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PlusCircleIcon } from "lucide-react";
 import { useAtom } from "jotai";
 import {
+  appointmentAtom,
   appointmentDetailAtom,
   conversationIdAtom,
   userConversationIdAtom,
@@ -19,14 +20,17 @@ import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import Heading from "@tiptap/extension-heading";
-import { useAppointmentIdHook } from "@/hooks/appointment";
+import { useAppointmentIdHook, usePutMutationAppointmentIdHook } from "@/hooks/appointment";
 import { displayStatusAppointment } from "@/helper";
 import { useWebSocketContext } from "./webSocketContext";
+import { useEffect } from "react";
 
 export function ChatInformation() {
   const [appointmentDetail, setAppointmentDetail] = useAtom(
     appointmentDetailAtom
   );
+
+  const [appointment, setAppointment] = useAtom(appointmentAtom);
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
   const [userConversationId, setUserConversationId] = useAtom(
@@ -41,6 +45,17 @@ export function ChatInformation() {
 
   const { data: appointments, ...queryAppointment } =
     useAppointmentIdHook(conversationId);
+
+    const usePutMutationAppointmentId = usePutMutationAppointmentIdHook(appointments?.data.conversationId);
+
+  useEffect(() => {
+    if (queryAppointment.isSuccess) {
+      setAppointmentDetail({
+        status: appointments?.data.status,
+        data: appointments?.data,
+      });
+    }
+  }, [appointments]);
 
   const editor = useEditor({
     extensions: [
@@ -58,11 +73,36 @@ export function ChatInformation() {
     },
     content: "<p>Hello World! 🌎️</p>",
   });
+
+  const cancelAppointment = () => {
+      const bodyCancel = {
+        ...appointments?.data,
+        status: 'CANCELLED'
+    }
+
+    usePutMutationAppointmentId.mutate(bodyCancel, {
+      onSuccess(data, variables, context) {
+        if (data.statusCode === 200) {
+          setAppointmentDetail({
+            status: data?.data?.status,
+            data: data?.data
+          });
+          sendMessageWS(JSON.stringify({
+            type:"appointment",
+            appointmentId: data?.data?.appointmentId,
+            conversationId: data?.data?.conversationId,
+            status: "CANCELLED"
+          }))
+          setAppointment(false);
+        }
+      },
+    })
+  }
   return (
     <div className="m-4 mb-3">
       {appointments && appointments.data && (
         <>
-          <Card className="bg-regal-green-light mb-3">
+          <Card className="bg-regal-green-light mb-3 border border-slate-300	">
             <CardContent className="flex gap-3 flex-col p-2">
               <p className="bg-neutral-ternary text-white w-fit rounded-md text-xs p-1">
                 {displayStatusAppointment(appointments?.data.status)}
@@ -81,10 +121,10 @@ export function ChatInformation() {
               </p>
             </CardContent>
             <CardFooter className="grid grid-flow-col gap-3 p-2 items-center justify-stretch w-full">
-              <Button variant="outline" className="border-regal-green">
+              <Button disabled={appointments.data?.status === 'CANCELLED'} variant="outline" className="border-regal-green" onClick={() => setAppointment(true)}>
                 Dời lịch hẹn
               </Button>
-              <Button variant="outline" className="border-regal-green">
+              <Button disabled={appointments.data?.status === 'CANCELLED'} variant="outline" className="border-regal-green" onClick={cancelAppointment}>
                 Huỷ lịch hẹn
               </Button>
             </CardFooter>

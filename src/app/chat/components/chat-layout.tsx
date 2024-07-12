@@ -52,11 +52,12 @@ export function ChatLayout({
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
   const [isMobile, setIsMobile] = useState(false);
   const [tab, setTab] = React.useState("chat");
+
+  // atom
   const [appointment, setAppointment] = useAtom(appointmentAtom);
   const [appointmentDetail, setAppointmentDetail] = useAtom(
     appointmentDetailAtom
   );
-
   const [senderFullName, setSenderFullName] = useAtom(senderFullNameAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
 

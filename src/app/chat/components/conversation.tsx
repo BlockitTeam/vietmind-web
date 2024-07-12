@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useGetConversation } from "@/hooks/conversation";
 import { useContentMessageHook } from "@/hooks/getContentMessage";
 import {
+    appointmentAtom,
   conversationIdAtom,
   conversationIdContentAtom,
   currentUserAtom,
@@ -18,6 +19,8 @@ export const Conversation = () => {
   const [userConversationId, setUserConversationId] = useAtom(
     userConversationIdAtom
   );
+  const [appointment, setAppointment] = useAtom(appointmentAtom);
+
 
   const [senderFullName, setSenderFullName] = useAtom(senderFullNameAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
@@ -68,6 +71,7 @@ export const Conversation = () => {
                   conversationId: conversation?.conversation?.conversationId,
                   userId: conversation?.conversation?.userId,
                 });
+                setAppointment(false);
               }}
             >
               <div className="flex justify-center items-center gap-2">
