@@ -238,7 +238,6 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
         )}
       </div>
       <ChatBottombar
-        sendMessageWS={sendMessageWS}
         isMobile={isMobile}
         setMessagesWS={setMessagesWS}
       />

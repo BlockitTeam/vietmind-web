@@ -31,6 +31,8 @@ import {
 import { useAtom } from "jotai";
 import CryptoJS from "crypto-js";
 import { encryptMessage } from "@/servers/message";
+// @ts-ignore:next-line
+import { useWebSocketContext } from "./webSocketContext";
 
 type INewMessageWS = {
   type: "message";
@@ -44,7 +46,6 @@ interface IChatMessage {
 }
 interface ChatBottombarProps {
   isMobile: boolean;
-  sendMessageWS: (newMessageWS: string) => void;
   setMessagesWS: (newMessage: IChatMessage[]) => void;
 }
 
@@ -52,7 +53,6 @@ export const BottombarIcons = [{ icon: FileImage }, { icon: Paperclip }];
 
 export default function ChatBottombar({
   isMobile,
-  sendMessageWS,
   setMessagesWS,
 }: ChatBottombarProps) {
   const [message, setMessage] = useState("");
@@ -65,6 +65,7 @@ export default function ChatBottombar({
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
   const [typingMessage, setTypingMessage] = useAtom(TypingMessageAtom);
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
+  const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     let newMessageWS = {};
