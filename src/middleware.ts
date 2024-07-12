@@ -23,20 +23,21 @@ export function middleware(req: NextRequest) {
 
   // Continue with the response chain
   const response = NextResponse.next();
+  // console.log("🚀 ~ middleware ~ response:", response)
 
-  // Check the response status and clear cookies if 403
-  response.headers.set('Cache-Control', 'no-store'); // Ensure we don't cache this check
+  // // Check the response status and clear cookies if 403
+  // response.headers.set('Cache-Control', 'no-store'); // Ensure we don't cache this check
 
-  // If there is a 403 status, clear the JSESSIONID cookie
-  if (response.status === 403) {
-    console.log('Access forbidden: 403 status code detected.');
-    // Clear the JSESSIONID cookies
-    response.cookies.set('JSESSIONID', '', { path: '/', maxAge: 0 });
+  // // If there is a 403 status, clear the JSESSIONID cookie
+  // if (response.status === 403) {
+  //   console.log('Access forbidden: 403 status code detected.');
+  //   // Clear the JSESSIONID cookies
+  //   response.cookies.set('JSESSIONID', '', { path: '/', maxAge: 0 });
 
-    // Redirect the user to the login page
-    url.pathname = '/';
-    return NextResponse.redirect(url);
-  }
+  //   // Redirect the user to the login page
+  //   url.pathname = '/';
+  //   return NextResponse.redirect(url);
+  // }
 
   return response;
 }

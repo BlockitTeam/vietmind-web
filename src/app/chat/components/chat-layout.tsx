@@ -62,7 +62,6 @@ export function ChatLayout({
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
 
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
-
   const { data: user, ...queryUser } = useCurrentUserHook();
 
   const { data: conversations, ...queryConversation } = useGetConversation();

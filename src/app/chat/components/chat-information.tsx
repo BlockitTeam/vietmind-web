@@ -174,8 +174,8 @@ export function ChatInformation() {
                 {/* <WatchDetail /> */}
               </div>
               <div className="flex gap-2 flex-col">
-                {Object.entries(screeningTest.data).map(([key, value]) => (
-                  <div className="flex gap-4">
+                {Object.entries(screeningTest.data).map(([key, value,], index) => (
+                  <div className="flex gap-4" key={index}>
                     <p className="text-neutral-ternary text-sm">{key}:</p>
                     <p className="text-neutral-primary text-sm ">
                       {value as any}
