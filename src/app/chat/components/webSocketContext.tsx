@@ -10,15 +10,15 @@ interface WebSocketContextType {
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
-const url = process.env.NEXT_PUBLIC_SOCKET_URL;
 export const WebSocketProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [socketUrl, setSocketUrl] = useState(url);
+const NEXT_PUBLIC_SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
+  const [socketUrl, setSocketUrl] = useState(NEXT_PUBLIC_SOCKET_URL);
   const { sendMessage: sendMessageWS, lastMessage, readyState } = useWebSocket(socketUrl, {
     onOpen: () => console.log("WebSocket connection established"),
   });
 
   const updateUrl = (targetUserId: string) => {
-    const updatedSocketUrl = `${url}?targetUserId=${targetUserId}`;
+    const updatedSocketUrl = `${NEXT_PUBLIC_SOCKET_URL}?targetUserId=${targetUserId}`;
     setSocketUrl(updatedSocketUrl);
   };
 

@@ -20,6 +20,7 @@ import {
   conversationIdAtom,
   conversationIdContentAtom,
   currentUserAtom,
+  senderFullNameAtom,
   userConversationIdAtom,
   userIdTargetUserAtom,
 } from "@/lib/jotai";
@@ -35,7 +36,8 @@ import { useContentMessageHook } from "@/hooks/getContentMessage";
 import { useGetConversation } from "@/hooks/conversation";
 import CryptoJS from "crypto-js";
 import { decryptMessageWithKeyAES } from "@/servers/message";
-import { useWebSocketContext, WebSocketProvider } from "./webSocketContext";
+import { WebSocketProvider } from "./webSocketContext";
+import { Conversation } from "./conversation";
 
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
@@ -55,22 +57,13 @@ export function ChatLayout({
     appointmentDetailAtom
   );
 
-  const [userConversationId, setUserConversationId] = useAtom(
-    userConversationIdAtom
-  );
-  const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
-
-  const [senderFullName, setSenderFullName] = useState("");
+  const [senderFullName, setSenderFullName] = useAtom(senderFullNameAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
-  const [conversationIdContent, setConversationIdContentAtom] = useAtom(
-    conversationIdContentAtom
-  );
-  const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
+
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
 
   const { data: user, ...queryUser } = useCurrentUserHook();
-  const { data: contentConversationId, ...queryConversationId } =
-    useContentMessageHook(conversationId);
+
   const { data: conversations, ...queryConversation } = useGetConversation();
 
   useEffect(() => {
@@ -79,434 +72,358 @@ export function ChatLayout({
     }
   }, [user]);
 
-  useEffect(() => {
-    if (queryConversationId.isSuccess) {
-      setConversationIdContentAtom(contentConversationId?.data);
-    }
-  }, [contentConversationId]);
-
-  useEffect(() => {
-    if (conversationId > 0) {
-      queryConversationId.refetch();
-    }
-  }, [conversationId]);
-
   return (
     queryUser.isSuccess && (
       <WebSocketProvider>
-         <ResizablePanelGroup
-        direction="horizontal"
-        onLayout={(sizes: number[]) => {
-          document.cookie = `react-resizable-panels:layout=${JSON.stringify(
-            sizes
-          )}`;
-        }}
-        className="h-full items-stretch"
-      >
-        <ResizablePanel
-          defaultSize={defaultLayout[0]}
-          collapsedSize={navCollapsedSize}
-          collapsible={false}
-          minSize={15}
-          maxSize={20}
-          onCollapse={(collapsed?: any) => {
-            setIsCollapsed(collapsed);
-            document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-              collapsed
+        <ResizablePanelGroup
+          direction="horizontal"
+          onLayout={(sizes: number[]) => {
+            document.cookie = `react-resizable-panels:layout=${JSON.stringify(
+              sizes
             )}`;
           }}
-          className={cn(
-            isCollapsed &&
-              "min-w-[50px] transition-all duration-300 ease-in-out"
-          )}
+          className="h-full items-stretch"
         >
-          <div
+          <ResizablePanel
+            defaultSize={defaultLayout[0]}
+            collapsedSize={navCollapsedSize}
+            collapsible={false}
+            minSize={15}
+            maxSize={20}
+            onCollapse={(collapsed?: any) => {
+              setIsCollapsed(collapsed);
+              document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
+                collapsed
+              )}`;
+            }}
             className={cn(
-              "flex h-[56px] items-center justify-center",
-              isCollapsed ? "h-[56px]" : "px-2"
+              isCollapsed &&
+                "min-w-[50px] transition-all duration-300 ease-in-out"
             )}
           >
-            <Tabs
-              defaultValue={tab}
-              value={tab}
-              onValueChange={(value) => setTab(value)}
-              className="w-full"
+            <div
+              className={cn(
+                "flex h-[56px] items-center justify-center",
+                isCollapsed ? "h-[56px]" : "px-2"
+              )}
             >
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger
-                  value="chat"
-                  className="focus:border-b-regal-green"
+              <Tabs
+                defaultValue={tab}
+                value={tab}
+                onValueChange={(value) => setTab(value)}
+                className="w-full"
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger
+                    value="chat"
+                    className="focus:border-b-regal-green"
+                  >
+                    Đang chat
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="history"
+                    className="focus:border-b-regal-green"
+                  >
+                    Lịch sử
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+            <Separator />
+            <div className="w-full">
+              <div className="m-2">
+                <div className="relative ">
+                  <Input
+                    className="pr-9 border-regal-green"
+                    placeholder="Tìm tên"
+                  />
+                  <Search className="absolute right-0 top-0 m-2.5 h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
+              <div className="m-2 mt-6">
+                {tab === "chat" && <Conversation />}
+
+                {tab === "history" && (
+                  <>
+                    <div className="flex items-center mt-3 justify-between">
+                      <div className="flex justify-center items-center gap-2">
+                        <Button
+                          variant="outline"
+                          className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                        >
+                          VT
+                        </Button>
+                        <div className="cursor-pointer">
+                          <p className="text-sm text-neutral-primary">
+                            Việt Trinh
+                          </p>
+                          <p className="text-sm text-neutral-ternary">
+                            Đã kết thúc
+                          </p>
+                        </div>
+                      </div>
+                      <div className="items-center">
+                        <p className="text-sm text-neutral-ternary">08/12</p>
+                        <p></p>
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-3 justify-between">
+                      <div className="flex justify-center items-center gap-2">
+                        <Button
+                          variant="outline"
+                          className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                        >
+                          HH
+                        </Button>
+                        <div className="cursor-pointer">
+                          <p className="text-sm text-neutral-primary">
+                            Huy Hoang
+                          </p>
+                          <p className="text-sm text-neutral-ternary">
+                            Đã kết thúc
+                          </p>
+                        </div>
+                      </div>
+                      <div className="items-center justify-end">
+                        <p className="text-sm text-neutral-ternary">08/12</p>
+                        <p></p>
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-3 justify-between">
+                      <div className="flex justify-center items-center gap-2">
+                        <Button
+                          variant="outline"
+                          className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                        >
+                          TTL
+                        </Button>
+                        <div className="cursor-pointer">
+                          <p className="text-sm text-neutral-primary">
+                            Trần Thuỳ Linh
+                          </p>
+                          <p className="text-sm text-neutral-ternary">
+                            Đã kết thúc
+                          </p>
+                        </div>
+                      </div>
+                      <div className="items-center justify-end">
+                        <p className="text-sm text-neutral-ternary">08/12</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-3 justify-between">
+                      <div className="flex justify-center items-center gap-2">
+                        <Button
+                          variant="outline"
+                          className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                        >
+                          TTL
+                        </Button>
+                        <div className="cursor-pointer">
+                          <p className="text-sm text-neutral-primary">
+                            Nhã Trang
+                          </p>
+                          <p className="text-sm text-neutral-ternary">
+                            Đã kết thúc
+                          </p>
+                        </div>
+                      </div>
+                      <div className="items-center justify-end">
+                        <p className="text-sm text-neutral-ternary">08/12</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-3 justify-between">
+                      <div className="flex justify-center items-center gap-2">
+                        <Button
+                          variant="outline"
+                          className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                        >
+                          TTL
+                        </Button>
+                        <div className="cursor-pointer">
+                          <p className="text-sm text-neutral-primary">
+                            Nhã Trang
+                          </p>
+                          <p className="text-sm text-neutral-ternary">
+                            Đã kết thúc
+                          </p>
+                        </div>
+                      </div>
+                      <div className="items-center justify-end">
+                        <p className="text-sm text-neutral-ternary">08/12</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-3 justify-between">
+                      <div className="flex justify-center items-center gap-2">
+                        <Button
+                          variant="outline"
+                          className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                        >
+                          TTL
+                        </Button>
+                        <div className="cursor-pointer">
+                          <p className="text-sm text-neutral-primary">
+                            Nhã Trang
+                          </p>
+                          <p className="text-sm text-neutral-ternary">
+                            Đã kết thúc
+                          </p>
+                        </div>
+                      </div>
+                      <div className="items-center justify-end">
+                        <p className="text-sm text-neutral-ternary">08/12</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-3 justify-between">
+                      <div className="flex justify-center items-center gap-2">
+                        <Button
+                          variant="outline"
+                          className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                        >
+                          TTL
+                        </Button>
+                        <div className="cursor-pointer">
+                          <p className="text-sm text-neutral-primary">
+                            Nhã Trang
+                          </p>
+                          <p className="text-sm text-neutral-ternary">
+                            Đã kết thúc
+                          </p>
+                        </div>
+                      </div>
+                      <div className="items-center justify-end">
+                        <p className="text-sm text-neutral-ternary">08/12</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-3 justify-between">
+                      <div className="flex justify-center items-center gap-2">
+                        <Button
+                          variant="outline"
+                          className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                        >
+                          TTL
+                        </Button>
+                        <div className="cursor-pointer">
+                          <p className="text-sm text-neutral-primary">
+                            Nhã Trang
+                          </p>
+                          <p className="text-sm text-neutral-ternary">
+                            Đã kết thúc
+                          </p>
+                        </div>
+                      </div>
+                      <div className="items-center justify-end">
+                        <p className="text-sm text-neutral-ternary">08/12</p>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel defaultSize={defaultLayout[1]} collapsible={false}>
+            {conversationId > 0 && (
+              <>
+                <div
+                  className={cn(
+                    "flex h-[56px] items-center justify-between",
+                    isCollapsed ? "h-[56px]" : "px-2"
+                  )}
                 >
-                  Đang chat
-                </TabsTrigger>
-                <TabsTrigger
-                  value="history"
-                  className="focus:border-b-regal-green"
-                >
-                  Lịch sử
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-          <Separator />
-          <div className="w-full">
-            <div className="m-2">
-              <div className="relative ">
-                <Input
-                  className="pr-9 border-regal-green"
-                  placeholder="Tìm tên"
+                  <div className="flex items-center gap-2">
+                    <Button className="text-neutral-primary border-regal-green bg-regal-green w-[45px] h-[45px] hover:bg-regal-green">
+                      VT
+                    </Button>
+                    <p className="text-md font-bold text-neutral-primary">
+                      {senderFullName && senderFullName}
+                    </p>
+                  </div>
+                  <div>
+                    <EndChat />
+                  </div>
+                </div>
+                <Separator />
+                <Chat
+                  isMobile={isMobile}
+                  refetchConversation={queryConversation.refetch}
                 />
-                <Search className="absolute right-0 top-0 m-2.5 h-4 w-4 text-muted-foreground" />
+              </>
+            )}
+            {!conversationId && (
+              <div className="flex flex-col align-middle items-center h-full justify-center">
+                <Image
+                  src="/NoData.png"
+                  width={500}
+                  height={500}
+                  alt="Picture of the author"
+                />
+                <p>Hãy chọn người bạn muốn trò chuyện</p>
               </div>
-            </div>
-            <div className="m-2 mt-6">
-              {tab === "chat" && (
-                <>
-                  {queryConversation.isSuccess &&
-                    conversations?.data &&
-                    Array.isArray(conversations?.data) &&
-                    conversations?.data.map(
-                      (conversation: any, index: number) => {
-                        const isActive =
-                          conversation?.conversation?.conversationId ===
-                          conversationId;
-
-                        return (
-                          <div
-                            className={cn(
-                              "flex items-center mt-2 justify-between cursor-pointer p-2",
-                              isActive && "bg-[#E0E9ED] text-white"
-                            )}
-                            key={index}
-                            onClick={() => {
-                              setSenderFullName(conversation?.senderFullName);
-                              setConversationId(
-                                conversation?.conversation?.conversationId
-                              );
-                              setUserIdTargetUser(
-                                conversation?.conversation?.userId
-                              );
-                              updateUrl(conversation?.conversation?.userId);
-                              setUserConversationId({
-                                senderFullName: conversation?.senderFullName,
-                                conversationId:
-                                  conversation?.conversation?.conversationId,
-                                userId: conversation?.conversation?.userId,
-                              });
-                            }}
-                          >
-                            <div className="flex justify-center items-center gap-2">
-                              <Button
-                                variant="outline"
-                                className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                              >
-                                NT
-                              </Button>
-                              <div className="cursor-pointer">
-                                <p className="text-sm text-neutral-primary">
-                                  {conversation?.senderFullName}
-                                </p>
-                                <p className="text-sm text-neutral-ternary whitespace-nowrap w-3">
-                                  {decryptMessageWithKeyAES(
-                                    conversation?.lastMessage?.encryptedMessage,
-                                    conversation?.conversation?.conversationKey
-                                  )}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="items-center">
-                              {/* <p className="text-sm text-neutral-ternary">{conversation?.lastMessage.createdAt}</p> */}
-                              <p></p>
-                            </div>
-                          </div>
-                        );
-                      }
-                    )}
-                </>
-              )}
-
-              {tab === "history" && (
-                <>
-                  <div className="flex items-center mt-3 justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                      >
-                        VT
-                      </Button>
-                      <div className="cursor-pointer">
-                        <p className="text-sm text-neutral-primary">
-                          Việt Trinh
-                        </p>
-                        <p className="text-sm text-neutral-ternary">
-                          Đã kết thúc
-                        </p>
-                      </div>
+            )}
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel
+            defaultSize={defaultLayout[2]}
+            collapsible={false}
+            minSize={30}
+            maxSize={35}
+          >
+            {conversationId > 0 && (
+              <>
+                <div
+                  className={cn(
+                    "flex h-[56px] items-center",
+                    isCollapsed ? "h-[56px]" : "px-2",
+                    !appointment ? "justify-start" : "justify-center"
+                  )}
+                >
+                  {!appointment ? (
+                    <Button
+                      className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
+                      onClick={() => setAppointment(true)}
+                      disabled={appointmentDetail.status !== null}
+                    >
+                      Đặt lịch hẹn
+                      <Calendar className="ml-2" size={20} />
+                    </Button>
+                  ) : (
+                    <div
+                      className="font-bold flex items-center w-full cursor-pointer"
+                      onClick={() => setAppointment(false)}
+                    >
+                      <IconArrowLeft size={20} className="mr-2" /> Quay lại
                     </div>
-                    <div className="items-center">
-                      <p className="text-sm text-neutral-ternary">08/12</p>
-                      <p></p>
-                    </div>
-                  </div>
-                  <div className="flex items-center mt-3 justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                      >
-                        HH
-                      </Button>
-                      <div className="cursor-pointer">
-                        <p className="text-sm text-neutral-primary">
-                          Huy Hoang
-                        </p>
-                        <p className="text-sm text-neutral-ternary">
-                          Đã kết thúc
-                        </p>
-                      </div>
-                    </div>
-                    <div className="items-center justify-end">
-                      <p className="text-sm text-neutral-ternary">08/12</p>
-                      <p></p>
-                    </div>
-                  </div>
-                  <div className="flex items-center mt-3 justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                      >
-                        TTL
-                      </Button>
-                      <div className="cursor-pointer">
-                        <p className="text-sm text-neutral-primary">
-                          Trần Thuỳ Linh
-                        </p>
-                        <p className="text-sm text-neutral-ternary">
-                          Đã kết thúc
-                        </p>
-                      </div>
-                    </div>
-                    <div className="items-center justify-end">
-                      <p className="text-sm text-neutral-ternary">08/12</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center mt-3 justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                      >
-                        TTL
-                      </Button>
-                      <div className="cursor-pointer">
-                        <p className="text-sm text-neutral-primary">
-                          Nhã Trang
-                        </p>
-                        <p className="text-sm text-neutral-ternary">
-                          Đã kết thúc
-                        </p>
-                      </div>
-                    </div>
-                    <div className="items-center justify-end">
-                      <p className="text-sm text-neutral-ternary">08/12</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center mt-3 justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                      >
-                        TTL
-                      </Button>
-                      <div className="cursor-pointer">
-                        <p className="text-sm text-neutral-primary">
-                          Nhã Trang
-                        </p>
-                        <p className="text-sm text-neutral-ternary">
-                          Đã kết thúc
-                        </p>
-                      </div>
-                    </div>
-                    <div className="items-center justify-end">
-                      <p className="text-sm text-neutral-ternary">08/12</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center mt-3 justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                      >
-                        TTL
-                      </Button>
-                      <div className="cursor-pointer">
-                        <p className="text-sm text-neutral-primary">
-                          Nhã Trang
-                        </p>
-                        <p className="text-sm text-neutral-ternary">
-                          Đã kết thúc
-                        </p>
-                      </div>
-                    </div>
-                    <div className="items-center justify-end">
-                      <p className="text-sm text-neutral-ternary">08/12</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center mt-3 justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                      >
-                        TTL
-                      </Button>
-                      <div className="cursor-pointer">
-                        <p className="text-sm text-neutral-primary">
-                          Nhã Trang
-                        </p>
-                        <p className="text-sm text-neutral-ternary">
-                          Đã kết thúc
-                        </p>
-                      </div>
-                    </div>
-                    <div className="items-center justify-end">
-                      <p className="text-sm text-neutral-ternary">08/12</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center mt-3 justify-between">
-                    <div className="flex justify-center items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                      >
-                        TTL
-                      </Button>
-                      <div className="cursor-pointer">
-                        <p className="text-sm text-neutral-primary">
-                          Nhã Trang
-                        </p>
-                        <p className="text-sm text-neutral-ternary">
-                          Đã kết thúc
-                        </p>
-                      </div>
-                    </div>
-                    <div className="items-center justify-end">
-                      <p className="text-sm text-neutral-ternary">08/12</p>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={defaultLayout[1]} collapsible={false}>
-          {conversationId > 0 && (
-            <>
-              <div
-                className={cn(
-                  "flex h-[56px] items-center justify-between",
-                  isCollapsed ? "h-[56px]" : "px-2"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  <Button className="text-neutral-primary border-regal-green bg-regal-green w-[45px] h-[45px] hover:bg-regal-green">
-                    VT
-                  </Button>
-                  <p className="text-md font-bold text-neutral-primary">
-                    {senderFullName && senderFullName}
-                  </p>
+                  )}
                 </div>
-                <div>
-                  <EndChat />
-                </div>
+                <Separator />
+
+                <ScrollArea className="w-full h-full">
+                  {!appointment && <ChatInformation />}
+
+                  {appointment && (
+                    <div className="m-4">
+                      <p className="font-bold text-2xl">Đặt lịch hẹn</p>
+                      <Appointment />
+                    </div>
+                  )}
+                </ScrollArea>
+              </>
+            )}
+
+            {!conversationId && (
+              <div className="flex flex-col align-middle items-center h-full justify-center">
+                <Image
+                  src="/NoData.png"
+                  width={500}
+                  height={500}
+                  alt="Picture of the author"
+                />
+                <p>Hãy chọn người bạn muốn trò chuyện</p>
               </div>
-              <Separator />
-              <Chat
-                isMobile={isMobile}
-                refetchConversation={queryConversation.refetch}
-              />
-            </>
-          )}
-          {!conversationId && (
-            <div className="flex flex-col align-middle items-center h-full justify-center">
-              <Image
-                src="/NoData.png"
-                width={500}
-                height={500}
-                alt="Picture of the author"
-              />
-              <p>Hãy chọn người bạn muốn trò chuyện</p>
-            </div>
-          )}
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel
-          defaultSize={defaultLayout[2]}
-          collapsible={false}
-          minSize={30}
-          maxSize={35}
-        >
-          {conversationId > 0 && (
-            <>
-              <div
-                className={cn(
-                  "flex h-[56px] items-center",
-                  isCollapsed ? "h-[56px]" : "px-2",
-                  !appointment ? "justify-start" : "justify-center"
-                )}
-              >
-                {!appointment ? (
-                  <Button
-                    className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
-                    onClick={() => setAppointment(true)}
-                    disabled={appointmentDetail.status !== null}
-                  >
-                    Đặt lịch hẹn
-                    <Calendar className="ml-2" size={20} />
-                  </Button>
-                ) : (
-                  <div
-                    className="font-bold flex items-center w-full cursor-pointer"
-                    onClick={() => setAppointment(false)}
-                  >
-                    <IconArrowLeft size={20} className="mr-2" /> Quay lại
-                  </div>
-                )}
-              </div>
-              <Separator />
-
-              <ScrollArea className="w-full h-full">
-                {!appointment && <ChatInformation />}
-
-                {appointment && (
-                  <div className="m-4">
-                    <p className="font-bold text-2xl">Đặt lịch hẹn</p>
-                    <Appointment />
-                  </div>
-                )}
-              </ScrollArea>
-            </>
-          )}
-
-          {!conversationId && (
-            <div className="flex flex-col align-middle items-center h-full justify-center">
-              <Image
-                src="/NoData.png"
-                width={500}
-                height={500}
-                alt="Picture of the author"
-              />
-              <p>Hãy chọn người bạn muốn trò chuyện</p>
-            </div>
-          )}
-        </ResizablePanel>
-      </ResizablePanelGroup>
+            )}
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </WebSocketProvider>
-     
     )
   );
 }

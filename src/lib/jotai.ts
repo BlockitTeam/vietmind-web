@@ -35,6 +35,7 @@ export const conversationIdAtom = atom<number>(0);
 export const conversationIdContentAtom = atom([]);
 export const userIdTargetUserAtom = atom<string | number>('');
 export const TypingMessageAtom = atom<boolean>(false);
+export const senderFullNameAtom = atom<string>('')
 
 export type TCurrentUser = {
   birthYear: number;

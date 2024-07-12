@@ -20,6 +20,7 @@ import {
 import { JSEncrypt } from "jsencrypt";
 import { useGetEASHook } from "@/hooks/getContentMessage";
 import { checkSenderFromDoctor, decryptMessage } from "@/servers/message";
+// @ts-ignore:next-line
 import { useWebSocketContext } from "./webSocketContext";
 
 interface ChatListProps {
