@@ -15,19 +15,27 @@ import { useWebSocketContext } from "./webSocketContext";
 import { useEffect } from "react";
 
 export function Appointment() {
-  const [userConversationId, setUserConversationId] = useAtom(userConversationIdAtom);
+  const [userConversationId, setUserConversationId] = useAtom(
+    userConversationIdAtom
+  );
 
   const [appointment, setAppointment] = useAtom(appointmentAtom);
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
+
   //socket
   const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
   //HOOK
-  const { data: appointments, ...queryAppointment } =
-  useAppointmentIdHook(conversationId);
+  const {
+    data: appointments,
+    refetch: refetchAppointment,
+    ...queryAppointment
+  } = useAppointmentIdHook(conversationId);
   const mutationAppointment = useMutationAppointment();
-  const usePutMutationAppointmentId = usePutMutationAppointmentIdHook(appointments?.data.conversationId);
+  const usePutMutationAppointmentId = usePutMutationAppointmentIdHook(
+    appointments?.data.conversationId
+  );
 
   const {
     register,
@@ -38,14 +46,28 @@ export function Appointment() {
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      content: '',
-      appointmentDate: '',
-      startTime: '',
-      endTime: '',
-      note: '',
+      content: "",
+      appointmentDate: "",
+      startTime: "",
+      endTime: "",
+      note: "",
       userId: userConversationId && userConversationId.senderFullName,
     },
   });
+
+  //Start: Todo setup websocket
+  useEffect(() => {
+    if (lastMessage !== null) {
+      const newMessage = JSON.parse(lastMessage.data);
+      if (newMessage?.type === "appointment") {
+        refetchAppointment().then((res) => {
+          setAppointment(res.data?.data);
+        });
+      }
+    }
+  }, [lastMessage]);
+
+  //End: Todo setup websocket
 
   useEffect(() => {
     if (appointments?.data) {
@@ -89,15 +111,18 @@ export function Appointment() {
       ...data,
       conversationId,
       doctorId: currentUser?.id,
-      status: "PENDING",
+
       userId: userIdTargetUser,
     };
 
-    if (appointments?.data === "PENDING") {
+    if (appointments?.data) {
+      console.log(appointments?.data);
       const bodyUpdate = {
         ...appointments.data,
         ...data,
+        status: "PENDING",
       };
+
       usePutMutationAppointmentId.mutate(bodyUpdate, {
         onSuccess(data, variables, context) {
           if (data.statusCode === 200) {
@@ -109,13 +134,13 @@ export function Appointment() {
                 appointmentId: data?.data?.appointmentId,
                 conversationId: data?.data?.conversationId,
                 status: "PENDING",
+                targetUserId: userIdTargetUser.toString().trim(),
               })
             );
             setAppointment(false);
           }
         },
       });
-
       return;
     }
 
@@ -129,6 +154,7 @@ export function Appointment() {
               appointmentId: data?.data?.appointmentId,
               conversationId: data?.data?.conversationId,
               status: "PENDING",
+              targetUserId: userIdTargetUser.toString().trim(),
             })
           );
           setAppointment(false);

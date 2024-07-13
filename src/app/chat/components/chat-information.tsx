@@ -43,11 +43,35 @@ export function ChatInformation() {
   const { data: screeningTest, ...queryScreeningTest } =
     useGetScreeningTestUserIdHook(userIdTargetUser);
 
-  const { data: appointments, ...queryAppointment } =
-    useAppointmentIdHook(conversationId);
+  const {
+    data: appointments,
+    refetch: refetchAppointment,
+    ...queryAppointment
+  } = useAppointmentIdHook(conversationId);
 
-    const usePutMutationAppointmentId = usePutMutationAppointmentIdHook(appointments?.data.conversationId);
+  const usePutMutationAppointmentId = usePutMutationAppointmentIdHook(
+    appointments?.data.conversationId
+  );
 
+  useEffect(() => {
+    if (lastMessage !== null) {
+      const newMessage = JSON.parse(lastMessage.data);
+      if (newMessage?.type === "appointment") {
+        refetchAppointment().then((res) => {
+          if (
+            res.data?.data.status === "CANCELLED" ||
+            res.data?.data.status === "CONFIRMED"
+          )
+            prompt(
+              `${res.data?.data.userId} đã ${
+                res.data?.data.status === "CANCELLED" ? "hủy" : "xác nhận"
+              } cuộc hẹn!`
+            );
+        });
+      }
+    }
+  }, [lastMessage]);
+  
   useEffect(() => {
     if (queryAppointment.isSuccess) {
       setAppointmentDetail({

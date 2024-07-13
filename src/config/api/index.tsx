@@ -50,7 +50,7 @@ export async function mutationPost<T>(obj: IMutation<object>): Promise<T> {
 
 export async function mutationPut<T>(obj: IMutation<object>): Promise<T> {
   const { url, body } = obj;
-  return await axiosInstance.post(url, body).then((response) => {
+  return await axiosInstance.put(url, body).then((response) => {
     return {
       data: response.data,
       statusCode: response.status,
