@@ -23,7 +23,9 @@ export function Appointment() {
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
-
+  const [appointmentDetail, setAppointmentDetail] = useAtom(
+    appointmentDetailAtom
+  );
   //socket
   const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
   //HOOK
@@ -71,6 +73,10 @@ export function Appointment() {
 
   useEffect(() => {
     if (appointments?.data) {
+      setAppointmentDetail({
+        status: appointments?.data.status,
+        data: appointments?.data
+      })
       setValue(
         "content",
         appointments?.data.status === "PENDING" && appointments?.data.content
@@ -126,8 +132,6 @@ export function Appointment() {
       usePutMutationAppointmentId.mutate(bodyUpdate, {
         onSuccess(data, variables, context) {
           if (data.statusCode === 200) {
-            console.log(' 11111 type:"appointment",');
-
             sendMessageWS(
               JSON.stringify({
                 type: "appointment",
