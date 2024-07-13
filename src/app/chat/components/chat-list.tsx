@@ -15,6 +15,7 @@ import {
   currentUserAtom,
   privateKeyAtom,
   publicKeyAtom,
+  senderFullNameAtom,
   userIdTargetUserAtom,
 } from "@/lib/jotai";
 import { JSEncrypt } from "jsencrypt";
@@ -48,10 +49,13 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
   );
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
+  const [senderFullName, setSenderFullName] = useAtom(senderFullNameAtom);
+
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
-  const [typingMessage, setTypingMessage] = useAtom(TypingMessageAtom)
+  const [typingMessage, setTypingMessage] = useAtom(TypingMessageAtom);
   const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
 
+  const [userTyping, setUserTyping] = useState(false);
   const getAES = useGetEASHook(conversationId);
   // const {
   //   sendMessage: sendMessageWS,
@@ -145,15 +149,23 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
   useEffect(() => {
     if (lastMessage !== null) {
       const newMessage = JSON.parse(lastMessage.data);
-      console.log("🚀 ~ useEffect ~ newMessage:", newMessage)
-      const decryptedMessage = decryptMessage(newMessage.message, aesKey);
-      setMessagesWS((prevMessages) => [
-        ...prevMessages,
-        {
-          fromMe: false,
-          message: decryptedMessage,
-        },
-      ]);
+      console.log("receive", newMessage);
+      if (newMessage?.type === "typing") {
+        setUserTyping(true);
+      } else if (newMessage?.type === "unTyping") {
+        setUserTyping(false);
+      } else if (newMessage?.type === "message") {
+        const decryptedMessage = decryptMessage(newMessage.message, aesKey);
+        setMessagesWS((prevMessages) => [
+          ...prevMessages,
+          {
+            fromMe: false,
+            message: decryptedMessage,
+          },
+        ]);
+      }
+
+      console.log("🚀 ~ useEffect ~ newMessage:", newMessage);
     }
   }, [lastMessage, aesKey, currentUser]);
 
@@ -193,7 +205,7 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
                       type: "spring",
                       bounce: 0.3,
                       // duration: messagesWS.indexOf(message) * 0.05 + 0.2,
-                      duration: 0.5
+                      duration: 0.5,
                     },
                   }}
                   style={{
@@ -237,10 +249,14 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
           </AnimatePresence>
         )}
       </div>
-      <ChatBottombar
-        isMobile={isMobile}
-        setMessagesWS={setMessagesWS}
-      />
+      {userTyping ? (
+        <p className="text-xs ml-[8px] text-gray-500">
+          {" "}
+          {`${senderFullName} đang chat...`}
+        </p>
+      ) : null}
+
+      <ChatBottombar isMobile={isMobile} setMessagesWS={setMessagesWS} />
     </div>
   );
 }

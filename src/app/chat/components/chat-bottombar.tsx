@@ -67,24 +67,32 @@ export default function ChatBottombar({
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
   const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
 
+  const [imTyping, setImTyping] = useState(false);
+
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     let newMessageWS = {};
-    if (event.target.value.toString().trim().length) {
+    if (event.target.value.toString().trim().length && !imTyping) {
       newMessageWS = {
         type: "typing",
         conversationId: conversationId,
         // message: encryptMessage(message.trim(), aesKey),
         targetUserId: userIdTargetUser,
       };
-    } else {
+      setImTyping(true);
+
+      sendMessageWS(JSON.stringify(newMessageWS));
+    }
+    if (!event.target.value.toString().trim().length && imTyping) {
       newMessageWS = {
         type: "unTyping",
         conversationId: conversationId,
         // message: encryptMessage(message.trim(), aesKey),
         targetUserId: userIdTargetUser,
       };
+      setImTyping(false);
+
+      sendMessageWS(JSON.stringify(newMessageWS));
     }
-    sendMessageWS(JSON.stringify(newMessageWS));
     setMessage(event.target.value);
   };
 

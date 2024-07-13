@@ -48,13 +48,30 @@ export function Appointment() {
   });
 
   useEffect(() => {
-    setValue('content',appointments?.data.status === 'PENDING' && appointments?.data.content);
-    setValue('appointmentDate', appointments?.data.status === 'PENDING' && appointments?.data.appointmentDate);
-    setValue('startTime', appointments?.data.status === 'PENDING' && appointments?.data.startTime);
-    setValue('endTime', appointments?.data.status === 'PENDING' && appointments?.data.endTime);
-    setValue('note',appointments?.data.status === 'PENDING' && appointments?.data.note);
-  }, [appointment])
-
+    if (appointments?.data) {
+      setValue(
+        "content",
+        appointments?.data.status === "PENDING" && appointments?.data.content
+      );
+      setValue(
+        "appointmentDate",
+        appointments?.data.status === "PENDING" &&
+          appointments?.data.appointmentDate
+      );
+      setValue(
+        "startTime",
+        appointments?.data.status === "PENDING" && appointments?.data.startTime
+      );
+      setValue(
+        "endTime",
+        appointments?.data.status === "PENDING" && appointments?.data.endTime
+      );
+      setValue(
+        "note",
+        appointments?.data.status === "PENDING" && appointments?.data.note
+      );
+    }
+  }, [appointments]);
 
   const watchFrom = watch("startTime");
   const watchTo = watch("endTime");
@@ -76,25 +93,28 @@ export function Appointment() {
       userId: userIdTargetUser,
     };
 
-
-    if (appointments?.data.status === 'PENDING') {
+    if (appointments?.data === "PENDING") {
       const bodyUpdate = {
         ...appointments.data,
-        ...data
+        ...data,
       };
       usePutMutationAppointmentId.mutate(bodyUpdate, {
         onSuccess(data, variables, context) {
           if (data.statusCode === 200) {
-            sendMessageWS(JSON.stringify({
-              type:"appointment",
-              appointmentId: data?.data?.appointmentId,
-              conversationId: data?.data?.conversationId,
-              status: "PENDING"
-            }))
+            console.log(' 11111 type:"appointment",');
+
+            sendMessageWS(
+              JSON.stringify({
+                type: "appointment",
+                appointmentId: data?.data?.appointmentId,
+                conversationId: data?.data?.conversationId,
+                status: "PENDING",
+              })
+            );
             setAppointment(false);
           }
         },
-      })
+      });
 
       return;
     }
@@ -102,12 +122,15 @@ export function Appointment() {
     mutationAppointment.mutate(body, {
       onSuccess(data, variables, context) {
         if (data.statusCode === 200) {
-          sendMessageWS(JSON.stringify({
-            type:"appointment",
-            appointmentId: data?.data?.appointmentId,
-            conversationId: data?.data?.conversationId,
-            status: "PENDING"
-          }))
+          console.log('2222     type:"appointment",');
+          sendMessageWS(
+            JSON.stringify({
+              type: "appointment",
+              appointmentId: data?.data?.appointmentId,
+              conversationId: data?.data?.conversationId,
+              status: "PENDING",
+            })
+          );
           setAppointment(false);
         }
       },
