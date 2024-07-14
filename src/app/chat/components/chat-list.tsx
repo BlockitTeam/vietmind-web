@@ -218,7 +218,7 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
                   )}
                 >
                   <div className="flex gap-3 items-center">
-                    {!message.fromMe && message.message && (
+                    {/* {!message.fromMe && message.message && (
                       <Avatar className="flex justify-center items-center">
                         <AvatarImage
                           src={"/User1.png"}
@@ -227,13 +227,13 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
                           height={6}
                         />
                       </Avatar>
-                    )}
+                    )} */}
                     {message.message && (
                       <span className="bg-accent p-3 rounded-md max-w-screen-sm break-words">
                         {message.message}
                       </span>
                     )}
-                    {message.fromMe && message.message && (
+                    {/* {message.fromMe && message.message && (
                       <Avatar className="flex justify-center items-center">
                         <AvatarImage
                           src={"/User2.png"}
@@ -242,7 +242,7 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
                           height={6}
                         />
                       </Avatar>
-                    )}
+                    )} */}
                   </div>
                 </motion.div>
               ))}
