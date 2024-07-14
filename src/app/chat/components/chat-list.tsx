@@ -213,11 +213,11 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
                     originY: 0.5,
                   }}
                   className={cn(
-                    "flex flex-col gap-2 p-4 whitespace-pre-wrap",
+                    "flex flex-col gap-2 p-4 whitespace-pre-wrap ",
                     message.fromMe ? "items-end" : "items-start"
                   )}
                 >
-                  <div className="flex gap-3 items-center">
+                  <div className="flex gap-3 items-center ">
                     {/* {!message.fromMe && message.message && (
                       <Avatar className="flex justify-center items-center">
                         <AvatarImage
@@ -229,7 +229,12 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
                       </Avatar>
                     )} */}
                     {message.message && (
-                      <span className="bg-accent p-3 rounded-md max-w-screen-sm break-words">
+                      <span
+                        className={cn(
+                          "bg-accent p-3 rounded-md max-w-screen-sm break-words ",
+                          message.fromMe ? "bg-[#C2F8CB]" : "bg-[#E0E9ED]"
+                        )}
+                      >
                         {message.message}
                       </span>
                     )}
