@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { displayAvatar } from "@/helper";
 import { useGetConversation } from "@/hooks/conversation";
 import { useContentMessageHook } from "@/hooks/getContentMessage";
 import {
@@ -79,7 +80,7 @@ export const Conversation = () => {
                   variant="outline"
                   className="border-regal-green bg-regal-green w-[40px] h-[40px]"
                 >
-                  NT
+                  {displayAvatar(conversation?.senderFullName)}
                 </Button>
                 <div className="cursor-pointer">
                   <p className="text-sm text-neutral-primary">

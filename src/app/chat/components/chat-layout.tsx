@@ -38,6 +38,7 @@ import CryptoJS from "crypto-js";
 import { decryptMessageWithKeyAES } from "@/servers/message";
 import { WebSocketProvider } from "./webSocketContext";
 import { Conversation } from "./conversation";
+import { displayAvatar } from "@/helper";
 
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
@@ -332,7 +333,7 @@ export function ChatLayout({
                 >
                   <div className="flex items-center gap-2">
                     <Button className="text-neutral-primary border-regal-green bg-regal-green w-[45px] h-[45px] hover:bg-regal-green">
-                      VT
+                      {senderFullName && displayAvatar(senderFullName)}
                     </Button>
                     <p className="text-md font-bold text-neutral-primary">
                       {senderFullName && senderFullName}
@@ -357,7 +358,7 @@ export function ChatLayout({
                   height={500}
                   alt="Picture of the author"
                 />
-                <p>Hãy chọn người bạn muốn trò chuyện</p>
+                <p>Hãy chọn người bệnh nhận để trò chuyện</p>
               </div>
             )}
           </ResizablePanel>
@@ -418,7 +419,7 @@ export function ChatLayout({
                   height={500}
                   alt="Picture of the author"
                 />
-                <p>Hãy chọn người bạn muốn trò chuyện</p>
+                <p>Hãy chọn người bệnh nhận để trò chuyện</p>
               </div>
             )}
           </ResizablePanel>

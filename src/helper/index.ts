@@ -13,3 +13,18 @@ export const displayStatusAppointment = (status: string) => {
       break;
   }
 };
+
+
+export const displayAvatar = (fullName: string) => {
+  if (fullName) {
+    const splitName = fullName.split(/(\s).+\s/).join("").split(' ');
+    let avatar = '';
+    splitName.map((item) => {
+      return avatar += item.charAt(0);
+    })
+
+    return avatar.split('').reverse().join('');
+  }
+
+  return 'NN';
+}
