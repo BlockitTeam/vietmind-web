@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { unknown } from "zod";
 
-type TStatusAppointment = '' | null | 'PENDING' | 'CANCELLED' | 'CONFIRMED';
+type TStatusAppointment = null | 'PENDING' | 'CANCELLED' | 'CONFIRMED';
 type TAppointmentDetail = {
   status: TStatusAppointment;
   data: {
