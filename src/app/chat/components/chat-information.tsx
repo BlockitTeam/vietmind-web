@@ -136,7 +136,7 @@ export function ChatInformation() {
                 Lịch hẹn : {userConversationId?.senderFullName}
               </p>
               <p className="text-sm text-neutral-secondary">
-                {appointments?.data?.appointmentDate}{" "}
+                {appointments?.data?.appointmentDate}
                 {appointments?.data?.startTime}-{appointments?.data?.endTime}
               </p>
 

@@ -382,7 +382,7 @@ export function ChatLayout({
                     <Button
                       className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
                       onClick={() => setAppointment(true)}
-                      disabled={ appointmentDetail.status  && appointmentDetail.status !== null ? true : false}
+                      disabled={ appointmentDetail.status  && appointmentDetail.status !== null && appointmentDetail.status !== 'CANCELLED'  ? true : false}
                     >
                       Đặt lịch hẹn
                       <Calendar className="ml-2" size={20} />

@@ -56,3 +56,35 @@ export const usePutMutationAppointmentIdHook = (id: string | number) => {
     },
   })
 }
+
+export const useScheduleAppointment = () => {
+  const queryClient = useQueryClient()
+  const url = `availabilities`;
+  return useMutation({
+    mutationKey: ['schedule-appointment'],
+    mutationFn: (body: any) => {
+      return mutationPost<IResponse<any>>({
+        url,
+        body
+      })
+    },
+    onSuccess(data, variables, context) {
+      void queryClient.invalidateQueries({
+        queryKey: ['schedule-appointment'],
+      })
+    },
+  })
+}
+
+export const FetchAvailability = () => {
+  const url = `availabilities`;
+  return getData<IResponse<any>>(url);
+};
+
+export const useGetScheduleAppointment = () => {
+  return useQuery<IResponse<any>>({
+    queryKey: ["schedule-appointment"],
+    queryFn: () => FetchAvailability(),
+    staleTime: 0
+  });
+}

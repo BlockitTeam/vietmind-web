@@ -25,7 +25,7 @@ export default function HeaderChat() {
   const useLogout = useLogoutHook();
 
   return (
-    <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 w-screen">
+    <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 w-screen z-10 p-3">
       <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
         <Link
           href="#"
@@ -35,13 +35,13 @@ export default function HeaderChat() {
           <span className="sr-only">Acme Inc</span>
         </Link>
         <Link
-          href="#"
+          href="/chat"
           className="text-foreground transition-colors hover:text-foreground w-max"
         >
           Chat
         </Link>
         <Link
-          href="#"
+          href="/appointment"
           className="text-muted-foreground transition-colors hover:text-foreground w-max"
         >
           Lịch hẹn
