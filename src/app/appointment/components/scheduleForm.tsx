@@ -28,7 +28,7 @@ const daysOfWeek = [
   "Chủ nhật",
 ];
 
-const ScheduleForm: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
+const ScheduleForm: React.FC<{ visible: boolean; onClose: () => void }> = ({ visible, onClose }) => {
   const { control, handleSubmit, setError, clearErrors, formState, reset } =
     useForm<FormValues>({
       mode: "onChange",
@@ -39,7 +39,7 @@ const ScheduleForm: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
       },
     });
 
-  const { data: scheduleAppointment, isSuccess } = useGetScheduleAppointment();
+  const { data: scheduleAppointment, isSuccess, refetch } = useGetScheduleAppointment();
 
   const convertDataToForm = (data: any[]) => {
     return data.map((item) => ({
@@ -75,13 +75,41 @@ const ScheduleForm: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
       }
     });
   };
+  useEffect(() => {
+    if (visible) {
+      // Khi Sheet mở, refetch lại dữ liệu
+      refetch();
+    }
+  }, [visible, refetch]);
+  
 
   useEffect(() => {
-    if (isSuccess && scheduleAppointment?.data && isOpen) {
+    if (isSuccess && scheduleAppointment?.data) {
       const formData = convertDataToForm(scheduleAppointment.data);
-      resetWithFieldArray(formData);
+  
+      // Debugging: Log the form data to ensure second shifts are being processed
+      console.log("Resetting form with data:", formData);
+  
+      // Lặp qua các ngày trong tuần và đảm bảo rằng mỗi ngày có tối đa 2 ca
+      const updatedShifts = daysOfWeek.flatMap((_, dayIndex) => {
+        const dayShifts = formData.filter((shift) => shift.dayOfWeek === dayIndex + 1);
+  
+        // Nếu chưa có ca nào, thêm ca mặc định cho ngày đó
+        if (dayShifts.length === 0) {
+          return [{ dayOfWeek: dayIndex + 1, shiftNumber: 1, startTime: "", endTime: "" }];
+        }
+  
+        // Trả về các ca làm việc cho ngày đó (1 hoặc 2 ca)
+        return dayShifts;
+      });
+  
+      // Log updated shifts to verify if second shifts exist
+      console.log("Updated shifts:", updatedShifts);
+  
+      // Reset lại form với dữ liệu mới
+      reset({ shifts: updatedShifts });
     }
-  }, [scheduleAppointment, isOpen, isSuccess]);
+  }, [scheduleAppointment, isSuccess, reset]);
 
   const executeScheduleAppointment = useScheduleAppointment();
 
@@ -181,14 +209,14 @@ const ScheduleForm: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
             <div className="w-[70px]">
               <h3>{day}</h3>
             </div>
-            <div className="flex flex-col ">
+            <Flex  justify="center" vertical gap={8}>
               {fields
                 .filter((field) => field.dayOfWeek === dayIndex + 1)
                 .map((field, index) => (
                   <Space
                     key={field.id}
                     align="center"
-                    className="flex mb-[10px]"
+                    className="flex gap-2"
                   >
                     <Controller
                       name={`shifts.${fields.findIndex(
@@ -251,7 +279,7 @@ const ScheduleForm: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
                     )}
                   </Space>
                 ))}
-            </div>
+            </Flex>
             <div>
               {fields.filter((field) => field.dayOfWeek === dayIndex + 1)
                 .length < 2 && (

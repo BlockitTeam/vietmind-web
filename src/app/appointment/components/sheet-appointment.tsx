@@ -37,7 +37,7 @@ export function SheetAppointment() {
           </SheetDescription>
         </SheetHeader>
         <ScrollArea>
-          <ScheduleForm isOpen={isOpen}/>
+          <ScheduleForm visible={isOpen} onClose={() => setIsOpen(false)} />
         </ScrollArea>
       </SheetContent>
     </Sheet>
