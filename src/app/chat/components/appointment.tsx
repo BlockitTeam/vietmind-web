@@ -122,7 +122,6 @@ export function Appointment() {
     };
 
     if (appointments?.data) {
-      console.log(appointments?.data);
       const bodyUpdate = {
         ...appointments.data,
         ...data,

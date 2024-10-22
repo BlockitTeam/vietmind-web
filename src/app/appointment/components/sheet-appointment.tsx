@@ -1,27 +1,27 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Sheet,
-  SheetClose,
+  SheetTrigger,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
+  SheetDescription,
 } from "@/components/ui/sheet";
 import { Calendar } from "lucide-react";
 import ScheduleForm from "./scheduleForm";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
+import { useGetScheduleAppointment } from "@/hooks/appointment";
 
 export function SheetAppointment() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleOpenChange = (isOpen: boolean) => {
-    setIsOpen(isOpen);
+  const { data: scheduleAppointment, isSuccess, refetch } = useGetScheduleAppointment();
+
+  const handleOpenChange = (openState: boolean) => {
+    setIsOpen(openState);
   };
+
   return (
     <Sheet onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
@@ -33,11 +33,14 @@ export function SheetAppointment() {
         <SheetHeader>
           <SheetTitle>Đặt lịch làm việc</SheetTitle>
           <SheetDescription>
-            Hai tuần từ 26 tháng 8 đến 1 tháng 9{" "}
+            Lịch làm việc trong một tuần
           </SheetDescription>
         </SheetHeader>
         <ScrollArea>
-          <ScheduleForm visible={isOpen} onClose={() => setIsOpen(false)} />
+          <ScheduleForm
+            visible={isOpen}
+            scheduleAppointment={scheduleAppointment?.data}
+          />
         </ScrollArea>
       </SheetContent>
     </Sheet>

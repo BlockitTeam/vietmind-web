@@ -10,16 +10,16 @@ import { CalendarSingle } from "./calendar";
 import { SheetAppointment } from "./sheet-appointment";
 
 const AppointmentLayout: React.FC = () => (
-  <div className="w-full h-screen"> {/* Full height of the viewport */}
+  <div className="w-full h-screen overflow-scroll">
     <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel minSize={15} maxSize={15} defaultSize={15} className="h-full w-full">
-        <div className="flex flex-col items-center justify-center mt-4"> {/* Center items vertically */}
+      <ResizablePanel minSize={15} maxSize={15} defaultSize={15} className="w-full h-full mt-5">
+        <div className="flex flex-col items-center justify-center w-full">
           <SheetAppointment />
           <CalendarSingle />
         </div>
       </ResizablePanel>
       <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={85} className="h-full">
+      <ResizablePanel defaultSize={85} className="h-fit">
         <div className="p-4 w-full h-full">
           <FullFeaturedCalendar />
         </div>

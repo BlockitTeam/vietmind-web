@@ -60,8 +60,9 @@ const FullFeaturedCalendar = () => {
   };
 
   return (
-    <div className="w-full h-full z-0">
+    <div className="w-full h-screen z-0">
       <FullCalendar
+        height={'100%'}
         ref={calendarRef} // Reference to calendar instance
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView="dayGridMonth" // Month view
