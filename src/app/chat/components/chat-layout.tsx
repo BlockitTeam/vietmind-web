@@ -18,27 +18,21 @@ import {
   appointmentAtom,
   appointmentDetailAtom,
   conversationIdAtom,
-  conversationIdContentAtom,
   currentUserAtom,
   senderFullNameAtom,
-  userConversationIdAtom,
-  userIdTargetUserAtom,
 } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { Form, useForm } from "react-hook-form";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EndChat } from "./chat-modal-end";
 import { Appointment } from "./appointment";
 import { ChatInformation } from "./chat-information";
 import { useCurrentUserHook } from "@/hooks/currentUser";
-import { useContentMessageHook } from "@/hooks/getContentMessage";
 import { useGetConversation } from "@/hooks/conversation";
-import CryptoJS from "crypto-js";
-import { decryptMessageWithKeyAES } from "@/servers/message";
 import { WebSocketProvider } from "./webSocketContext";
 import { Conversation } from "./conversation";
 import { displayAvatar } from "@/helper";
+import { AnswerSheet } from "./answer-sheet";
 
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
@@ -339,7 +333,8 @@ export function ChatLayout({
                       {senderFullName && senderFullName}
                     </p>
                   </div>
-                  <div>
+                  <div className="flex gap-3">
+                    <AnswerSheet/>
                     <EndChat />
                   </div>
                 </div>

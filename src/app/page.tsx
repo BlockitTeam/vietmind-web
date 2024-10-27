@@ -6,16 +6,13 @@ import { Label } from "@radix-ui/react-label";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
 import * as z from "zod";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import { useSetAtom } from "jotai";
 import { TCurrentUser, currentUserAtom, sessionAtom } from "@/lib/jotai";
-import axios from "axios";
 import axiosInstance from "@/config/axios/axiosInstance";
 import { QueryClient } from "@tanstack/react-query";
-import { useCurrentUserHook } from "@/hooks/currentUser";
 import useLocalStorage from "@/hooks/useLocalStorage";
 
 const loginSchema = z.object({

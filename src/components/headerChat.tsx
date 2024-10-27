@@ -11,18 +11,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "./ui/button";
+import { usePathname } from "next/navigation"; // Import usePathname
 import axiosInstance from "@/config/axios/axiosInstance";
 import { useRouter } from "next/navigation";
 import { useLogoutHook } from "@/hooks/logout";
 import Cookies from "universal-cookie";
 import { currentUserAtom } from "@/lib/jotai";
 import { useAtom } from "jotai";
-import { deleteCookie } from 'cookies-next';
+import { deleteCookie } from "cookies-next";
+import { InformationDoctor } from "./InformationDoctor";
+import { useRef } from "react";
 
 export default function HeaderChat() {
+  const pathname = usePathname(); // Get the current pathname
   const router = useRouter();
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
   const useLogout = useLogoutHook();
+  const dropdownMenuRef = useRef<HTMLButtonElement>(null);
+
+  const handleInformationClick = () => {
+    dropdownMenuRef.current?.click(); // Programmatically close the dropdown menu
+  };
+
+  const isActive = (href: any) => pathname === href; // Helper to check if link is active
 
   return (
     <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 w-screen z-10 p-3">
@@ -36,15 +47,33 @@ export default function HeaderChat() {
         </Link>
         <Link
           href="/chat"
-          className="text-foreground transition-colors hover:text-foreground w-max"
+          className={`${
+            isActive("/chat")
+              ? "text-blue-500 font-bold border-b-2 border-b-regal-green"
+              : "text-foreground"
+          } transition-colors hover:text-foreground w-max`}
         >
           Chat
         </Link>
         <Link
           href="/appointment"
-          className="text-muted-foreground transition-colors hover:text-foreground w-max"
+          className={`${
+            isActive("/appointment")
+              ? "text-blue-500 font-bold border-b-2 border-b-regal-green"
+              : "text-muted-foreground"
+          } transition-colors hover:text-foreground w-max`}
         >
           Lịch hẹn
+        </Link>
+        <Link
+          href="/results"
+          className={`${
+            isActive("/results")
+              ? "text-blue-500 font-bold border-b-2 border-b-regal-green"
+              : "text-muted-foreground"
+          } transition-colors hover:text-foreground w-max`}
+        >
+          Kết quả sàn lọc
         </Link>
       </nav>
       <Sheet>
@@ -56,43 +85,11 @@ export default function HeaderChat() {
         </SheetTrigger>
         <SheetContent side="left">
           <nav className="grid gap-6 text-lg font-medium">
-            <Link
-              href="#"
-              className="flex items-center gap-2 text-lg font-semibold"
-            >
-              <Package2 className="h-6 w-6" />
-              <span className="sr-only">Acme Inc</span>
-            </Link>
-            <Link href="#" className="hover:text-foreground">
-              Dashboard
-            </Link>
-            <Link
-              href="#"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Orders
-            </Link>
-            <Link
-              href="#"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Products
-            </Link>
-            <Link
-              href="#"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Customers
-            </Link>
-            <Link
-              href="#"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Analytics
-            </Link>
+            {/* Add other links here */}
           </nav>
         </SheetContent>
       </Sheet>
+      {/* Rest of your component */}
       <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
         <form className="ml-auto flex-1 sm:flex-initial">
           {/* <div className="relative">
@@ -104,18 +101,25 @@ export default function HeaderChat() {
             />
           </div> */}
         </form>
-        <DropdownMenu>
+        <DropdownMenu >
           <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="icon" className="rounded-full">
+            <Button variant="secondary" size="icon" className="rounded-full" ref={dropdownMenuRef}>
               <CircleUser className="h-5 w-5" />
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>Cài đặt</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
+            <DropdownMenuItem
+              asChild
+              onClick={(e) => {
+                handleInformationClick();
+              }}
+            >
+              <InformationDoctor />
+            </DropdownMenuItem>
+            {/* <DropdownMenuItem>Support</DropdownMenuItem> */}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={async () => {
@@ -123,7 +127,10 @@ export default function HeaderChat() {
                   onSuccess(data, variables, context) {
                     if (data.statusCode === 200) {
                       setCurrentUser(null);
-                      deleteCookie('JSESSIONID', { path: '/', domain: 'http://91.108.104.57' });
+                      deleteCookie("JSESSIONID", {
+                        path: "/",
+                        domain: "http://91.108.104.57",
+                      });
                       // Remove the cookie
                       // Redirect to the home page or any other page
                       router.push("/");
