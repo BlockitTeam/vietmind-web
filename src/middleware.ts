@@ -1,19 +1,26 @@
 // middleware.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  const jsessionId = request.cookies.get('JSESSIONID');
+export function middleware(req: NextRequest) {
+  // Get the authentication token (or session) from cookies
+  const token = req.cookies.get("JSESSIONID");
 
-  if (!jsessionId) {
-    const response: any = NextResponse.redirect(new URL('/', request.url));
-    // ts-ignore-next-line
-    response.status = 401;
-    return response;
+  // Define protected paths
+  const protectedPaths = ["/chat", "/appointment"];
+
+  // Check if the request is for a protected path and the token is missing
+  if (protectedPaths.includes(req.nextUrl.pathname) && !token) {
+    // Redirect to the login page if not authenticated
+    const loginUrl = new URL("/", req.url);
+    return NextResponse.redirect(loginUrl);
   }
 
+  // Allow the request to continue if authenticated or path isn't protected
   return NextResponse.next();
 }
 
+// Apply middleware to all routes under /chat or /appointment
 export const config = {
-  matcher: ['/protected/:path*', '/another-protected-page'], // Apply middleware to specific paths
+  matcher: ["/chat/:path*", "/appointment/:path*"],
 };

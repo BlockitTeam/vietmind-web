@@ -20,10 +20,14 @@ import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import Heading from "@tiptap/extension-heading";
-import { useAppointmentIdHook, usePutMutationAppointmentIdHook } from "@/hooks/appointment";
+import {
+  useAppointmentIdHook,
+  usePutMutationAppointmentIdHook,
+} from "@/hooks/appointment";
 import { displayStatusAppointment } from "@/helper";
 import { useWebSocketContext } from "./webSocketContext";
 import { useEffect } from "react";
+import { AnswerSheet } from "./answer-sheet";
 
 export function ChatInformation() {
   const [appointmentDetail, setAppointmentDetail] = useAtom(
@@ -71,7 +75,7 @@ export function ChatInformation() {
       }
     }
   }, [lastMessage]);
-  
+
   useEffect(() => {
     if (queryAppointment.isSuccess) {
       setAppointmentDetail({
@@ -99,29 +103,31 @@ export function ChatInformation() {
   });
 
   const cancelAppointment = () => {
-      const bodyCancel = {
-        ...appointments?.data,
-        status: 'CANCELLED'
-    }
+    const bodyCancel = {
+      ...appointments?.data,
+      status: "CANCELLED",
+    };
 
     usePutMutationAppointmentId.mutate(bodyCancel, {
       onSuccess(data, variables, context) {
         if (data.statusCode === 200) {
           setAppointmentDetail({
             status: data?.data?.status,
-            data: data?.data
+            data: data?.data,
           });
-          sendMessageWS(JSON.stringify({
-            type:"appointment",
-            appointmentId: data?.data?.appointmentId,
-            conversationId: data?.data?.conversationId,
-            status: "CANCELLED"
-          }))
+          sendMessageWS(
+            JSON.stringify({
+              type: "appointment",
+              appointmentId: data?.data?.appointmentId,
+              conversationId: data?.data?.conversationId,
+              status: "CANCELLED",
+            })
+          );
           setAppointment(false);
         }
       },
-    })
-  }
+    });
+  };
   return (
     <div className="m-4 mb-3">
       {appointments && appointments.data && (
@@ -145,10 +151,20 @@ export function ChatInformation() {
               </p>
             </CardContent>
             <CardFooter className="grid grid-flow-col gap-3 p-2 items-center justify-stretch w-full">
-              <Button disabled={appointments.data?.status === 'CANCELLED'} variant="outline" className="border-regal-green" onClick={() => setAppointment(true)}>
+              <Button
+                disabled={appointments.data?.status === "CANCELLED"}
+                variant="outline"
+                className="border-regal-green"
+                onClick={() => setAppointment(true)}
+              >
                 Dời lịch hẹn
               </Button>
-              <Button disabled={appointments.data?.status === 'CANCELLED'} variant="outline" className="border-regal-green" onClick={cancelAppointment}>
+              <Button
+                disabled={appointments.data?.status === "CANCELLED"}
+                variant="outline"
+                className="border-regal-green"
+                onClick={cancelAppointment}
+              >
                 Huỷ lịch hẹn
               </Button>
             </CardFooter>
@@ -198,14 +214,7 @@ export function ChatInformation() {
                 {/* <WatchDetail /> */}
               </div>
               <div className="flex gap-2 flex-col">
-                {Object.entries(screeningTest.data).map(([key, value,], index) => (
-                  <div className="flex gap-4" key={index}>
-                    <p className="text-neutral-ternary text-sm">{key}:</p>
-                    <p className="text-neutral-primary text-sm ">
-                      {value as any}
-                    </p>
-                  </div>
-                ))}
+                <AnswerSheet />
               </div>
             </div>
             <Separator />

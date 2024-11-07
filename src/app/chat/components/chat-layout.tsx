@@ -32,7 +32,6 @@ import { useGetConversation } from "@/hooks/conversation";
 import { WebSocketProvider } from "./webSocketContext";
 import { Conversation } from "./conversation";
 import { displayAvatar } from "@/helper";
-import { AnswerSheet } from "./answer-sheet";
 
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
@@ -334,7 +333,6 @@ export function ChatLayout({
                     </p>
                   </div>
                   <div className="flex gap-3">
-                    <AnswerSheet/>
                     <EndChat />
                   </div>
                 </div>

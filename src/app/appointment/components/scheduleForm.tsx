@@ -238,6 +238,7 @@ const ScheduleForm: React.FC<{
               2 && (
               <Button
                 type="primary"
+                style={{background: "rgb(80 225 104)"}}
                 onClick={() =>
                   append({
                     dayOfWeek: index + 1,
@@ -253,7 +254,7 @@ const ScheduleForm: React.FC<{
           </Flex>
         </div>
       ))}
-      <Button type="primary" htmlType="submit" className="mt-4">
+      <Button type="primary" htmlType="submit" className="mt-4" style={{background: "rgb(80 225 104)"}}>
         Đặt lịch làm việc
       </Button>
     </form>

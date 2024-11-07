@@ -65,16 +65,6 @@ export default function HeaderChat() {
         >
           Lịch hẹn
         </Link>
-        <Link
-          href="/results"
-          className={`${
-            isActive("/results")
-              ? "text-blue-500 font-bold border-b-2 border-b-regal-green"
-              : "text-muted-foreground"
-          } transition-colors hover:text-foreground w-max`}
-        >
-          Kết quả sàn lọc
-        </Link>
       </nav>
       <Sheet>
         <SheetTrigger asChild>
