@@ -1,5 +1,5 @@
 "use client";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { cn } from "@/utils/cn";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
@@ -12,8 +12,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { useSetAtom } from "jotai";
 import { TCurrentUser, currentUserAtom, sessionAtom } from "@/lib/jotai";
 import axiosInstance from "@/config/axios/axiosInstance";
-import { QueryClient } from "@tanstack/react-query";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import Cookies from 'js-cookie';
 
 const loginSchema = z.object({
   username: z.string().email({ message: "Invalid email address" }),
@@ -44,7 +44,13 @@ export default function Home() {
     useLocalStorage<TCurrentUser | null>("currentUser", null);
 
   const router = useRouter();
-
+  useEffect(() => {
+        const sessionCookie = Cookies.get('JSESSIONID');
+        if (sessionCookie) {
+          
+            router.replace('/chat'); // Redirect to dashboard or preferred page
+        }
+    }, [router]);
   const customSubmit = async (e: FormEvent) => {
     e.preventDefault();
     await handleSubmit(onSubmit)(e);

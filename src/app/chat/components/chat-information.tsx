@@ -242,7 +242,7 @@ export function ChatInformation() {
               <li>Khó ngủ, giờ ngủ không cố định </li>
             </ul>
           </div>
-          <div className="border-spacing-2 border-l-yellow-300 border p-2 rounded-md	">
+          <div className="border-spacing-2 border-yellow-300 border p-2 rounded-md	w-full h-full">
             <EditorContent editor={editor} style={{ padding: "10px" }} />
           </div>
           <Button variant={"outline"} className="border-regal-green mt-4">

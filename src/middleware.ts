@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(req: NextRequest) {
-  // Get the authentication token (or session) from cookies
+  // Get the authentication token from cookies
   const token = req.cookies.get("JSESSIONID");
 
   // Define protected paths
@@ -16,11 +16,16 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Allow the request to continue if authenticated or path isn't protected
+  // If the user is authenticated and trying to access the login page, redirect them to /chat
+  if (token && req.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL('/chat', req.url));
+  }
+
+  // Allow the request to proceed if authenticated or not accessing protected paths
   return NextResponse.next();
 }
 
-// Apply middleware to all routes under /chat or /appointment
+// Apply middleware to the root, /chat, and /appointment paths
 export const config = {
-  matcher: ["/chat/:path*", "/appointment/:path*"],
+  matcher: ["/", "/chat/:path*", "/appointment/:path*"],
 };

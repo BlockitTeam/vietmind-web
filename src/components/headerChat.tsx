@@ -15,12 +15,12 @@ import { usePathname } from "next/navigation"; // Import usePathname
 import axiosInstance from "@/config/axios/axiosInstance";
 import { useRouter } from "next/navigation";
 import { useLogoutHook } from "@/hooks/logout";
-import Cookies from "universal-cookie";
 import { currentUserAtom } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { deleteCookie } from "cookies-next";
 import { InformationDoctor } from "./InformationDoctor";
 import { useRef } from "react";
+import Cookies from 'js-cookie';
 
 export default function HeaderChat() {
   const pathname = usePathname(); // Get the current pathname
@@ -117,6 +117,7 @@ export default function HeaderChat() {
                   onSuccess(data, variables, context) {
                     if (data.statusCode === 200) {
                       setCurrentUser(null);
+                      Cookies.remove('JSESSIONID');
                       deleteCookie("JSESSIONID", {
                         path: "/",
                         domain: "http://91.108.104.57",
