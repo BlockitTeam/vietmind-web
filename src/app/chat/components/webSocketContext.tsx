@@ -15,6 +15,8 @@ const NEXT_PUBLIC_SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
   const [socketUrl, setSocketUrl] = useState(NEXT_PUBLIC_SOCKET_URL);
   const { sendMessage: sendMessageWS, lastMessage, readyState } = useWebSocket(socketUrl, {
     onOpen: () => console.log("WebSocket connection established"),
+    onClose: () => console.log("WebSocket connection closed"),
+    onError: (error) => console.error("WebSocket error:", error),
   });
 
   const updateUrl = (targetUserId: string) => {

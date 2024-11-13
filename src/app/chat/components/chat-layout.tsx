@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-import { userData } from "../data";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -34,16 +33,10 @@ import { Conversation } from "./conversation";
 import { displayAvatar } from "@/helper";
 
 interface ChatLayoutProps {
-  defaultLayout: number[] | undefined;
   defaultCollapsed?: boolean;
   navCollapsedSize: number;
 }
-export function ChatLayout({
-  defaultLayout = [265, 440, 655],
-  defaultCollapsed = false,
-  navCollapsedSize,
-}: ChatLayoutProps) {
-  const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
+export function ChatLayout() {
   const [isMobile, setIsMobile] = useState(false);
   const [tab, setTab] = React.useState("chat");
 
@@ -79,28 +72,19 @@ export function ChatLayout({
           className="h-full items-stretch"
         >
           <ResizablePanel
-            defaultSize={defaultLayout[0]}
-            collapsedSize={navCollapsedSize}
+            defaultSize={20}
             collapsible={false}
-            minSize={15}
+            minSize={20}
             maxSize={20}
             onCollapse={(collapsed?: any) => {
-              setIsCollapsed(collapsed);
               document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
                 collapsed
               )}`;
             }}
-            className={cn(
-              isCollapsed &&
-                "min-w-[50px] transition-all duration-300 ease-in-out"
-            )}
           >
-            <div
-              className={cn(
-                "flex h-[56px] items-center justify-center",
-                isCollapsed ? "h-[56px]" : "px-2"
-              )}
-            >
+            <div className={cn(
+                "flex h-[56px] items-center justify-center px-2",
+              )}>
               <Tabs
                 defaultValue={tab}
                 value={tab}
@@ -136,7 +120,6 @@ export function ChatLayout({
               </div>
               <div className="m-2 mt-6">
                 {tab === "chat" && <Conversation />}
-
                 {tab === "history" && (
                   <>
                     <div className="flex items-center mt-3 justify-between">
@@ -315,13 +298,12 @@ export function ChatLayout({
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={defaultLayout[1]} collapsible={false}>
+          <ResizablePanel defaultSize={60} collapsible={false}>
             {conversationId > 0 && (
               <>
                 <div
                   className={cn(
-                    "flex h-[56px] items-center justify-between",
-                    isCollapsed ? "h-[56px]" : "px-2"
+                    "flex h-[56px] items-center justify-between px-2",
                   )}
                 >
                   <div className="flex items-center gap-2">
@@ -357,7 +339,7 @@ export function ChatLayout({
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel
-            defaultSize={defaultLayout[2]}
+            defaultSize={20}
             collapsible={false}
             minSize={30}
             maxSize={35}
@@ -366,8 +348,7 @@ export function ChatLayout({
               <>
                 <div
                   className={cn(
-                    "flex h-[56px] items-center",
-                    isCollapsed ? "h-[56px]" : "px-2",
+                    "flex h-[56px] items-center px-2",
                     !appointment ? "justify-start" : "justify-center"
                   )}
                 >
@@ -375,7 +356,13 @@ export function ChatLayout({
                     <Button
                       className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
                       onClick={() => setAppointment(true)}
-                      disabled={ appointmentDetail.status  && appointmentDetail.status !== null && appointmentDetail.status !== 'CANCELLED'  ? true : false}
+                      disabled={
+                        appointmentDetail.status &&
+                        appointmentDetail.status !== null &&
+                        appointmentDetail.status !== "CANCELLED"
+                          ? true
+                          : false
+                      }
                     >
                       Đặt lịch hẹn
                       <Calendar className="ml-2" size={20} />
