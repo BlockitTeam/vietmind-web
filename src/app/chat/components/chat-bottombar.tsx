@@ -2,7 +2,6 @@ import {
   FileImage,
   Mic,
   Paperclip,
-  PlusCircle,
   SendHorizontal,
   Smile,
   ThumbsUp,
@@ -11,14 +10,8 @@ import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Message, loggedInUserData } from "../data";
 import { buttonVariants } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   TypingMessageAtom,
   aesKeyAtom,
@@ -33,6 +26,8 @@ import CryptoJS from "crypto-js";
 import { encryptMessage } from "@/servers/message";
 // @ts-ignore:next-line
 import { useWebSocketContext } from "./webSocketContext";
+import { useQueryClient } from "@tanstack/react-query";
+import { useConversationContext } from "./conversations-provider";
 
 type INewMessageWS = {
   type: "message";
@@ -45,16 +40,15 @@ interface IChatMessage {
   message: string;
 }
 interface ChatBottombarProps {
-  isMobile: boolean;
   setMessagesWS: (newMessage: IChatMessage[]) => void;
 }
 
 export const BottombarIcons = [{ icon: FileImage }, { icon: Paperclip }];
 
 export default function ChatBottombar({
-  isMobile,
   setMessagesWS,
 }: ChatBottombarProps) {
+  const {refetchConversation} = useConversationContext();
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [loadTyping, setLoadTyping] = useState(false);
@@ -113,6 +107,8 @@ export default function ChatBottombar({
           message: "👍",
         },
       ]);
+      refetchConversation();
+
       setMessage("");
     }
   };
@@ -135,8 +131,8 @@ export default function ChatBottombar({
             message: message.trim(),
           },
         ]);
+        refetchConversation();
         setMessage("");
-
         if (inputRef.current) {
           inputRef.current.focus();
         }
@@ -164,7 +160,7 @@ export default function ChatBottombar({
         <div className="p-2 overflow-visible text-sm bg-transparent">
           <span>Thao đang chat...</span>
         </div>
-       )}
+      )}
       <div className="p-2 flex justify-between w-full items-center gap-2 mb-16">
         <AnimatePresence initial={false}>
           <motion.div

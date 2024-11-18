@@ -150,7 +150,6 @@ export function Appointment() {
     mutationAppointment.mutate(body, {
       onSuccess(data, variables, context) {
         if (data.statusCode === 200) {
-          console.log('2222     type:"appointment",');
           sendMessageWS(
             JSON.stringify({
               type: "appointment",

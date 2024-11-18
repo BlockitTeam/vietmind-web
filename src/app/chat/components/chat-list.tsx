@@ -23,6 +23,7 @@ import { useGetEASHook } from "@/hooks/getContentMessage";
 import { checkSenderFromDoctor, decryptMessage } from "@/servers/message";
 // @ts-ignore:next-line
 import { useWebSocketContext } from "./webSocketContext";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ChatListProps {
   isMobile: boolean;
@@ -34,8 +35,9 @@ interface IChatMessage {
   message: string;
 }
 
-export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
+export function ChatList() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
   const [loadingMessage, setLoadingMessage] = useState(false);
   const [socketUrl, setSocketUrl] = useState("ws://localhost:9001/ws");
   const [messagesWS, setMessagesWS] = useState<IChatMessage[]>([]);
@@ -57,39 +59,6 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
 
   const [userTyping, setUserTyping] = useState(false);
   const getAES = useGetEASHook(conversationId);
-  // const {
-  //   sendMessage: sendMessageWS,
-  //   lastMessage,
-  //   readyState,
-  // } = useWebSocket(process.env.NEXT_PUBLIC_SOCKET_URL as string, {
-  //   onOpen: () => console.log("WebSocket connection established"),
-  //   onMessage: (message) => {
-  //     const data = JSON.parse(message.data);
-  //     console.log(data, 'data')
-
-  //     if (aesKey) {
-  //       data?.type === 'typing' ? setTypingMessage(true) : setTypingMessage(false);
-  //       if (data?.message) {
-  //         setMessagesWS((prevMessages) => [
-  //           ...prevMessages,
-  //           {
-  //             fromMe: false,
-  //             message: decryptMessage(data.message, aesKey),
-  //           },
-  //         ]);
-  //       }
-  //     }
-  //     if (data?.type == 'message') {
-  //       refetchConversation();
-  //     }
-  //   },
-  //   queryParams: {
-  //     targetUserId: userIdTargetUser,
-  //   },
-  // });
-
-  // Generate RSA keys
-
   const JSEncryptLib = new JSEncrypt({ default_key_size: "512" });
 
   React.useLayoutEffect(() => {
@@ -147,6 +116,8 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
   }, [conversationIdContent]);
 
   useEffect(() => {
+    console.log("🚀 ~ useEffect ~ newMessage:", lastMessage);
+
     if (lastMessage !== null) {
       const newMessage = JSON.parse(lastMessage.data);
       console.log("receive", newMessage);
@@ -261,7 +232,7 @@ export function ChatList({ isMobile, refetchConversation }: ChatListProps) {
         </p>
       ) : null}
 
-      <ChatBottombar isMobile={isMobile} setMessagesWS={setMessagesWS} />
+      <ChatBottombar setMessagesWS={setMessagesWS} />
     </div>
   );
 }

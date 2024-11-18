@@ -14,6 +14,7 @@ import { TCurrentUser, currentUserAtom, sessionAtom } from "@/lib/jotai";
 import axiosInstance from "@/config/axios/axiosInstance";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import Cookies from 'js-cookie';
+import { notification } from "antd";
 
 const loginSchema = z.object({
   username: z.string().email({ message: "Invalid email address" }),
@@ -67,6 +68,14 @@ export default function Home() {
           setCurrentUser(respUser.data);
           setCurrentUserStorage(respUser.data);
           router.push("/chat");
+          notification.success({
+            message: 'Đặng nhập thành công',
+          })
+        } else {
+          notification.warning({
+            message: 'Đặng nhập thất bại',
+            description: 'Vui long kiểm tra thống tin đăng nhập'
+          })
         }
       } else {
         toast({
@@ -78,6 +87,10 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error during login:", error);
+      notification.warning({
+        message: 'Đặng nhập thất bại',
+        description: 'Vui long kiểm tra thống tin đăng nhập'
+      })
     } finally {
       setLoading(false);
     }

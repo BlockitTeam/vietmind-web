@@ -26,7 +26,7 @@ const NEXT_PUBLIC_SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
 
   const value = useMemo(
     () => ({ sendMessageWS, lastMessage, readyState, updateUrl }),
-    [sendMessageWS, lastMessage, readyState]
+    [sendMessageWS, lastMessage, readyState, updateUrl]
   );
 
   return <WebSocketContext.Provider value={value}>{children}</WebSocketContext.Provider>;
