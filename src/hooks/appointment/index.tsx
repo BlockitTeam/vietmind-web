@@ -29,7 +29,7 @@ export const useMutationAppointment = () => {
         },
         onSuccess(data, variables, context) {
           void queryClient.invalidateQueries({
-            queryKey: ['appointmentId', data.data.conversationId],
+            queryKey: ['appointmentId'],
           })
         },
     })
@@ -51,7 +51,7 @@ export const usePutMutationAppointmentIdHook = (id: string | number) => {
     },
     onSuccess(data, variables, context) {
       void queryClient.invalidateQueries({
-        queryKey: ['appointmentId', data.data.conversationId],
+        queryKey: ['appointmentId'],
       })
     },
   })

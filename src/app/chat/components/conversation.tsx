@@ -13,10 +13,10 @@ import {
 } from "@/lib/jotai";
 import { decryptMessageWithKeyAES } from "@/servers/message";
 import { cn } from "@/utils/cn";
+import { useContentMessageHook } from "@/hooks/getContentMessage";
 
 export const Conversation = () => {
   const { conversations, isSuccessConversationQuery } = useConversationContext();
-  console.log("🚀 ~ Conversation ~ conversations:", conversations);
 
   // ATOM states
   const [userConversationId, setUserConversationId] = useAtom(userConversationIdAtom);
@@ -26,6 +26,19 @@ export const Conversation = () => {
   const [conversationIdContent, setConversationIdContentAtom] = useAtom(conversationIdContentAtom);
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
 
+  const { data: contentConversationId, ...queryConversationId } =
+  useContentMessageHook(conversationId);
+  useEffect(() => {
+    if (queryConversationId.isSuccess) {
+      setConversationIdContentAtom(contentConversationId?.data);
+    }
+  }, [contentConversationId]);
+
+  useEffect(() => {
+    if (conversationId > 0) {
+      queryConversationId.refetch();
+    }
+  }, [conversationId]);
   return (
     <>
       {isSuccessConversationQuery &&

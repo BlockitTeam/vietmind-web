@@ -51,7 +51,7 @@ export function ChatInformation() {
     data: appointments,
     refetch: refetchAppointment,
     ...queryAppointment
-  } = useAppointmentIdHook(conversationId);
+  } = useAppointmentIdHook(conversationId!);
 
   const usePutMutationAppointmentId = usePutMutationAppointmentIdHook(
     appointments?.data.conversationId
@@ -77,7 +77,7 @@ export function ChatInformation() {
   }, [lastMessage]);
 
   useEffect(() => {
-    if (queryAppointment.isSuccess) {
+    if (queryAppointment.isSuccess && appointments?.data) {
       setAppointmentDetail({
         status: appointments?.data.status,
         data: appointments?.data,
@@ -130,7 +130,7 @@ export function ChatInformation() {
   };
   return (
     <div className="m-4 mb-3">
-      {appointments && appointments.data && (
+      {appointments && appointments.data && queryAppointment.isSuccess && (
         <>
           <Card className="bg-regal-green-light mb-3 border border-slate-300	">
             <CardContent className="flex gap-3 flex-col p-2">

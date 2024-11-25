@@ -14,6 +14,8 @@ import { useAppointmentIdHook, useMutationAppointment, usePutMutationAppointment
 import { useWebSocketContext } from "./webSocketContext";
 import { useEffect } from "react";
 
+const AppointmentStatus = ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"];
+
 export function Appointment() {
   const [userConversationId, setUserConversationId] = useAtom(
     userConversationIdAtom
@@ -79,12 +81,12 @@ export function Appointment() {
       })
       setValue(
         "content",
-        appointments?.data.status === "PENDING" && appointments?.data.content
+        appointments?.data.status === "PENDING" ? appointments?.data.content : ''
       );
       setValue(
         "appointmentDate",
         appointments?.data.status === "PENDING" &&
-          appointments?.data.appointmentDate
+        appointments?.data.appointmentDate
       );
       setValue(
         "startTime",
@@ -96,7 +98,7 @@ export function Appointment() {
       );
       setValue(
         "note",
-        appointments?.data.status === "PENDING" && appointments?.data.note
+        appointments?.data.status === "PENDING" ? appointments?.data.note : ''
       );
     }
   }, [appointments]);
@@ -121,7 +123,7 @@ export function Appointment() {
       userId: userIdTargetUser,
     };
 
-    if (appointments?.data) {
+    if (appointments?.data && AppointmentStatus.includes(appointments?.data?.status)) {
       const bodyUpdate = {
         ...appointments.data,
         ...data,
