@@ -83,7 +83,7 @@ export function ChatLayout() {
               }}
             >
               <div
-                className={cn("flex h-[56px] items-center justify-center px-2")}
+                className={cn("flex h-[56px] items-center justify-center px-2 shadow-md")}
               >
                 <Tabs
                   defaultValue={tab}
@@ -303,7 +303,7 @@ export function ChatLayout() {
                 <>
                   <div
                     className={cn(
-                      "flex h-[56px] items-center justify-between px-2"
+                      "flex h-[56px] items-center justify-between px-2 shadow-md"
                     )}
                   >
                     <div className="flex items-center gap-2">
@@ -342,10 +342,10 @@ export function ChatLayout() {
               maxSize={35}
             >
               {conversationId > 0 && (
-                <>
+                <div className="w-full h-full">
                   <div
                     className={cn(
-                      "flex h-[56px] items-center px-2",
+                      "flex h-[56px] items-center px-2 shadow-md",
                       !appointment ? "justify-start" : "justify-center"
                     )}
                   >
@@ -385,7 +385,7 @@ export function ChatLayout() {
                       </div>
                     )}
                   </ScrollArea>
-                </>
+                </div>
               )}
 
               {!conversationId && (

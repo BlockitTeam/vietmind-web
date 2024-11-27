@@ -1,7 +1,6 @@
 "use client";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { PlusCircleIcon } from "lucide-react";
 import { useAtom } from "jotai";
 import {
   appointmentAtom,
@@ -28,6 +27,7 @@ import { displayStatusAppointment } from "@/helper";
 import { useWebSocketContext } from "./webSocketContext";
 import { useEffect } from "react";
 import { AnswerSheet } from "./answer-sheet";
+import TiptapInput from "./tiptap";
 
 export function ChatInformation() {
   const [appointmentDetail, setAppointmentDetail] = useAtom(
@@ -46,7 +46,6 @@ export function ChatInformation() {
     useGetUserBasicHook(userIdTargetUser);
   const { data: screeningTest, ...queryScreeningTest } =
     useGetScreeningTestUserIdHook(userIdTargetUser);
-
   const {
     data: appointments,
     refetch: refetchAppointment,
@@ -67,8 +66,7 @@ export function ChatInformation() {
             res.data?.data.status === "CONFIRMED"
           )
             prompt(
-              `${res.data?.data.userId} đã ${
-                res.data?.data.status === "CANCELLED" ? "hủy" : "xác nhận"
+              `${res.data?.data.userId} đã ${res.data?.data.status === "CANCELLED" ? "hủy" : "xác nhận"
               } cuộc hẹn!`
             );
         });
@@ -225,29 +223,10 @@ export function ChatInformation() {
         <div className="flex justify-between items-center cursor-pointer">
           <p className="font-bold text-lg mb-4">Ghi chú</p>
         </div>
-        <div className="flex gap-4 flex-col">
-          <div className="flex flex-col gap-2">
-            <p className="text-neutral-primary text-md font-bold">17/06/2023</p>
-            <ul className="list-disc ml-4">
-              <li>Stress nhẹ do áp lực công việc quá nhiều. </li>
-              <li>Hiện tại đang ở một mình, không có người thân bên cạnh </li>
-              <li>Khó ngủ, giờ ngủ không cố định </li>
-            </ul>
-          </div>
-          <div className="flex flex-col gap-2">
-            <p className="text-neutral-primary text-md font-bold">17/06/2023</p>
-            <ul className="list-disc ml-4">
-              <li>Stress nhẹ do áp lực công việc quá nhiều. </li>
-              <li>Hiện tại đang ở một mình, không có người thân bên cạnh </li>
-              <li>Khó ngủ, giờ ngủ không cố định </li>
-            </ul>
-          </div>
-          <div className="border-spacing-2 border-yellow-300 border p-2 rounded-md	w-full h-full">
-            <EditorContent editor={editor} style={{ padding: "10px" }} />
-          </div>
-          <Button variant={"outline"} className="border-regal-green mt-4">
-            <PlusCircleIcon size={15} className="mr-2" /> Thêm ghi chú
-          </Button>
+        <div className="flex gap-4 flex-col justify-between">
+            <div className="w-full break-words">
+              <TiptapInput />
+            </div>
         </div>
       </div>
     </div>

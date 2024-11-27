@@ -1,6 +1,6 @@
 import { ConversationData } from "@/app/chat/components/conversations-provider";
-import { IResponse, getData } from "@/config/api";
-import { useQuery } from "@tanstack/react-query";
+import { IResponse, getData, mutationPost } from "@/config/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const FetchConversation = () => {
   const url = `conversation`;
@@ -21,8 +21,29 @@ export const useGetConversation = () => {
 
 export const useGetNoteConversationId = (id: string | number) => {
   return useQuery<IResponse<any>>({
-    queryKey: ["conversationId"],
+    queryKey: ["noteConversationId", id],
     queryFn: () => FetchNoteConversationId(id),
-    enabled:!!id
+    enabled: !!id
   });
 };
+
+// POST
+export const usePutNoteConversationId = (id: string | number) => {
+  const queryClient = useQueryClient()
+
+  const url = `conversation/${id}/note`;
+  return useMutation({
+    mutationKey: ['postConversationId'],
+    mutationFn: (body: any) => {
+      return mutationPost<IResponse<any>>({
+        url,
+        body
+      })
+    },
+    onSuccess(data, variables, context) {
+      void queryClient.invalidateQueries({
+        queryKey: ['noteConversationId'],
+      })
+    },
+  })
+}
