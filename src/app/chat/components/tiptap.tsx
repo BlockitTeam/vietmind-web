@@ -58,25 +58,6 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
                     Strike
                 </button>
                 <button
-                    onClick={() => editor.chain().focus().toggleCode().run()}
-                    disabled={
-                        !editor.can()
-                            .chain()
-                            .focus()
-                            .toggleCode()
-                            .run()
-                    }
-                    className={editor.isActive('code') ? 'is-active' : ''}
-                >
-                    Code
-                </button>
-                <button onClick={() => editor.chain().focus().unsetAllMarks().run()}>
-                    Clear marks
-                </button>
-                <button onClick={() => editor.chain().focus().clearNodes().run()}>
-                    Clear nodes
-                </button>
-                <button
                     onClick={() => editor.chain().focus().setParagraph().run()}
                     className={editor.isActive('paragraph') ? 'is-active' : ''}
                 >
@@ -162,12 +143,12 @@ const ExtensionsCustom = [
 const TiptapInput = () => {
     const [conversationId] = useAtom(conversationIdAtom);
     const [contentEditor, setContentEditor] = useState('');
-  const { data: notes, isSuccess } = useGetNoteConversationId(conversationId!);
+    const { data: notes, isSuccess } = useGetNoteConversationId(conversationId!);
 
     const editor = useEditor({
         extensions: ExtensionsCustom,
         editable: true,
-        editorProps:{
+        editorProps: {
             attributes: { class: "prose max-w-none [&_ol]:list-decimal [&_ul]:list-disc focus:outline-none focus:shadow-outline break-all" }
         },
         onUpdate: ({ editor }) => {
@@ -182,17 +163,17 @@ const TiptapInput = () => {
     }, [editor, notes, isSuccess, conversationId])
 
     const mutationNote = usePutNoteConversationId(conversationId!);
-    
+
     return (
         <div className='w-full'>
-            <MenuBar editor={editor}/>
-            <EditorContent 
+            <MenuBar editor={editor} />
+            <EditorContent
                 editor={editor}
             >
             </EditorContent>
-            <Button 
-                variant={"outline"} 
-                className="border-regal-green mt-4 mb-20" 
+            <Button
+                variant={"outline"}
+                className="border-regal-green mt-4 mb-20"
                 onClick={() => mutationNote.mutate({ note: contentEditor })}
             >
                 <PlusCircleIcon size={15} className="mr-2" /> Thêm ghi chú
