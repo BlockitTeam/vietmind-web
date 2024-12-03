@@ -14,6 +14,7 @@ import {
 import { decryptMessageWithKeyAES } from "@/servers/message";
 import { cn } from "@/utils/cn";
 import { useContentMessageHook } from "@/hooks/getContentMessage";
+import dayjs from "dayjs";
 
 export const Conversation = () => {
   const { conversations } = useConversationContext();
@@ -26,7 +27,7 @@ export const Conversation = () => {
   const [, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
 
   const { data: contentConversationId, ...queryConversationId } =
-  useContentMessageHook(conversationId);
+    useContentMessageHook(conversationId);
   useEffect(() => {
     if (queryConversationId.isSuccess) {
       setConversationIdContentAtom(contentConversationId?.data);
@@ -64,23 +65,30 @@ export const Conversation = () => {
                 setAppointment(false);
               }}
             >
-              <div className="flex justify-center items-center gap-2">
-                <Button
-                  variant="outline"
-                  className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                >
-                  {displayAvatar(conversation.senderFullName)}
-                </Button>
-                <div className="cursor-pointer">
-                  <p className="text-sm text-neutral-primary">
-                    {conversation.senderFullName}
-                  </p>
-                  <p className="text-sm text-neutral-ternary whitespace-nowrap w-3">
-                    {decryptMessageWithKeyAES(
-                      conversation.lastMessage.encryptedMessage,
-                      conversation.conversation.conversationKey
-                    )}
-                  </p>
+              <div className="flex  w-full">
+                <div className="flex items-center gap-2  w-full">
+                  <Button
+                    variant="outline"
+                    className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                  >
+                    {displayAvatar(conversation.senderFullName)}
+                  </Button>
+                  <div className="cursor-pointer">
+                    <p className="text-sm text-neutral-primary">
+                      {conversation.senderFullName}
+                    </p>
+                    <p className="text-sm text-neutral-ternary whitespace-nowrap w-3">
+                      {decryptMessageWithKeyAES(
+                        conversation.lastMessage.encryptedMessage,
+                        conversation.conversation.conversationKey
+                      )}
+                    </p>
+                  </div>
+                 
+                </div>
+                <div className="items-center">
+                  <p className="text-sm text-neutral-ternary">{dayjs(conversation.lastMessage.createdAt).format('DD/MM')}</p>
+                  <p></p>
                 </div>
               </div>
             </div>

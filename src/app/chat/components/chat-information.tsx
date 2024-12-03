@@ -157,14 +157,14 @@ export function ChatInformation() {
               >
                 Dời lịch hẹn
               </Button>
-              <Button
+              {/* <Button
                 disabled={appointments.data?.status === "CANCELLED"}
                 variant="outline"
                 className="border-regal-green"
                 onClick={cancelAppointment}
               >
                 Huỷ lịch hẹn
-              </Button>
+              </Button> */}
             </CardFooter>
           </Card>
           <Separator />

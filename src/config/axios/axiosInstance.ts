@@ -23,15 +23,4 @@ const axiosInstance = axios.create({
   withCredentials: true, // Include credentials with requests
 });
 
-axiosInstance.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response && error.response.status === 401) {
-      clearAllCookies();
-      redirectToRoot();
-    }
-    return Promise.reject(error);
-  }
-);
-
 export default axiosInstance;

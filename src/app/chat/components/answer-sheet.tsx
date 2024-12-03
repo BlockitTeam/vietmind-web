@@ -70,11 +70,12 @@ export function AnswerSheet() {
             Make changes to your profile here. Click save when you're done.
           </SheetDescription> */}
         </SheetHeader>
-        <div className="w-full mt-3">
+        <div className="w-full h-full mt-3">
           <Table<DataType>
             columns={columns}
+            className="h-full"
             pagination={false}
-            scroll={{ y: "max-content" }}
+            scroll={{ y: 1000 }}
             dataSource={isSuccess ? formatData(answerData.data) : []}
           />
         </div>
