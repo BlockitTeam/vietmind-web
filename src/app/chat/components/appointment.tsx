@@ -276,16 +276,7 @@ export function Appointment() {
         >
           Người dùng *
         </label>
-        <input
-          id="userId"
-          disabled
-          placeholder="Trần thuỷ"
-          {...register("userId")}
-          className="mt-1 block w-full border border-regal-green rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"
-        />
-        {errors.userId && (
-          <p className="text-sm text-red-500">{errors.userId.message}</p>
-        )}
+        
       </div>
       <div className="flex justify-between">
         <button
