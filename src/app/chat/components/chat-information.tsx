@@ -140,8 +140,9 @@ export function ChatInformation() {
                 Lịch hẹn : {userConversationId?.senderFullName}
               </p>
               <p className="text-sm text-neutral-secondary">
-                {appointments?.data?.appointmentDate}
-                {appointments?.data?.startTime}-{appointments?.data?.endTime}
+                Giờ bắt đầu : <b>{appointments?.data?.startTime}</b> <br/>
+                Giờ kết thúc : <b>{appointments?.data?.endTime}</b> <br/>
+                Ngày : <b>{appointments?.data?.appointmentDate}</b>
               </p>
 
               <p className="text-sm text-neutral-secondary">
