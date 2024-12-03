@@ -36,7 +36,9 @@ type ConversationContextType = {
   conversations?: ConversationData[];
   refetchConversation: () => void;
   isSuccessConversationQuery: boolean;
+  setConversationWs: (conversations: ConversationData[]) => void;
 };
+
 
 const ConversationContext = createContext<ConversationContextType | undefined>(
   undefined
@@ -46,14 +48,22 @@ export const ConversationProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const { data: conversations, refetch, isSuccess } = useGetConversation();
+  const [conversationDataWs, setConversationDataWs] = useState<ConversationData[]>([]);
+  useEffect(() => {
+    if (conversations?.data) {
+      setConversationDataWs(conversations?.data);
+    }
+  }, [conversations, isSuccess, setConversationDataWs, conversationDataWs]);
 
+  
   const value = useMemo(
     () => ({
-      conversations: conversations?.data,
+      conversations: conversationDataWs,
       refetchConversation: refetch,
       isSuccessConversationQuery: isSuccess,
+      setConversationWs: setConversationDataWs
     }),
-    [conversations?.data, refetch, isSuccess]
+    [conversationDataWs, refetch, isSuccess, setConversationDataWs]
   );
 
   return (

@@ -16,15 +16,14 @@ import { cn } from "@/utils/cn";
 import { useContentMessageHook } from "@/hooks/getContentMessage";
 
 export const Conversation = () => {
-  const { conversations, isSuccessConversationQuery } = useConversationContext();
-
+  const { conversations } = useConversationContext();
   // ATOM states
-  const [userConversationId, setUserConversationId] = useAtom(userConversationIdAtom);
-  const [appointment, setAppointment] = useAtom(appointmentAtom);
-  const [senderFullName, setSenderFullName] = useAtom(senderFullNameAtom);
+  const [, setUserConversationId] = useAtom(userConversationIdAtom);
+  const [, setAppointment] = useAtom(appointmentAtom);
+  const [, setSenderFullName] = useAtom(senderFullNameAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
-  const [conversationIdContent, setConversationIdContentAtom] = useAtom(conversationIdContentAtom);
-  const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
+  const [, setConversationIdContentAtom] = useAtom(conversationIdContentAtom);
+  const [, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
 
   const { data: contentConversationId, ...queryConversationId } =
   useContentMessageHook(conversationId);
@@ -41,7 +40,7 @@ export const Conversation = () => {
   }, [conversationId]);
   return (
     <>
-      {isSuccessConversationQuery &&
+      {
         Array.isArray(conversations) &&
         conversations.map((conversation: ConversationData, index: number) => {
           const isActive = conversation.conversation.conversationId === conversationId;

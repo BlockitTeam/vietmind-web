@@ -87,9 +87,10 @@ export function InformationDoctor() {
             form={form}
             layout="vertical"
             onFinish={(values) => {
-              console.log(values);
-              type BodyType = Pick<FormValues, "currentPassword" | "newPassword">;
-              const body: BodyType = values;
+              const body = {
+                currentPassword: values.currentPassword,
+                newPassword: values.newPassword
+              }
               resetPassword.mutate(body, {
                 onSuccess: () => {
                   setIsDisplayChangePassword(false);

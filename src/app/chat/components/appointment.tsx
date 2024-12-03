@@ -17,15 +17,15 @@ import { useEffect } from "react";
 const AppointmentStatus = ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"];
 
 export function Appointment() {
-  const [userConversationId, setUserConversationId] = useAtom(
+  const [userConversationId,] = useAtom(
     userConversationIdAtom
   );
 
-  const [appointment, setAppointment] = useAtom(appointmentAtom);
-  const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
-  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
-  const [conversationId, setConversationId] = useAtom(conversationIdAtom);
-  const [appointmentDetail, setAppointmentDetail] = useAtom(
+  const [, setAppointment] = useAtom(appointmentAtom);
+  const [userIdTargetUser,] = useAtom(userIdTargetUserAtom);
+  const [currentUser, ] = useAtom(currentUserAtom);
+  const [conversationId,] = useAtom(conversationIdAtom);
+  const [, setAppointmentDetail] = useAtom(
     appointmentDetailAtom
   );
   //socket
@@ -55,7 +55,7 @@ export function Appointment() {
       startTime: "",
       endTime: "",
       note: "",
-      userId: userConversationId && userConversationId.senderFullName,
+      userId: userConversationId && userConversationId.userId,
     },
   });
 

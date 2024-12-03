@@ -24,6 +24,7 @@ import { checkSenderFromDoctor, decryptMessage } from "@/servers/message";
 // @ts-ignore:next-line
 import { useWebSocketContext } from "./webSocketContext";
 import { useQueryClient } from "@tanstack/react-query";
+import { useConversationContext } from "./conversations-provider";
 
 interface ChatListProps {
   isMobile: boolean;
@@ -39,23 +40,20 @@ export function ChatList() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const [loadingMessage, setLoadingMessage] = useState(false);
-  const [socketUrl, setSocketUrl] = useState("ws://localhost:9001/ws");
   const [messagesWS, setMessagesWS] = useState<IChatMessage[]>([]);
   const [privateKey, setPrivateKey] = useState<string | null>("");
-  const [publicKey, setPublicKey] = useState<string>("");
+  const [, setPublicKey] = useState<string>("");
   const [privateKeyAtomStorage, setPrivateKeyAtom] = useAtom(privateKeyAtom);
-  const [publicKeyAtomStorage, setPublicKeyAtom] = useAtom(publicKeyAtom);
   const [aesKey, setAesKey] = useAtom(aesKeyAtom);
-  const [conversationIdContent, setConversationIdContentAtom] = useAtom(
+  const [conversationIdContent] = useAtom(
     conversationIdContentAtom
   );
-  const [conversationId, setConversationId] = useAtom(conversationIdAtom);
-  const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
-  const [senderFullName, setSenderFullName] = useAtom(senderFullNameAtom);
+  const [conversationId] = useAtom(conversationIdAtom);
+  const [senderFullName] = useAtom(senderFullNameAtom);
 
-  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
-  const [typingMessage, setTypingMessage] = useAtom(TypingMessageAtom);
+  const [currentUser] = useAtom(currentUserAtom);
   const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
+  const {setConversationWs, refetchConversation} = useConversationContext()
 
   const [userTyping, setUserTyping] = useState(false);
   const getAES = useGetEASHook(conversationId);
@@ -116,11 +114,8 @@ export function ChatList() {
   }, [conversationIdContent]);
 
   useEffect(() => {
-    console.log("🚀 ~ useEffect ~ newMessage:", lastMessage);
-
     if (lastMessage !== null) {
       const newMessage = JSON.parse(lastMessage.data);
-      console.log("receive", newMessage);
       if (newMessage?.type === "typing") {
         setUserTyping(true);
       } else if (newMessage?.type === "unTyping") {
@@ -136,7 +131,9 @@ export function ChatList() {
         ]);
       }
 
-      console.log("🚀 ~ useEffect ~ newMessage:", newMessage);
+      if (newMessage?.type === 'panel') {
+        refetchConversation();
+      }
     }
   }, [lastMessage, aesKey, currentUser]);
 

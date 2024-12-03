@@ -27,7 +27,6 @@ import { encryptMessage } from "@/servers/message";
 // @ts-ignore:next-line
 import { useWebSocketContext } from "./webSocketContext";
 import { useQueryClient } from "@tanstack/react-query";
-import { useConversationContext } from "./conversations-provider";
 
 type INewMessageWS = {
   type: "message";
@@ -48,7 +47,6 @@ export const BottombarIcons = [{ icon: FileImage }, { icon: Paperclip }];
 export default function ChatBottombar({
   setMessagesWS,
 }: ChatBottombarProps) {
-  const {refetchConversation} = useConversationContext();
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [loadTyping, setLoadTyping] = useState(false);
@@ -107,8 +105,6 @@ export default function ChatBottombar({
           message: "👍",
         },
       ]);
-      refetchConversation();
-
       setMessage("");
     }
   };
@@ -131,7 +127,6 @@ export default function ChatBottombar({
             message: message.trim(),
           },
         ]);
-        refetchConversation();
         setMessage("");
         if (inputRef.current) {
           inputRef.current.focus();
