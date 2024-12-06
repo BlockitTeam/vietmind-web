@@ -48,6 +48,27 @@ const FullFeaturedCalendar = () => {
     }
   };
 
+  const renderEventContent = (eventInfo: any) => {
+    // Format hours from start and end dates
+    const startTime = new Date(eventInfo.event.start).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    const endTime = new Date(eventInfo.event.end).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    return (
+      <div style={{fontSize: 12}}>
+        <strong>
+          {startTime} - {endTime}
+        </strong> <br/>
+        {eventInfo.event.title}
+      </div>
+    );
+  };
+
   return (
     <div className="w-full h-screen z-0">
       <FullCalendar
@@ -75,6 +96,7 @@ const FullFeaturedCalendar = () => {
         selectMirror={true}
         dayMaxEvents={true} // Show 'more' link when too many events
         events={events} // Event data
+        eventContent={renderEventContent} // Custom rendering of events
       />
     </div>
   );
