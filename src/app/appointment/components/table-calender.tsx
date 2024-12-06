@@ -1,33 +1,22 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction"; // for selectable, draggable events
+import { useGetAppointmentDoctor } from "@/hooks/appointment";
 
 const FullFeaturedCalendar = () => {
   const calendarRef = useRef(null) as any;
 
-  const [events, setEvents] = useState([
-    {
-      id: "2",
-      title: "Lunch with Client",
-      start: new Date(2024, 9, 18, 10, 0), // Start at 10 AM on October 18, 2024
-      end: new Date(2024, 9, 18, 12, 0),   // End at 12 PM on October 18, 2024
-    },
+  const [events, setEvents] = useState([]);
 
-    {
-      id: "3",
-      title: "Lịch ca 1 ",
-      start: new Date(2024, 9, 16, 9, 12), // Start at 10 AM on October 16, 2024
-      end: new Date(2024, 9, 16, 11, 0),   // End at 12 PM on October 16, 2024
-    },
-    {
-      id: "4",
-      title: "Lịch ca 2",
-      start: new Date(2024, 9, 16, 13, 0), // Start at 10 AM on October 18, 2024
-      end: new Date(2024, 9, 16, 15, 0),   // End at 12 PM on October 18, 2024
-    },
-  ]);
+  const {data: appointmentDoctor, isSuccess} = useGetAppointmentDoctor();
+
+  useEffect(() => {
+    if (appointmentDoctor && isSuccess) {
+      setEvents(appointmentDoctor.data)
+    }
+  }, [appointmentDoctor])
 
   const handleEventClick = (clickInfo: any) => {
     if (

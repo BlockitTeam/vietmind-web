@@ -88,3 +88,16 @@ export const useGetScheduleAppointment = () => {
     staleTime: 0
   });
 }
+
+export const FetchAppointmentDoctor = () => {
+  const url = `appointments/doctor`;
+  return getData<IResponse<any>>(url);
+};
+
+export const useGetAppointmentDoctor = () => {
+  return useQuery<IResponse<any>>({
+    queryKey: ["appointment-doctor"],
+    queryFn: () => FetchAppointmentDoctor(),
+    staleTime: 0
+  });
+}
