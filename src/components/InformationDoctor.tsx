@@ -40,7 +40,6 @@ export function InformationDoctor() {
       </DialogTrigger>
       <DialogContent
         className="sm:max-w-[725px]"
-        popover="auto"
         onCloseAutoFocus={() => {
           setIsDisplayChangePassword(false);
           form.resetFields();
