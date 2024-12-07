@@ -222,13 +222,6 @@ export function ChatList() {
           </AnimatePresence>
         )}
       </div>
-      {userTyping ? (
-        <p className="text-xs ml-[8px] text-gray-500">
-          {" "}
-          {`${senderFullName} đang chat...`}
-        </p>
-      ) : null}
-
       <ChatBottombar setMessagesWS={setMessagesWS} />
     </div>
   );

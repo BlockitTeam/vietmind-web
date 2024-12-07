@@ -19,14 +19,13 @@ import {
   currentUserAtom,
   privateKeyAtom,
   publicKeyAtom,
+  senderFullNameAtom,
   userIdTargetUserAtom,
 } from "@/lib/jotai";
 import { useAtom } from "jotai";
-import CryptoJS from "crypto-js";
 import { encryptMessage } from "@/servers/message";
 // @ts-ignore:next-line
 import { useWebSocketContext } from "./webSocketContext";
-import { useQueryClient } from "@tanstack/react-query";
 
 type INewMessageWS = {
   type: "message";
@@ -55,11 +54,11 @@ export default function ChatBottombar({
   const [aesKey, setAesKey] = useAtom(aesKeyAtom);
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
   const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
-  const [typingMessage, setTypingMessage] = useAtom(TypingMessageAtom);
   const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
   const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
-
+  const dataLastMessage = lastMessage?.data && JSON.parse(lastMessage?.data);
   const [imTyping, setImTyping] = useState(false);
+  const [senderFullName] = useAtom(senderFullNameAtom);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     let newMessageWS = {};
@@ -151,10 +150,11 @@ export default function ChatBottombar({
 
   return (
     <>
-      {typingMessage && currentUser && (
-        <div className="p-2 overflow-visible text-sm bg-transparent">
-          <span>Thao đang chat...</span>
-        </div>
+       {dataLastMessage.type === 'typing' && dataLastMessage.conversationId === conversationId && (
+        <p className="text-xs ml-[8px] text-gray-500">
+          {" "}
+          {`${senderFullName} đang chat...`}
+        </p>
       )}
       <div className="p-2 flex justify-between w-full items-center gap-2 mb-16">
         <AnimatePresence initial={false}>
