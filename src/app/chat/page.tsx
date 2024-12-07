@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { ChatLayout } from "./components/chat-layout";
 import HeaderChat from "@/components/headerChat";
 import {
@@ -11,7 +10,7 @@ export default function ChatPage() {
     <div className="hidden z-10 min-w-full w-full h-full flex-col md:flex">
       <HeaderChat />
       <HydrationBoundary >
-        <ChatLayout/>
+          <ChatLayout/>
       </HydrationBoundary>
     </div>
   );

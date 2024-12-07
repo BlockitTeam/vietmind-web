@@ -150,7 +150,7 @@ export default function ChatBottombar({
 
   return (
     <>
-       {dataLastMessage.type === 'typing' && dataLastMessage.conversationId === conversationId && (
+       {dataLastMessage?.type === 'typing' && dataLastMessage?.conversationId === conversationId && (
         <p className="text-xs ml-[8px] text-gray-500">
           {" "}
           {`${senderFullName} đang chat...`}

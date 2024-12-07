@@ -2,8 +2,8 @@ import { ConversationData } from "@/app/chat/components/conversations-provider";
 import { IResponse, getData, mutationPost } from "@/config/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const FetchConversation = () => {
-  const url = `conversation`;
+export const FetchConversation = (senderName: string) => {
+  const url = `conversation?senderName=${senderName}`;
   return getData<IResponse<ConversationData[]>>(url);
 };
 
@@ -12,10 +12,10 @@ export const FetchNoteConversationId = (id: string | number) => {
   return getData<IResponse<any>>(url);
 };
 
-export const useGetConversation = () => {
+export const useGetConversation = (senderName: string) => {
   return useQuery<IResponse<ConversationData[]>>({
-    queryKey: ["conversations"],
-    queryFn: () => FetchConversation()
+    queryKey: ["conversations", senderName],
+    queryFn: () => FetchConversation(senderName)
   });
 };
 

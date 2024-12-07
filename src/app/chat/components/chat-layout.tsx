@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect } from "react";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -32,24 +32,23 @@ import { WebSocketProvider } from "./webSocketContext";
 import { Conversation } from "./conversation";
 import { displayAvatar } from "@/helper";
 import { ConversationProvider } from "./conversations-provider";
+import SearchConversation from "./search-conversation";
 
 interface ChatLayoutProps {
   defaultCollapsed?: boolean;
   navCollapsedSize: number;
 }
 export function ChatLayout() {
-  const [isMobile, setIsMobile] = useState(false);
   const [tab, setTab] = React.useState("chat");
-
   // atom
   const [appointment, setAppointment] = useAtom(appointmentAtom);
   const [appointmentDetail, setAppointmentDetail] = useAtom(
     appointmentDetailAtom
   );
-  const [senderFullName, setSenderFullName] = useAtom(senderFullNameAtom);
-  const [conversationId, setConversationId] = useAtom(conversationIdAtom);
+  const [senderFullName] = useAtom(senderFullNameAtom);
+  const [conversationId] = useAtom(conversationIdAtom);
 
-  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
+  const [, setCurrentUser] = useAtom(currentUserAtom);
   const { data: user, ...queryUser } = useCurrentUserHook();
 
   useEffect(() => {
@@ -110,13 +109,7 @@ export function ChatLayout() {
               <Separator />
               <div className="w-full">
                 <div className="m-2">
-                  <div className="relative ">
-                    <Input
-                      className="pr-9 border-regal-green"
-                      placeholder="Tìm tên"
-                    />
-                    <Search className="absolute right-0 top-0 m-2.5 h-4 w-4 text-muted-foreground" />
-                  </div>
+                  <SearchConversation />
                 </div>
                 <div className="m-2 mt-6">
                   {tab === "chat" && <Conversation />}
