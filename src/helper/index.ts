@@ -9,6 +9,11 @@ export const displayStatusAppointment = (status: string) => {
     case "CANCELLED":
       return "Đã huỷ";
 
+    case "IN_PROGRESS":
+      return "Đang diễn ra";
+
+    case "FINISH":
+      return "Hoàn thành"
     default:
       break;
   }

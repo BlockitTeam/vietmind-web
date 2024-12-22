@@ -10,7 +10,7 @@ export const useAppointmentIdHook = (id: string | number) => {
   return useQuery<IResponse<any>>({
     queryKey: ["appointmentId", id],
     queryFn: () => FetchAppointment(id),
-    enabled:!!id
+    enabled: !!id
   });
 };
 
@@ -18,21 +18,21 @@ export const useAppointmentIdHook = (id: string | number) => {
 export const useMutationAppointment = () => {
   const queryClient = useQueryClient()
 
-    const url = `appointments`;
-    return useMutation({
-        mutationKey: ['create-appointment'],
-        mutationFn: (body: any) => {
-            return mutationPost<IResponse<any>>({
-                url,
-                body
-            })
-        },
-        onSuccess(data, variables, context) {
-          void queryClient.invalidateQueries({
-            queryKey: ['appointmentId'],
-          })
-        },
-    })
+  const url = `appointments/doctor/create`;
+  return useMutation({
+    mutationKey: ['create-appointment'],
+    mutationFn: (body: any) => {
+      return mutationPost<IResponse<any>>({
+        url,
+        body
+      })
+    },
+    onSuccess(data, variables, context) {
+      void queryClient.invalidateQueries({
+        queryKey: ['appointmentId'],
+      })
+    },
+  })
 }
 
 // PUT
@@ -100,4 +100,22 @@ export const useGetAppointmentDoctor = () => {
     queryFn: () => FetchAppointmentDoctor(),
     staleTime: 0
   });
+}
+
+export const useGetCurrentAppointment = (userId: string | number) => {
+  return useQuery<IResponse<any>>({
+    queryKey: ["currentAppointment"],
+    queryFn: () => {
+      return getData<IResponse<any>>(`appointments/doctor/currentAppointment/${userId}`)
+    }
+  })
+}
+
+export const useGetFutureAppointment = (userId: string | number) => {
+  return useQuery<IResponse<any>>({
+    queryKey: ["futureAppointment"],
+    queryFn: () => {
+      return getData<IResponse<any>>(`appointments/doctor/futureAppointment/${userId}`)
+    }
+  })
 }

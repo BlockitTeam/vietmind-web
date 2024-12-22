@@ -14,13 +14,14 @@ import { WatchDetail } from "./watch-detail";
 import { useGetUserBasicHook } from "@/hooks/user";
 import { useGetScreeningTestUserIdHook } from "@/hooks/screeningTest";
 import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import Heading from "@tiptap/extension-heading";
 import {
   useAppointmentIdHook,
+  useGetCurrentAppointment,
+  useGetFutureAppointment,
   usePutMutationAppointmentIdHook,
 } from "@/hooks/appointment";
 import { displayStatusAppointment } from "@/helper";
@@ -47,13 +48,19 @@ export function ChatInformation() {
   const { data: screeningTest, ...queryScreeningTest } =
     useGetScreeningTestUserIdHook(userIdTargetUser);
   const {
-    data: appointments,
+    data: currentAppointments,
     refetch: refetchAppointment,
     ...queryAppointment
-  } = useAppointmentIdHook(conversationId!);
+  } = useGetCurrentAppointment(userIdTargetUser!);
+
+  const {
+    data: futureAppointments,
+    refetch: refetchFutureAppointment,
+    ...queryFutureAppointment
+  } = useGetFutureAppointment(userIdTargetUser!);
 
   const usePutMutationAppointmentId = usePutMutationAppointmentIdHook(
-    appointments?.data.conversationId
+    currentAppointments?.data.conversationId
   );
 
   useEffect(() => {
@@ -75,13 +82,13 @@ export function ChatInformation() {
   }, [lastMessage]);
 
   useEffect(() => {
-    if (queryAppointment.isSuccess && appointments?.data) {
+    if (queryAppointment.isSuccess && currentAppointments?.data) {
       setAppointmentDetail({
-        status: appointments?.data.status,
-        data: appointments?.data,
+        status: currentAppointments?.data.status,
+        data: currentAppointments?.data,
       });
     }
-  }, [appointments]);
+  }, [currentAppointments]);
 
   const editor = useEditor({
     extensions: [
@@ -102,7 +109,7 @@ export function ChatInformation() {
 
   const cancelAppointment = () => {
     const bodyCancel = {
-      ...appointments?.data,
+      ...currentAppointments?.data,
       status: "CANCELLED",
     };
 
@@ -128,30 +135,74 @@ export function ChatInformation() {
   };
   return (
     <div className="m-4 mb-3">
-      {appointments && appointments.data && queryAppointment.isSuccess && (
+      {currentAppointments && currentAppointments.data && queryAppointment.isSuccess && (
         <>
           <Card className="bg-regal-green-light mb-3 border border-slate-300	">
             <CardContent className="flex gap-3 flex-col p-2">
               <p className="bg-neutral-ternary text-white w-fit rounded-md text-xs p-1">
-                {displayStatusAppointment(appointments?.data.status)}
+                {displayStatusAppointment(currentAppointments?.data.status)}
               </p>
 
               <p className="font-bold text-sm">
                 Lịch hẹn : {userConversationId?.senderFullName}
               </p>
               <p className="text-sm text-neutral-secondary">
-                Giờ bắt đầu : <b>{appointments?.data?.startTime}</b> <br/>
-                Giờ kết thúc : <b>{appointments?.data?.endTime}</b> <br/>
-                Ngày : <b>{appointments?.data?.appointmentDate}</b>
+                Giờ bắt đầu : <b>{currentAppointments?.data?.startTime}</b> <br />
+                Giờ kết thúc : <b>{currentAppointments?.data?.endTime}</b> <br />
+                Ngày : <b>{currentAppointments?.data?.appointmentDate}</b>
               </p>
 
               <p className="text-sm text-neutral-secondary">
-                Ghi chú: {appointments?.data?.content}
+                Ghi chú: {currentAppointments?.data?.content}
               </p>
             </CardContent>
             <CardFooter className="grid grid-flow-col gap-3 p-2 items-center justify-stretch w-full">
               <Button
+                disabled={currentAppointments.data?.status === "CANCELLED"}
+                variant="outline"
+                className="border-regal-green"
+                onClick={() => setAppointment(true)}
+              >
+                Dời lịch hẹn
+              </Button>
+              {/* <Button
                 disabled={appointments.data?.status === "CANCELLED"}
+                variant="outline"
+                className="border-regal-green"
+                onClick={cancelAppointment}
+              >
+                Huỷ lịch hẹn
+              </Button> */}
+            </CardFooter>
+          </Card>
+          <Separator />
+        </>
+      )}
+
+      {futureAppointments && futureAppointments.data && queryFutureAppointment.isSuccess && (
+        <>
+          <Card className="bg-regal-green-light mb-3 border border-slate-300	">
+            <CardContent className="flex gap-3 flex-col p-2">
+              <p className="bg-neutral-ternary text-white w-fit rounded-md text-xs p-1">
+                {displayStatusAppointment(futureAppointments?.data.status)}
+              </p>
+
+              <p className="font-bold text-sm">
+                Lịch hẹn : {userConversationId?.senderFullName}
+              </p>
+              <p className="text-sm text-neutral-secondary">
+                Giờ bắt đầu : <b>{futureAppointments?.data?.startTime}</b> <br />
+                Giờ kết thúc : <b>{futureAppointments?.data?.endTime}</b> <br />
+                Ngày : <b>{futureAppointments?.data?.appointmentDate}</b>
+              </p>
+
+              <p className="text-sm text-neutral-secondary">
+                Ghi chú: {futureAppointments?.data?.content}
+              </p>
+            </CardContent>
+            <CardFooter className="grid grid-flow-col gap-3 p-2 items-center justify-stretch w-full">
+              <Button
+                disabled={futureAppointments.data?.status === "CANCELLED"}
                 variant="outline"
                 className="border-regal-green"
                 onClick={() => setAppointment(true)}
@@ -225,9 +276,9 @@ export function ChatInformation() {
           <p className="font-bold text-lg mb-4">Ghi chú</p>
         </div>
         <div className="flex gap-4 flex-col justify-between">
-            <div className="w-full break-words">
-              <TiptapInput />
-            </div>
+          <div className="w-full break-words">
+            <TiptapInput />
+          </div>
         </div>
       </div>
     </div>

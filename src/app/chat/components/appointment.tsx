@@ -121,6 +121,7 @@ export function Appointment() {
       doctorId: currentUser?.id,
 
       userId: userIdTargetUser,
+      status: "PENDING"
     };
 
     if (appointments?.data && AppointmentStatus.includes(appointments?.data?.status)) {
@@ -269,15 +270,7 @@ export function Appointment() {
           <p className="text-sm text-red-500">{errors.note.message}</p>
         )}
       </div>
-      <div>
-        <label
-          htmlFor="userId"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Người dùng *
-        </label>
-        
-      </div>
+    
       <div className="flex justify-between">
         <button
           disabled={!isValid}
