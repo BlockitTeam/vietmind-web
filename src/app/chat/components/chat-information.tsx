@@ -19,7 +19,6 @@ import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import Heading from "@tiptap/extension-heading";
 import {
-  useAppointmentIdHook,
   useGetCurrentAppointment,
   useGetFutureAppointment,
   usePutMutationAppointmentIdHook,
@@ -60,7 +59,7 @@ export function ChatInformation() {
   } = useGetFutureAppointment(userIdTargetUser!);
 
   const usePutMutationAppointmentId = usePutMutationAppointmentIdHook(
-    currentAppointments?.data.conversationId
+    futureAppointments?.data.userId!
   );
 
   useEffect(() => {
@@ -82,10 +81,10 @@ export function ChatInformation() {
   }, [lastMessage]);
 
   useEffect(() => {
-    if (queryAppointment.isSuccess && currentAppointments?.data) {
+    if (queryAppointment.isSuccess && futureAppointments?.data) {
       setAppointmentDetail({
-        status: currentAppointments?.data.status,
-        data: currentAppointments?.data,
+        status: futureAppointments?.data.status,
+        data: futureAppointments?.data,
       });
     }
   }, [currentAppointments]);
@@ -109,7 +108,7 @@ export function ChatInformation() {
 
   const cancelAppointment = () => {
     const bodyCancel = {
-      ...currentAppointments?.data,
+      ...futureAppointments?.data,
       status: "CANCELLED",
     };
 
@@ -123,6 +122,7 @@ export function ChatInformation() {
           sendMessageWS(
             JSON.stringify({
               type: "appointment",
+              targerUserId: userIdTargetUser,
               appointmentId: data?.data?.appointmentId,
               conversationId: data?.data?.conversationId,
               status: "CANCELLED",
@@ -156,24 +156,6 @@ export function ChatInformation() {
                 Ghi chú: {currentAppointments?.data?.content}
               </p>
             </CardContent>
-            <CardFooter className="grid grid-flow-col gap-3 p-2 items-center justify-stretch w-full">
-              <Button
-                disabled={currentAppointments.data?.status === "CANCELLED"}
-                variant="outline"
-                className="border-regal-green"
-                onClick={() => setAppointment(true)}
-              >
-                Dời lịch hẹn
-              </Button>
-              {/* <Button
-                disabled={appointments.data?.status === "CANCELLED"}
-                variant="outline"
-                className="border-regal-green"
-                onClick={cancelAppointment}
-              >
-                Huỷ lịch hẹn
-              </Button> */}
-            </CardFooter>
           </Card>
           <Separator />
         </>
@@ -209,14 +191,14 @@ export function ChatInformation() {
               >
                 Dời lịch hẹn
               </Button>
-              {/* <Button
-                disabled={appointments.data?.status === "CANCELLED"}
+              <Button
+                disabled={futureAppointments.data?.status === "CANCELLED"}
                 variant="outline"
                 className="border-regal-green"
                 onClick={cancelAppointment}
               >
                 Huỷ lịch hẹn
-              </Button> */}
+              </Button>
             </CardFooter>
           </Card>
           <Separator />

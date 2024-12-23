@@ -10,9 +10,11 @@ import {
 } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { cn } from "@/lib/utils";
-import { useAppointmentIdHook, useMutationAppointment, usePutMutationAppointmentIdHook } from "@/hooks/appointment";
+import { useGetFutureAppointment, useMutationAppointment, usePutMutationAppointmentIdHook } from "@/hooks/appointment";
 import { useWebSocketContext } from "./webSocketContext";
 import { useEffect } from "react";
+import { notification } from "antd";
+import dayjs from "dayjs";
 
 const AppointmentStatus = ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"];
 
@@ -23,7 +25,7 @@ export function Appointment() {
 
   const [, setAppointment] = useAtom(appointmentAtom);
   const [userIdTargetUser,] = useAtom(userIdTargetUserAtom);
-  const [currentUser, ] = useAtom(currentUserAtom);
+  const [currentUser,] = useAtom(currentUserAtom);
   const [conversationId,] = useAtom(conversationIdAtom);
   const [, setAppointmentDetail] = useAtom(
     appointmentDetailAtom
@@ -31,14 +33,14 @@ export function Appointment() {
   //socket
   const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
   //HOOK
-  const {
-    data: appointments,
-    refetch: refetchAppointment,
-    ...queryAppointment
-  } = useAppointmentIdHook(conversationId);
   const mutationAppointment = useMutationAppointment();
+  const {
+    data: futureAppointments,
+    refetch: refetchFutureAppointment,
+    ...queryFutureAppointment
+  } = useGetFutureAppointment(userIdTargetUser!);
   const usePutMutationAppointmentId = usePutMutationAppointmentIdHook(
-    appointments?.data.conversationId
+    futureAppointments?.data?.userId
   );
 
   const {
@@ -63,45 +65,37 @@ export function Appointment() {
   useEffect(() => {
     if (lastMessage !== null) {
       const newMessage = JSON.parse(lastMessage.data);
-      if (newMessage?.type === "appointment") {
-        refetchAppointment().then((res) => {
-          setAppointment(res.data?.data);
-        });
-      }
     }
   }, [lastMessage]);
-
-  //End: Todo setup websocket
-
   useEffect(() => {
-    if (appointments?.data) {
+    if (futureAppointments?.data && queryFutureAppointment.isSuccess) {
       setAppointmentDetail({
-        status: appointments?.data.status,
-        data: appointments?.data
+        status: futureAppointments?.data.status,
+        data: futureAppointments?.data
       })
       setValue(
         "content",
-        appointments?.data.status === "PENDING" ? appointments?.data.content : ''
+        futureAppointments?.data.status === "PENDING" ? futureAppointments?.data.content : ''
       );
       setValue(
         "appointmentDate",
-        appointments?.data.status === "PENDING" &&
-        appointments?.data.appointmentDate
+        futureAppointments?.data.status === "PENDING" &&
+        futureAppointments?.data.appointmentDate
       );
       setValue(
         "startTime",
-        appointments?.data.status === "PENDING" && appointments?.data.startTime
+        futureAppointments?.data.status === "PENDING" && futureAppointments?.data.startTime
       );
       setValue(
         "endTime",
-        appointments?.data.status === "PENDING" && appointments?.data.endTime
+        futureAppointments?.data.status === "PENDING" && futureAppointments?.data.endTime
       );
       setValue(
         "note",
-        appointments?.data.status === "PENDING" ? appointments?.data.note : ''
+        futureAppointments?.data.status === "PENDING" ? futureAppointments?.data.note : ''
       );
     }
-  }, [appointments]);
+  }, [futureAppointments]);
 
   const watchFrom = watch("startTime");
   const watchTo = watch("endTime");
@@ -124,9 +118,9 @@ export function Appointment() {
       status: "PENDING"
     };
 
-    if (appointments?.data && AppointmentStatus.includes(appointments?.data?.status)) {
+    if (futureAppointments?.data && AppointmentStatus.includes(futureAppointments?.data?.status)) {
       const bodyUpdate = {
-        ...appointments.data,
+        ...futureAppointments.data,
         ...data,
         status: "PENDING",
       };
@@ -165,6 +159,12 @@ export function Appointment() {
           setAppointment(false);
         }
       },
+      onError: (error) => {
+        notification.error({
+          message: 'Error',
+          description: `Can't create appointment`
+        })
+      }
     });
   };
   return (
@@ -203,7 +203,16 @@ export function Appointment() {
           type="date"
           id="appointmentDate"
           data-date-format="DD MMMM YYYY"
-          {...register("appointmentDate", { required: "Ngày là bắt buộc" })}
+          {...register("appointmentDate", {
+            required: "Ngày là bắt buộc", validate: (value) => {
+              const selectedDate = dayjs(value);
+              const today = dayjs().startOf("day"); // Get current date without time
+              if (selectedDate.isBefore(today)) {
+                return "Ngày phải lớn hơn hoặc bằng ngày hiện tại";
+              }
+              return true;
+            }
+          },)}
           className="mt-1 block w-full border border-regal-green rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"
         />
         {errors.appointmentDate && (
@@ -270,7 +279,7 @@ export function Appointment() {
           <p className="text-sm text-red-500">{errors.note.message}</p>
         )}
       </div>
-    
+
       <div className="flex justify-between">
         <button
           disabled={!isValid}
