@@ -227,7 +227,7 @@ export function ChatInformation() {
                   <b>Sàn lọc chung</b>
                   {/* <span><b>Ngày làm : </b> 16/11/2024</span> */}
                 </div>
-                <AnswerSheet />
+                <AnswerDetailSheet />
               </div>
 
               {
@@ -237,7 +237,7 @@ export function ChatInformation() {
                     <b>{informationSurveyById?.data?.surveyName} - Chuyên sâu</b>
                     <span><b>Ngày làm : </b>{informationSurveyById?.data?.date}</span>
                   </div>
-                  <AnswerDetailSheet />
+                  <AnswerSheet />
                 </div>
                 )
               }

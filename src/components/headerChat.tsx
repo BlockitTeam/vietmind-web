@@ -25,7 +25,7 @@ import Cookies from 'js-cookie';
 export default function HeaderChat() {
   const pathname = usePathname(); // Get the current pathname
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
+  const [, setCurrentUser] = useAtom(currentUserAtom);
   const useLogout = useLogoutHook();
   const dropdownMenuRef = useRef<HTMLButtonElement>(null);
 
