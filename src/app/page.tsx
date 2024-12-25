@@ -86,7 +86,6 @@ export default function Home() {
         });
       }
     } catch (error) {
-      console.error("Error during login:", error);
       notification.warning({
         message: 'Đặng nhập thất bại',
         description: 'Vui long kiểm tra thống tin đăng nhập'

@@ -28,28 +28,30 @@ import { useWebSocketContext } from "./webSocketContext";
 import { useEffect } from "react";
 import { AnswerSheet } from "./answer-sheet";
 import TiptapInput from "./tiptap";
+import { AnswerDetailSheet } from "./answer-detail-sheet";
+import { useGetNameOfSurveyDetailByUserId } from "@/hooks/answer";
 
 export function ChatInformation() {
-  const [appointmentDetail, setAppointmentDetail] = useAtom(
+  const [, setAppointmentDetail] = useAtom(
     appointmentDetailAtom
   );
 
-  const [appointment, setAppointment] = useAtom(appointmentAtom);
-  const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
-  const [conversationId, setConversationId] = useAtom(conversationIdAtom);
-  const [userConversationId, setUserConversationId] = useAtom(
+  const [, setAppointment] = useAtom(appointmentAtom);
+  const [userIdTargetUser, ] = useAtom(userIdTargetUserAtom);
+  const [conversationId, ] = useAtom(conversationIdAtom);
+  const [userConversationId, ] = useAtom(
     userConversationIdAtom
   );
   const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
 
   const { data: userBasic, ...queryUserBasic } =
-    useGetUserBasicHook(userIdTargetUser);
+    useGetUserBasicHook(userIdTargetUser!);
   const { data: screeningTest, ...queryScreeningTest } =
-    useGetScreeningTestUserIdHook(userIdTargetUser);
+    useGetScreeningTestUserIdHook(userIdTargetUser!);
   const {
     data: currentAppointments,
     refetch: refetchAppointment,
-    ...queryAppointment
+    ...queryCurrenrAppointment
   } = useGetCurrentAppointment(userIdTargetUser!);
 
   const {
@@ -62,49 +64,24 @@ export function ChatInformation() {
     futureAppointments?.data.userId!
   );
 
+  const {data: informationSurveyById, ...NameOfSurveyDetailByUserId} = useGetNameOfSurveyDetailByUserId(userIdTargetUser!);
+
+  useEffect(() => {
+    if (userIdTargetUser) {
+      refetchAppointment();
+      refetchFutureAppointment();
+    }
+  }, [userIdTargetUser])
+
   useEffect(() => {
     if (lastMessage !== null) {
       const newMessage = JSON.parse(lastMessage.data);
       if (newMessage?.type === "appointment") {
-        refetchAppointment().then((res) => {
-          if (
-            res.data?.data.status === "CANCELLED" ||
-            res.data?.data.status === "CONFIRMED"
-          )
-            prompt(
-              `${res.data?.data.userId} đã ${res.data?.data.status === "CANCELLED" ? "hủy" : "xác nhận"
-              } cuộc hẹn!`
-            );
-        });
+        refetchAppointment();
+        refetchFutureAppointment();
       }
     }
   }, [lastMessage]);
-
-  useEffect(() => {
-    if (queryAppointment.isSuccess && futureAppointments?.data) {
-      setAppointmentDetail({
-        status: futureAppointments?.data.status,
-        data: futureAppointments?.data,
-      });
-    }
-  }, [currentAppointments]);
-
-  const editor = useEditor({
-    extensions: [
-      Document,
-      Paragraph,
-      Text,
-      Heading.configure({
-        levels: [1, 2, 3],
-      }),
-    ],
-    editorProps: {
-      attributes: {
-        class: "focus:outline-none",
-      },
-    },
-    content: "<p>Hello World! 🌎️</p>",
-  });
 
   const cancelAppointment = () => {
     const bodyCancel = {
@@ -135,7 +112,7 @@ export function ChatInformation() {
   };
   return (
     <div className="m-4 mb-3">
-      {currentAppointments && currentAppointments.data && queryAppointment.isSuccess && (
+      {currentAppointments && currentAppointments.data && queryCurrenrAppointment.isSuccess && (
         <>
           <Card className="bg-regal-green-light mb-3 border border-slate-300	">
             <CardContent className="flex gap-3 flex-col p-2">
@@ -242,12 +219,31 @@ export function ChatInformation() {
           <>
             <div className="m-4">
               <div className="flex justify-between cursor-pointer ">
-                <p className="font-bold text-md mb-4">Kết quả sàng lọc</p>
-                {/* <WatchDetail /> */}
+                <p className="font-bold text-lg mb-4">Kết quả sàng lọc</p>
               </div>
-              <div className="flex gap-2 flex-col">
+             <div className="flex flex-col gap-4">
+             <div className="flex gap-2 justify-between">
+                <div className="flex flex-col">
+                  <b>Sàn lọc chung</b>
+                  {/* <span><b>Ngày làm : </b> 16/11/2024</span> */}
+                </div>
                 <AnswerSheet />
               </div>
+
+              {
+                NameOfSurveyDetailByUserId.isSuccess && informationSurveyById && (
+                  <div className="flex gap-2 justify-between">
+                  <div className="flex flex-col">
+                    <b>{informationSurveyById?.data?.surveyName} - Chuyên sâu</b>
+                    <span><b>Ngày làm : </b>{informationSurveyById?.data?.date}</span>
+                  </div>
+                  <AnswerDetailSheet />
+                </div>
+                )
+              }
+             
+             </div>
+              
             </div>
             <Separator />
           </>

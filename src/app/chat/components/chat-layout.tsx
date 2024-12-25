@@ -307,9 +307,9 @@ export function ChatLayout() {
                         {senderFullName && senderFullName}
                       </p>
                     </div>
-                    <div className="flex gap-3">
+                    {/* <div className="flex gap-3">
                       <EndChat />
-                    </div>
+                    </div> */}
                   </div>
                   <Separator />
                   <Chat />

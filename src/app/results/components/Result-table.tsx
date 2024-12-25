@@ -12,7 +12,6 @@ export default function ResultTable() {
   const { data: tableResult, isSuccess } = useAnswerByIdHook(
     "5d69bb54-59b8-42fa-8c90-32d37ad09377"
   );
-  console.log("🚀 ~ ResultTable ~ tableResult:", tableResult);
   const columns: TableColumnsType<DataType> = [
     {
       title: "Question",

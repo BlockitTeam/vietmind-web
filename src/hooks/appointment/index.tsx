@@ -97,7 +97,9 @@ export const useGetCurrentAppointment = (userId: string | number) => {
     queryKey: ["currentAppointment"],
     queryFn: () => {
       return getData<IResponse<any>>(`appointments/doctor/currentAppointment/${userId}`)
-    }
+    },
+    enabled: !!userId,
+    retry: false
   })
 }
 
@@ -106,6 +108,8 @@ export const useGetFutureAppointment = (userId: string | number) => {
     queryKey: ["futureAppointment"],
     queryFn: () => {
       return getData<IResponse<any>>(`appointments/doctor/futureAppointment/${userId}`)
-    }
+    },
+    enabled: !!userId,
+    retry: false
   })
 }

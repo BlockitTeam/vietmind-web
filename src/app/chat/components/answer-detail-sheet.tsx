@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ApiResponse, useAnswerByIdHook } from "@/hooks/answer";
+import { ApiResponse, useAnswerByIdHook, useGetDetailSurveyById } from "@/hooks/answer";
 import { senderFullNameAtom, userIdTargetUserAtom } from "@/lib/jotai";
 import { Table, TableColumnsType } from "antd";
 import { useAtom } from "jotai";
@@ -41,7 +41,7 @@ interface FormattedQuestion {
   responseFormat: string
 }
 
-export function AnswerSheet() {
+export function AnswerDetailSheet() {
   const [userIdTargetUser,] = useAtom(userIdTargetUserAtom);
   const [senderFullName,] = useAtom(senderFullNameAtom);
 
@@ -49,21 +49,13 @@ export function AnswerSheet() {
     data: answerData,
     isSuccess,
     isError,
-  } = useAnswerByIdHook(userIdTargetUser!);
+  } = useGetDetailSurveyById(userIdTargetUser!);
 
   const formatData = (data: ApiResponse): any[] => {
     return data.map(({ responseFormat, questionText, answer, options }) => {
-      if (responseFormat === 'single_choice') {
         const answerText =
           options.find((option) => option.optionId === answer)?.optionText || "";
         return { responseFormat, question: questionText, answer: answerText };
-      }
-      if (responseFormat === 'text_input') {
-        return { responseFormat, question: questionText, answer: answer }
-      }
-      if (responseFormat === 'parent_question') {
-        return { responseFormat, question: questionText, answer: answer }
-      }
     });
   };
 

@@ -29,11 +29,42 @@ export const getAnswerById = (id: string | number) => {
 };
 
 
+export const getDetailSurveyById = (id: string | number) => {
+  const url = `response/resultDetailByUserId/${id}`;
+  return getData<IResponse<ApiResponse>>(url);
+};
+
+export const getNameOfSurveyDetailByUserId = (id: string | number) => {
+  const url = `response/getNameOfSurveyDetailByUserId/${id}`;
+  return getData<IResponse<{surveyName: string, date: string}>>(url);
+};
+
+
 export const useAnswerByIdHook = (id: string | number) => {
   const url = "user/current-user";
   return useQuery<IResponse<ApiResponse>>({
     queryKey: ["answerById", id],
     queryFn: () => getAnswerById(id!),
-    enabled: !!id
+    enabled: !!id,
+    retry: false
   });
 };
+
+
+export const useGetDetailSurveyById = (id: string | number) => {
+  return useQuery<IResponse<ApiResponse>>({
+    queryKey: ["DetailSurveyById", id],
+    queryFn: () => getDetailSurveyById(id!),
+    enabled: !!id,
+    retry: false
+  });
+}
+
+export const useGetNameOfSurveyDetailByUserId = (id: string | number) => {
+  return useQuery<IResponse<{surveyName: string, date: string}>>({
+    queryKey: ["GetNameOfSurveyDetail", id],
+    queryFn: () => getNameOfSurveyDetailByUserId(id!),
+    enabled: !!id,
+    retry: false
+  });
+}
