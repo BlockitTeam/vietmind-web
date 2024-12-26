@@ -1,5 +1,5 @@
 "use client";
-import { Form, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   appointmentAtom,
   appointmentDetailAtom,
@@ -30,13 +30,10 @@ export function Appointment() {
   const [, setAppointmentDetail] = useAtom(
     appointmentDetailAtom
   );
-  //socket
-  const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
-  //HOOK
+  const { sendMessageWS } = useWebSocketContext();
   const mutationAppointment = useMutationAppointment();
   const {
     data: futureAppointments,
-    refetch: refetchFutureAppointment,
     ...queryFutureAppointment
   } = useGetFutureAppointment(userIdTargetUser!);
   const usePutMutationAppointmentId = usePutMutationAppointmentIdHook(
@@ -61,21 +58,15 @@ export function Appointment() {
     },
   });
 
-  //Start: Todo setup websocket
-  useEffect(() => {
-    if (lastMessage !== null) {
-      const newMessage = JSON.parse(lastMessage.data);
-    }
-  }, [lastMessage]);
   useEffect(() => {
     if (futureAppointments?.data && queryFutureAppointment.isSuccess) {
       setAppointmentDetail({
         status: futureAppointments?.data.status,
         data: futureAppointments?.data
-      })
+      });
       setValue(
         "content",
-        futureAppointments?.data.status === "PENDING" ? futureAppointments?.data.content : ''
+        futureAppointments?.data.status === "PENDING" ? futureAppointments?.data.content : ""
       );
       setValue(
         "appointmentDate",
@@ -92,13 +83,12 @@ export function Appointment() {
       );
       setValue(
         "note",
-        futureAppointments?.data.status === "PENDING" ? futureAppointments?.data.note : ''
+        futureAppointments?.data.status === "PENDING" ? futureAppointments?.data.note : ""
       );
     }
   }, [futureAppointments]);
 
   const watchFrom = watch("startTime");
-  const watchTo = watch("endTime");
 
   const validateTime = (endTime: string) => {
     const startTime = watchFrom;
@@ -126,7 +116,7 @@ export function Appointment() {
       };
 
       usePutMutationAppointmentId.mutate(bodyUpdate, {
-        onSuccess(data, variables, context) {
+        onSuccess(data) {
           if (data.statusCode === 200) {
             sendMessageWS(
               JSON.stringify({
@@ -145,7 +135,7 @@ export function Appointment() {
     }
 
     mutationAppointment.mutate(body, {
-      onSuccess(data, variables, context) {
+      onSuccess(data) {
         if (data.statusCode === 200) {
           sendMessageWS(
             JSON.stringify({
@@ -159,11 +149,11 @@ export function Appointment() {
           setAppointment(false);
         }
       },
-      onError: (error) => {
+      onError: () => {
         notification.error({
-          message: 'Error',
-          description: `Can't create appointment`
-        })
+          message: "Error",
+          description: "Can't create appointment"
+        });
       }
     });
   };

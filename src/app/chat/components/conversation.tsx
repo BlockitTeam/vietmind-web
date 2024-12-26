@@ -87,7 +87,7 @@ export const Conversation = () => {
                  
                 </div>
                 <div className="items-center">
-                  <p className="text-sm text-neutral-ternary">{dayjs(conversation.lastMessage.createdAt).format('DD/MM')}</p>
+                  <p className="text-sm text-neutral-ternary">{dayjs(conversation.lastMessage.createdAt).format("DD/MM")}</p>
                   <p></p>
                 </div>
               </div>

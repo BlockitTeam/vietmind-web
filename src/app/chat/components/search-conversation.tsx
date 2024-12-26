@@ -1,7 +1,7 @@
-import React from 'react'
+import React from "react";
 import { Input } from "@/components/ui/input";
-import { useConversationContext } from './conversations-provider';
-import { Search } from 'lucide-react';
+import { useConversationContext } from "./conversations-provider";
+import { Search } from "lucide-react";
 
 export default function SearchConversation() {
   const { setSearchTerm } = useConversationContext();
@@ -14,5 +14,5 @@ export default function SearchConversation() {
             />
             <Search className="absolute right-0 top-0 m-2.5 h-4 w-4 text-muted-foreground" />
         </div>
-    )
+    );
 }

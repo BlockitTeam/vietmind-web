@@ -1,7 +1,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -10,11 +9,11 @@ import { useCurrentUserDoctorHook } from "@/hooks/currentUser";
 import { useLogoutHook } from "@/hooks/logout";
 import { useResetPassword } from "@/hooks/user";
 import { currentUserAtom } from "@/lib/jotai";
-import { Button, Divider, Form, Input, notification, Tooltip } from "antd";
+import { Button, Divider, Form, Input, notification } from "antd";
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { deleteCookie } from "cookies-next";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
 type FormValues = {
@@ -28,7 +27,7 @@ export function InformationDoctor() {
   const [isDisplayChangePassword, setIsDisplayChangePassword] = useState(false);
   const resetPassword = useResetPassword();
   const useLogout = useLogoutHook();
-  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
+  const [, setCurrentUser] = useAtom(currentUserAtom);
   const router = useRouter();
 
   return (
@@ -89,16 +88,16 @@ export function InformationDoctor() {
               const body = {
                 currentPassword: values.currentPassword,
                 newPassword: values.newPassword
-              }
+              };
               resetPassword.mutate(body, {
                 onSuccess: () => {
                   setIsDisplayChangePassword(false);
                   form.resetFields();
                   useLogout.mutate(undefined, {
-                    onSuccess(data, variables, context) {
+                    onSuccess(data) {
                       if (data.statusCode === 200) {
                         setCurrentUser(null);
-                        Cookies.remove('JSESSIONID');
+                        Cookies.remove("JSESSIONID");
                         deleteCookie("JSESSIONID", {
                           path: "/",
                           domain: "http://91.108.104.57",
@@ -107,8 +106,8 @@ export function InformationDoctor() {
                         // Redirect to the home page or any other page
                         router.push("/");
                         notification.success({
-                          message: 'Đổi mật khẩu thành công',
-                        })
+                          message: "Đổi mật khẩu thành công",
+                        });
 
                       } else {
                         console.error("Logout failed");
@@ -119,7 +118,7 @@ export function InformationDoctor() {
                     },
                   });
                 },
-              })
+              });
             }}
           >
             <Form.Item

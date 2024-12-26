@@ -1,8 +1,8 @@
 // utils/redirect.ts
-import Router from 'next/router';
+import Router from "next/router";
 
 export const redirectToRoot = () => {
-  if (typeof window !== 'undefined') {
-    Router.push('/');
+  if (typeof window !== "undefined") {
+    Router.push("/");
   }
 };

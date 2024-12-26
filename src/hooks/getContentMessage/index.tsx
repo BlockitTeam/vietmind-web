@@ -8,7 +8,6 @@ export const FetchContentMessage = (conversationId?: number) => {
 
 
 export const useContentMessageHook = (conversationId?: number) => {
-  const url = `conversation/${conversationId}/content`;
   return useQuery<IResponse<any>>({
     queryKey: ["contentConversationId", conversationId],
     queryFn: () => FetchContentMessage(conversationId),

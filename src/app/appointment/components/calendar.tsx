@@ -1,9 +1,9 @@
-import * as React from "react"
+import * as React from "react";
 
-import { Calendar } from "@/components/ui/calendar"
+import { Calendar } from "@/components/ui/calendar";
 
 export function CalendarSingle() {
-  const [date, setDate] = React.useState<Date | undefined>(new Date())
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
 
   return (
     <Calendar
@@ -12,5 +12,5 @@ export function CalendarSingle() {
       onSelect={setDate}
       className=""
     />
-  )
+  );
 }

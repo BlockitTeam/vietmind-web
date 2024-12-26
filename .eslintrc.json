@@ -1,5 +1,14 @@
 {
-  "extends": "next/core-web-vitals",
-  "react/no-unescaped-entities": "off",
-  "@next/next/no-page-custom-font": "off"
+  "extends": ["next/core-web-vitals", "eslint:recommended"],
+  "plugins": ["react", "@typescript-eslint"],
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "semi": ["error", "always"],
+    "quotes": ["error", "double"],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+  }
 }

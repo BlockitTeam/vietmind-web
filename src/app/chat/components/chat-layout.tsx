@@ -7,15 +7,13 @@ import {
 } from "@/components/ui/resizable";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Calendar, Search } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { Chat } from "@/app/chat/components/chat";
 import {
   appointmentAtom,
-  appointmentDetailAtom,
   conversationIdAtom,
   currentUserAtom,
   senderFullNameAtom,
@@ -23,28 +21,19 @@ import {
 import { useAtom } from "jotai";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { EndChat } from "./chat-modal-end";
 import { Appointment } from "./appointment";
 import { ChatInformation } from "./chat-information";
 import { useCurrentUserHook } from "@/hooks/currentUser";
-import { useGetConversation } from "@/hooks/conversation";
 import { WebSocketProvider } from "./webSocketContext";
 import { Conversation } from "./conversation";
 import { displayAvatar } from "@/helper";
 import { ConversationProvider } from "./conversations-provider";
 import SearchConversation from "./search-conversation";
 
-interface ChatLayoutProps {
-  defaultCollapsed?: boolean;
-  navCollapsedSize: number;
-}
 export function ChatLayout() {
   const [tab, setTab] = React.useState("chat");
   // atom
   const [appointment, setAppointment] = useAtom(appointmentAtom);
-  const [appointmentDetail, setAppointmentDetail] = useAtom(
-    appointmentDetailAtom
-  );
   const [senderFullName] = useAtom(senderFullNameAtom);
   const [conversationId] = useAtom(conversationIdAtom);
 
@@ -55,7 +44,7 @@ export function ChatLayout() {
     if (queryUser.isSuccess) {
       setCurrentUser(user?.data);
     }
-  }, [user]);
+  }, [user, queryUser.isSuccess, setCurrentUser]);
 
   return (
     queryUser.isSuccess && (

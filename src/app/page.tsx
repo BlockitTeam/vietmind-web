@@ -10,10 +10,10 @@ import * as z from "zod";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import { useSetAtom } from "jotai";
-import { TCurrentUser, currentUserAtom, sessionAtom } from "@/lib/jotai";
+import { TCurrentUser, currentUserAtom } from "@/lib/jotai";
 import axiosInstance from "@/config/axios/axiosInstance";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import { notification } from "antd";
 
 const loginSchema = z.object({
@@ -27,7 +27,6 @@ type LoginSchema = z.infer<typeof loginSchema>;
 
 export default function Home() {
   const { toast } = useToast();
-  const setSession = useSetAtom(sessionAtom);
   const setCurrentUser = useSetAtom(currentUserAtom);
   const {
     register,
@@ -41,15 +40,15 @@ export default function Home() {
     },
   });
   const [loading, setLoading] = useState(false);
-  const [currentUser, setCurrentUserStorage] =
+  const [, setCurrentUserStorage] =
     useLocalStorage<TCurrentUser | null>("currentUser", null);
 
   const router = useRouter();
   useEffect(() => {
-        const sessionCookie = Cookies.get('JSESSIONID');
+        const sessionCookie = Cookies.get("JSESSIONID");
         if (sessionCookie) {
           
-            router.replace('/chat'); // Redirect to dashboard or preferred page
+            router.replace("/chat"); // Redirect to dashboard or preferred page
         }
     }, [router]);
   const customSubmit = async (e: FormEvent) => {
@@ -58,8 +57,6 @@ export default function Home() {
   };
   const onSubmit = async (data: any) => {
     setLoading(true);
-    const { username, password } = data;
-
     try {
       const response = await axiosInstance.post("auth/login", data);
       if (response.status === 200) {
@@ -69,13 +66,13 @@ export default function Home() {
           setCurrentUserStorage(respUser.data);
           router.push("/chat");
           notification.success({
-            message: 'Đặng nhập thành công',
-          })
+            message: "Đặng nhập thành công",
+          });
         } else {
           notification.warning({
-            message: 'Đặng nhập thất bại',
-            description: 'Vui long kiểm tra thống tin đăng nhập'
-          })
+            message: "Đặng nhập thất bại",
+            description: "Vui long kiểm tra thống tin đăng nhập"
+          });
         }
       } else {
         toast({
@@ -87,9 +84,9 @@ export default function Home() {
       }
     } catch (error) {
       notification.warning({
-        message: 'Đặng nhập thất bại',
-        description: 'Vui long kiểm tra thống tin đăng nhập'
-      })
+        message: "Đặng nhập thất bại",
+        description: "Vui long kiểm tra thống tin đăng nhập"
+      });
     } finally {
       setLoading(false);
     }
@@ -155,7 +152,7 @@ export default function Home() {
                 fill="currentColor"
               />
             </svg>
-            Loading...</> : 'Đăng nhập'}
+            Loading...</> : "Đăng nhập"}
           </button>
 
           {/* <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" /> */}
@@ -164,15 +161,6 @@ export default function Home() {
     </div>
   );
 }
-
-const BottomGradient = () => {
-  return (
-    <>
-      <span className="group-hover/btn:opacity-100 block transition duration-500 opacity-0 absolute h-px w-full -bottom-px inset-x-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
-      <span className="group-hover/btn:opacity-100 blur-sm block transition duration-500 opacity-0 absolute h-px w-1/2 mx-auto -bottom-px inset-x-10 bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
-    </>
-  );
-};
 
 const LabelInputContainer = ({
   children,

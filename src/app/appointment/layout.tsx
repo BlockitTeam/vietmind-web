@@ -1,4 +1,4 @@
-import HeaderChat from "@/components/headerChat";
+import React from "react";
 
 export default function Layout({ children }: Readonly<{
     children: React.ReactNode;
@@ -7,5 +7,5 @@ export default function Layout({ children }: Readonly<{
     <div className="flex h-screen w-full flex-col">
       <main className="flex h-full flex-col justify-center overflow-auto">{children}</main>
     </div>
-  )
+  );
 }

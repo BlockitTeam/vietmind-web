@@ -16,7 +16,7 @@ import { useGetScheduleAppointment } from "@/hooks/appointment";
 export function SheetAppointment() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const { data: scheduleAppointment, isSuccess, refetch } = useGetScheduleAppointment();
+  const { data: scheduleAppointment } = useGetScheduleAppointment();
 
   const handleOpenChange = (openState: boolean) => {
     setIsOpen(openState);

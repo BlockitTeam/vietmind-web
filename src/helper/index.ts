@@ -13,7 +13,7 @@ export const displayStatusAppointment = (status: string) => {
       return "Đang diễn ra";
 
     case "FINISH":
-      return "Hoàn thành"
+      return "Hoàn thành";
     default:
       break;
   }
@@ -22,14 +22,14 @@ export const displayStatusAppointment = (status: string) => {
 
 export const displayAvatar = (fullName: string) => {
   if (fullName) {
-    const splitName = fullName.split(/(\s).+\s/).join("").split(' ');
-    let avatar = '';
+    const splitName = fullName.split(/(\s).+\s/).join("").split(" ");
+    let avatar = "";
     splitName.map((item) => {
       return avatar += item.charAt(0);
-    })
+    });
 
-    return avatar.split('').reverse().join('');
+    return avatar.split("").reverse().join("");
   }
 
-  return 'NN';
-}
+  return "NN";
+};

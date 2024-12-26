@@ -1,15 +1,11 @@
-import { Button } from "@/components/ui/button";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ApiResponse, useAnswerByIdHook, useGetDetailSurveyById } from "@/hooks/answer";
+import { ApiResponse, useGetDetailSurveyById } from "@/hooks/answer";
 import { senderFullNameAtom, userIdTargetUserAtom } from "@/lib/jotai";
 import { Table, TableColumnsType } from "antd";
 import { useAtom } from "jotai";
@@ -24,7 +20,7 @@ const columns: TableColumnsType<DataType> = [
     dataIndex: "question",
     width: "70%",
     render: (value, record) => {
-      return <span className={record?.responseFormat === 'parent_question' ? 'font-bold text-lg' : ''}>{value}</span>;
+      return <span className={record?.responseFormat === "parent_question" ? "font-bold text-lg" : ""}>{value}</span>;
     }
   },
   {
@@ -35,11 +31,6 @@ const columns: TableColumnsType<DataType> = [
     }
   },
 ];
-interface FormattedQuestion {
-  question: string;
-  answer: string;
-  responseFormat: string
-}
 
 export function AnswerDetailSheet() {
   const [userIdTargetUser,] = useAtom(userIdTargetUserAtom);
@@ -48,7 +39,6 @@ export function AnswerDetailSheet() {
   const {
     data: answerData,
     isSuccess,
-    isError,
   } = useGetDetailSurveyById(userIdTargetUser!);
 
   const formatData = (data: ApiResponse): any[] => {

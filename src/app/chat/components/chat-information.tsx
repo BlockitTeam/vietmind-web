@@ -5,19 +5,12 @@ import { useAtom } from "jotai";
 import {
   appointmentAtom,
   appointmentDetailAtom,
-  conversationIdAtom,
   userConversationIdAtom,
   userIdTargetUserAtom,
 } from "@/lib/jotai";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { WatchDetail } from "./watch-detail";
 import { useGetUserBasicHook } from "@/hooks/user";
 import { useGetScreeningTestUserIdHook } from "@/hooks/screeningTest";
-import { useEditor, EditorContent } from "@tiptap/react";
-import Document from "@tiptap/extension-document";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
-import Heading from "@tiptap/extension-heading";
 import {
   useGetCurrentAppointment,
   useGetFutureAppointment,
@@ -38,11 +31,10 @@ export function ChatInformation() {
 
   const [, setAppointment] = useAtom(appointmentAtom);
   const [userIdTargetUser, ] = useAtom(userIdTargetUserAtom);
-  const [conversationId, ] = useAtom(conversationIdAtom);
   const [userConversationId, ] = useAtom(
     userConversationIdAtom
   );
-  const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
+  const { sendMessageWS, lastMessage } = useWebSocketContext();
 
   const { data: userBasic, ...queryUserBasic } =
     useGetUserBasicHook(userIdTargetUser!);
@@ -71,7 +63,7 @@ export function ChatInformation() {
       refetchAppointment();
       refetchFutureAppointment();
     }
-  }, [userIdTargetUser])
+  }, [userIdTargetUser, refetchFutureAppointment, refetchAppointment]);
 
   useEffect(() => {
     if (lastMessage !== null) {
@@ -81,7 +73,7 @@ export function ChatInformation() {
         refetchFutureAppointment();
       }
     }
-  }, [lastMessage]);
+  }, [lastMessage, refetchAppointment, refetchFutureAppointment]);
 
   const cancelAppointment = () => {
     const bodyCancel = {
@@ -90,7 +82,7 @@ export function ChatInformation() {
     };
 
     usePutMutationAppointmentId.mutate(bodyCancel, {
-      onSuccess(data, variables, context) {
+      onSuccess(data) {
         if (data.statusCode === 200) {
           setAppointmentDetail({
             status: data?.data?.status,

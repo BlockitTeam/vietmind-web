@@ -52,4 +52,4 @@ export const encryptMessage = (m: string, aesKey: CryptoJS.lib.WordArray | null)
 
 export const checkSenderFromDoctor = (userId: string, senderId: string) => {
   return userId === senderId ? true : false;
-}
+};

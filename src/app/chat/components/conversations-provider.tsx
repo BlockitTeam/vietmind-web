@@ -1,5 +1,5 @@
 import { useGetConversation } from "@/hooks/conversation";
-import {
+import React , {
   createContext,
   ReactNode,
   useContext,
@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useDebounce } from 'use-debounce';
+import { useDebounce } from "use-debounce";
 
 export type ConversationData = {
   conversation: {
@@ -37,8 +37,8 @@ type ConversationContextType = {
   conversations?: ConversationData[];
   refetchConversation: () => void;
   isSuccessConversationQuery: boolean;
-  setConversationWs: (conversations: ConversationData[]) => void;
-  setSearchTerm: (searchTerm: string) => void
+  setConversationWs: (_conversations: ConversationData[]) => void;
+  setSearchTerm: (_searchTerm: string) => void;
 };
 
 
@@ -70,7 +70,7 @@ export const ConversationProvider: React.FC<{ children: ReactNode }> = ({
       setConversationWs: setConversationDataWs,
       setSearchTerm
     }),
-    [conversationDataWs, refetch, isSuccess, setConversationDataWs, searchTerm, setSearchTerm]
+    [conversationDataWs, refetch, isSuccess, setConversationDataWs, setSearchTerm]
   );
 
   return (

@@ -2,12 +2,12 @@ import { IResponse, getData } from "@/config/api";
 import { useQuery } from "@tanstack/react-query";
 
 export const FetchCurrentUser = () => {
-  const url = `user/current-user`;
+  const url = "user/current-user";
   return getData<IResponse<any>>(url);
 };
 
 export const FetchCurrentUserDoctor = () => {
-  const url = `user/current-user-doctor`;
+  const url = "user/current-user-doctor";
   return getData<IResponse<any>>(url);
 };
 

@@ -1,10 +1,10 @@
-import React from 'react'
-import { UserData } from '../data';
-import { Info, Phone, Video } from 'lucide-react';
-import Link from 'next/link';
-import { cn } from '@/lib/utils';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
-import { buttonVariants } from '@/components/ui/button';
+import React from "react";
+import { UserData } from "../data";
+import { Info, Phone, Video } from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { buttonVariants } from "@/components/ui/button";
 
 interface ChatTopbarProps {
     selectedUser: UserData;
@@ -47,5 +47,5 @@ export default function ChatTopbar({selectedUser}: ChatTopbarProps) {
           ))}
         </div>
       </div>
-  )
+  );
 }

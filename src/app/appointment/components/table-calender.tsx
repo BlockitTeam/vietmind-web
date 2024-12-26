@@ -14,20 +14,9 @@ const FullFeaturedCalendar = () => {
 
   useEffect(() => {
     if (appointmentDoctor && isSuccess) {
-      setEvents(appointmentDoctor.data)
+      setEvents(appointmentDoctor.data);
     }
-  }, [appointmentDoctor])
-
-  const handleEventClick = (clickInfo: any) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the event '${clickInfo.event.title}'?`
-      )
-    ) {
-      clickInfo.event.remove();
-    }
-  };
-
+  }, [appointmentDoctor, isSuccess]);
 
   // Function to handle today's date navigation
   const handleTodayClick = () => {
@@ -35,28 +24,22 @@ const FullFeaturedCalendar = () => {
     calendarApi.today(); // Navigate to today's date
   };
 
-  // Function to handle date click
-  const handleDateClick = (dateClickInfo: any) => {
-    const clickedDate = dateClickInfo.dateStr;
-    calendarRef.current.getApi().gotoDate(clickedDate);
-  };
-
   const goToDate = (dateString: string) => {
     const calendarApi = calendarRef.current?.getApi(); // Ensure calendarApi exists
     if (calendarApi) {
-      calendarApi.changeView('timeGridDay',dateString); // Navigate to the specific date
+      calendarApi.changeView("timeGridDay",dateString); // Navigate to the specific date
     }
   };
 
   const renderEventContent = (eventInfo: any) => {
     // Format hours from start and end dates
     const startTime = new Date(eventInfo.event.start).toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
+      hour: "2-digit",
+      minute: "2-digit",
     });
     const endTime = new Date(eventInfo.event.end).toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
+      hour: "2-digit",
+      minute: "2-digit",
     });
 
     return (
@@ -72,7 +55,7 @@ const FullFeaturedCalendar = () => {
   return (
     <div className="w-full h-screen z-0">
       <FullCalendar
-        height={'90%'}
+        height={"90%"}
         ref={calendarRef} // Reference to calendar instance
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView="dayGridMonth" // Month view
