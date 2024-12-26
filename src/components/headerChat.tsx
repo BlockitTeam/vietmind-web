@@ -16,7 +16,6 @@ import { useRouter } from "next/navigation";
 import { useLogoutHook } from "@/hooks/logout";
 import { currentUserAtom } from "@/lib/jotai";
 import { useAtom } from "jotai";
-import { deleteCookie } from "cookies-next";
 import { InformationDoctor } from "./InformationDoctor";
 import { useRef } from "react";
 import Cookies from "js-cookie";
@@ -46,21 +45,19 @@ export default function HeaderChat() {
         </Link>
         <Link
           href="/chat"
-          className={`${
-            isActive("/chat")
+          className={`${isActive("/chat")
               ? "text-blue-500 font-bold border-b-2 border-b-regal-green"
               : "text-foreground"
-          } transition-colors hover:text-foreground w-max`}
+            } transition-colors hover:text-foreground w-max`}
         >
           Chat
         </Link>
         <Link
           href="/appointment"
-          className={`${
-            isActive("/appointment")
+          className={`${isActive("/appointment")
               ? "text-blue-500 font-bold border-b-2 border-b-regal-green"
               : "text-muted-foreground"
-          } transition-colors hover:text-foreground w-max`}
+            } transition-colors hover:text-foreground w-max`}
         >
           Lịch hẹn
         </Link>
@@ -113,19 +110,13 @@ export default function HeaderChat() {
             <DropdownMenuItem
               onClick={async () => {
                 useLogout.mutate(undefined, {
-                  onSuccess(data ) {
+                  onSuccess(data) {
                     if (data.statusCode === 200) {
+                      // Clear cookies and user state
                       setCurrentUser(null);
                       Cookies.remove("JSESSIONID");
-                      deleteCookie("JSESSIONID", {
-                        path: "/",
-                        domain: "http://91.108.104.57",
-                      });
-                      // Remove the cookie
-                      // Redirect to the home page or any other page
+                      // Redirect to the login or home page
                       router.push("/");
-                    } else {
-                      console.error("Logout failed");
                     }
                   },
                   onError: (error) => {
