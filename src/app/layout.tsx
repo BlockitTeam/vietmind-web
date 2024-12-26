@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
 import { Inter as FontSans } from "next/font/google";
-
+import React from "react";
 import { cn } from "@/lib/utils";
 
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
 
 import { Provider } from "jotai";
 import QueryClientProvider from "@/lib/queryClientProvider";

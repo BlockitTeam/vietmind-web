@@ -1,6 +1,6 @@
 // middleware.ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
   // Get the authentication token from cookies
@@ -18,7 +18,7 @@ export function middleware(req: NextRequest) {
 
   // If the user is authenticated and trying to access the login page, redirect them to /chat
   if (token && req.nextUrl.pathname === "/") {
-    return NextResponse.redirect(new URL('/chat', req.url));
+    return NextResponse.redirect(new URL("/chat", req.url));
   }
 
   // Allow the request to proceed if authenticated or not accessing protected paths

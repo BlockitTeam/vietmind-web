@@ -1,9 +1,7 @@
 import {
   FileImage,
-  Mic,
   Paperclip,
   SendHorizontal,
-  Smile,
   ThumbsUp,
 } from "lucide-react";
 import Link from "next/link";
@@ -13,12 +11,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { buttonVariants } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  TypingMessageAtom,
   aesKeyAtom,
   conversationIdAtom,
-  currentUserAtom,
-  privateKeyAtom,
-  publicKeyAtom,
   senderFullNameAtom,
   userIdTargetUserAtom,
 } from "@/lib/jotai";
@@ -27,18 +21,12 @@ import { encryptMessage } from "@/servers/message";
 // @ts-ignore:next-line
 import { useWebSocketContext } from "./webSocketContext";
 
-type INewMessageWS = {
-  type: "message";
-  conversationId: string;
-  message: string;
-};
-
 interface IChatMessage {
   fromMe: boolean;
   message: string;
 }
 interface ChatBottombarProps {
-  setMessagesWS: (newMessage: IChatMessage[]) => void;
+  setMessagesWS: (_newMessage: IChatMessage[]) => void;
 }
 
 export const BottombarIcons = [{ icon: FileImage }, { icon: Paperclip }];
@@ -48,14 +36,10 @@ export default function ChatBottombar({
 }: ChatBottombarProps) {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [loadTyping, setLoadTyping] = useState(false);
-  const [privateKeyAtomStorage, setPrivateKeyAtom] = useAtom(privateKeyAtom);
-  const [publicKeyAtomStorage, setPublicKeyAtom] = useAtom(publicKeyAtom);
-  const [aesKey, setAesKey] = useAtom(aesKeyAtom);
-  const [conversationId, setConversationId] = useAtom(conversationIdAtom);
-  const [userIdTargetUser, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
-  const [currentUser, setCurrentUser] = useAtom(currentUserAtom);
-  const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
+  const [aesKey,] = useAtom(aesKeyAtom);
+  const [conversationId,] = useAtom(conversationIdAtom);
+  const [userIdTargetUser,] = useAtom(userIdTargetUserAtom);
+  const { sendMessageWS, lastMessage } = useWebSocketContext();
   const dataLastMessage = lastMessage?.data && JSON.parse(lastMessage?.data);
   const [imTyping, setImTyping] = useState(false);
   const [senderFullName] = useAtom(senderFullNameAtom);
@@ -150,7 +134,7 @@ export default function ChatBottombar({
 
   return (
     <>
-       {dataLastMessage?.type === 'typing' && dataLastMessage?.conversationId === conversationId && (
+       {dataLastMessage?.type === "typing" && dataLastMessage?.conversationId === conversationId && (
         <p className="text-xs ml-[8px] text-gray-500">
           {" "}
           {`${senderFullName} đang chat...`}

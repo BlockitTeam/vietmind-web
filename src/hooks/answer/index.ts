@@ -41,7 +41,6 @@ export const getNameOfSurveyDetailByUserId = (id: string | number) => {
 
 
 export const useAnswerByIdHook = (id: string | number) => {
-  const url = "user/current-user";
   return useQuery<IResponse<ApiResponse>>({
     queryKey: ["answerById", id],
     queryFn: () => getAnswerById(id!),
@@ -58,7 +57,7 @@ export const useGetDetailSurveyById = (id: string | number) => {
     enabled: !!id,
     retry: false
   });
-}
+};
 
 export const useGetNameOfSurveyDetailByUserId = (id: string | number) => {
   return useQuery<IResponse<{surveyName: string, date: string}>>({
@@ -67,4 +66,4 @@ export const useGetNameOfSurveyDetailByUserId = (id: string | number) => {
     enabled: !!id,
     retry: false
   });
-}
+};

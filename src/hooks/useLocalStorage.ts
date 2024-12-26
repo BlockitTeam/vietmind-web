@@ -1,8 +1,8 @@
 // src/hooks/useLocalStorage.ts
-import { useState } from 'react';
+import { useState } from "react";
 
 function useLocalStorage<T>(key: string, initialValue: T) {
-  const isBrowser = typeof window !== 'undefined';
+  const isBrowser = typeof window !== "undefined";
 
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (!isBrowser) {
@@ -17,9 +17,9 @@ function useLocalStorage<T>(key: string, initialValue: T) {
     }
   });
 
-  const setValue = (value: T | ((val: T) => T)) => {
+  const setValue = (value: T | ((_val: T) => T)) => {
     if (!isBrowser) {
-      console.error('localStorage is not available');
+      console.error("localStorage is not available");
       return;
     }
     try {

@@ -167,7 +167,7 @@ const ScheduleForm: React.FC<{
                   return field.dayOfWeek === index + 1;
                 })
                 .sort((a, b) => a.shiftNumber - b.shiftNumber)
-                .map((field, fieldIndex) => (
+                .map((field) => (
                   <Space key={field.id} direction="vertical" align="start">
                     <Space key={field.id} align="center">
                       <Controller

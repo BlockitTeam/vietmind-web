@@ -15,14 +15,14 @@ export const useGetUserBasicHook = (id: string | number) => {
 };
 
 export const useResetPassword = () => {
-  const url = `user/reset-password`;
+  const url = "user/reset-password";
   return useMutation({
     mutationKey: ["reset-password"],
     mutationFn: (body: {currentPassword: string, newPassword: string}) => {
       return mutationPost<IResponse<any>>({
         url,
         body
-      })
+      });
     }
-  })
-}
+  });
+};

@@ -29,21 +29,21 @@ export const useGetNoteConversationId = (id: string | number) => {
 
 // POST
 export const usePutNoteConversationId = (id: string | number) => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const url = `conversation/${id}/note`;
   return useMutation({
-    mutationKey: ['postConversationId'],
+    mutationKey: ["postConversationId"],
     mutationFn: (body: any) => {
       return mutationPost<IResponse<any>>({
         url,
         body
-      })
+      });
     },
-    onSuccess(data, variables, context) {
+    onSuccess() {
       void queryClient.invalidateQueries({
-        queryKey: ['noteConversationId'],
-      })
+        queryKey: ["noteConversationId"],
+      });
     },
-  })
-}
+  });
+};

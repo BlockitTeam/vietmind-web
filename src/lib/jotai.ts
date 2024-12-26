@@ -1,7 +1,6 @@
 import { atom } from "jotai";
-import { unknown } from "zod";
-
-type TStatusAppointment = null | 'PENDING' | 'CANCELLED' | 'CONFIRMED';
+import CryptoJS from "crypto-js"; // Add this line
+type TStatusAppointment = null | "PENDING" | "CANCELLED" | "CONFIRMED";
 type TAppointmentDetail = {
   status: TStatusAppointment;
   data: {
@@ -33,9 +32,9 @@ export const publicKeyAtom = atom<string | null>(null);
 export const aesKeyAtom = atom<CryptoJS.lib.WordArray | null>(null);
 export const conversationIdAtom = atom<number>(0);
 export const conversationIdContentAtom = atom([]);
-export const userIdTargetUserAtom = atom<string | number>('');
+export const userIdTargetUserAtom = atom<string | number>("");
 export const TypingMessageAtom = atom<boolean>(false);
-export const senderFullNameAtom = atom<string>('')
+export const senderFullNameAtom = atom<string>("");
 
 export type TCurrentUser = {
   birthYear: number;

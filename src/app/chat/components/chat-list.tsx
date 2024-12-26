@@ -1,35 +1,21 @@
-import { Message, UserData } from "../data";
 import { cn } from "@/lib/utils";
 import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import ChatBottombar from "./chat-bottombar";
-import useWebSocket, { ReadyState } from "react-use-websocket";
 import CryptoJS from "crypto-js";
 import { useAtom } from "jotai";
 import {
-  TypingMessageAtom,
   aesKeyAtom,
   conversationIdAtom,
   conversationIdContentAtom,
   currentUserAtom,
   privateKeyAtom,
-  publicKeyAtom,
-  senderFullNameAtom,
-  userIdTargetUserAtom,
 } from "@/lib/jotai";
 import { JSEncrypt } from "jsencrypt";
 import { useGetEASHook } from "@/hooks/getContentMessage";
 import { checkSenderFromDoctor, decryptMessage } from "@/servers/message";
-// @ts-ignore:next-line
 import { useWebSocketContext } from "./webSocketContext";
-import { useQueryClient } from "@tanstack/react-query";
 import { useConversationContext } from "./conversations-provider";
-
-interface ChatListProps {
-  isMobile: boolean;
-  refetchConversation: () => void;
-}
 
 interface IChatMessage {
   fromMe: boolean;
@@ -38,24 +24,22 @@ interface IChatMessage {
 
 export function ChatList() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const queryClient = useQueryClient();
   const [loadingMessage, setLoadingMessage] = useState(false);
   const [messagesWS, setMessagesWS] = useState<IChatMessage[]>([]);
-  const [privateKey, setPrivateKey] = useState<string | null>("");
+  const [, setPrivateKey] = useState<string | null>("");
   const [, setPublicKey] = useState<string>("");
-  const [privateKeyAtomStorage, setPrivateKeyAtom] = useAtom(privateKeyAtom);
+  const [, setPrivateKeyAtom] = useAtom(privateKeyAtom);
   const [aesKey, setAesKey] = useAtom(aesKeyAtom);
   const [conversationIdContent] = useAtom(
     conversationIdContentAtom
   );
   const [conversationId] = useAtom(conversationIdAtom);
-  const [senderFullName] = useAtom(senderFullNameAtom);
 
   const [currentUser] = useAtom(currentUserAtom);
-  const { sendMessageWS, updateUrl, lastMessage } = useWebSocketContext();
-  const {setConversationWs, refetchConversation} = useConversationContext()
+  const { lastMessage } = useWebSocketContext();
+  const {refetchConversation} = useConversationContext();
 
-  const [userTyping, setUserTyping] = useState(false);
+  const [, setUserTyping] = useState(false);
   const getAES = useGetEASHook(conversationId);
   const JSEncryptLib = new JSEncrypt({ default_key_size: "512" });
 
@@ -105,7 +89,7 @@ export function ChatList() {
             setLoadingMessage(false);
           }
         },
-        onError(error, variables, context) {
+        onError(error) {
           setLoadingMessage(false);
           console.log(error);
         },
@@ -131,7 +115,7 @@ export function ChatList() {
         ]);
       }
 
-      if (newMessage?.type === 'panel') {
+      if (newMessage?.type === "panel") {
         refetchConversation();
       }
     }
