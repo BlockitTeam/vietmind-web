@@ -151,7 +151,9 @@ export function ChatInformation() {
                 Ghi chú: {futureAppointments?.data?.content}
               </p>
             </CardContent>
-            <CardFooter className="grid grid-flow-col gap-3 p-2 items-center justify-stretch w-full">
+           {
+            futureAppointments?.data.status === "PENDING" && (
+              <CardFooter className="grid grid-flow-col gap-3 p-2 items-center justify-stretch w-full">
               <Button
                 disabled={futureAppointments.data?.status === "CANCELLED"}
                 variant="outline"
@@ -169,6 +171,8 @@ export function ChatInformation() {
                 Huỷ lịch hẹn
               </Button>
             </CardFooter>
+            )
+           }
           </Card>
           <Separator />
         </>
