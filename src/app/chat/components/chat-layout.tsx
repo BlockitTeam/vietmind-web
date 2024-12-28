@@ -17,6 +17,7 @@ import {
   conversationIdAtom,
   currentUserAtom,
   senderFullNameAtom,
+  userIdTargetUserAtom,
 } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { IconArrowLeft } from "@tabler/icons-react";
@@ -29,6 +30,7 @@ import { Conversation } from "./conversation";
 import { displayAvatar } from "@/helper";
 import { ConversationProvider } from "./conversations-provider";
 import SearchConversation from "./search-conversation";
+import { useGetFutureAppointment } from "@/hooks/appointment";
 
 export function ChatLayout() {
   const [tab, setTab] = React.useState("chat");
@@ -39,6 +41,11 @@ export function ChatLayout() {
 
   const [, setCurrentUser] = useAtom(currentUserAtom);
   const { data: user, ...queryUser } = useCurrentUserHook();
+  const [userIdTargetUser,] = useAtom(userIdTargetUserAtom);
+  const {
+    data: futureAppointments,
+    ...queryFutureAppointment
+  } = useGetFutureAppointment(userIdTargetUser!);
 
   useEffect(() => {
     if (queryUser.isSuccess) {
@@ -331,22 +338,38 @@ export function ChatLayout() {
                       !appointment ? "justify-start" : "justify-center"
                     )}
                   >
-                    {!appointment ? (
-                      <Button
-                        className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
-                        onClick={() => setAppointment(true)}
-                      >
-                        Đặt lịch hẹn
-                        <Calendar className="ml-2" size={20} />
-                      </Button>
-                    ) : (
-                      <div
-                        className="font-bold flex items-center w-full cursor-pointer"
-                        onClick={() => setAppointment(false)}
-                      >
-                        <IconArrowLeft size={20} className="mr-2" /> Quay lại
-                      </div>
-                    )}
+                    {
+                      !appointment && !queryFutureAppointment.isSuccess && (
+                        <Button
+                          className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
+                          onClick={() => setAppointment(true)}
+                        >
+                          Đặt lịch hẹn
+                          <Calendar className="ml-2" size={20} />
+                        </Button>
+                      )
+                    }
+                    {
+                      !appointment && futureAppointments && queryFutureAppointment.isSuccess && (
+                        <Button
+                          className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
+                        >
+                          Thông tin lịch hẹn
+                          <Calendar className="ml-2" size={20} />
+                        </Button>
+                      )
+                    }
+                    {
+                      appointment && (
+                        <div
+                          className="font-bold flex items-center w-full cursor-pointer"
+                          onClick={() => setAppointment(false)}
+                        >
+                          <IconArrowLeft size={20} className="mr-2" /> Quay lại
+                        </div>
+                      )
+                    }
+
                   </div>
                   <Separator />
 
