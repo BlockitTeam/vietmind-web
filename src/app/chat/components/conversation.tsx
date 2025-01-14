@@ -49,8 +49,8 @@ export const Conversation = () => {
           return (
             <div
               className={cn(
-                "flex items-center mt-2 justify-between cursor-pointer p-2",
-                isActive && "bg-[#E0E9ED] text-white"
+                "cursor-pointer p-2 flex flex-row gap-2",
+                isActive && "bg-[#E0E9ED] w-full"
               )}
               key={index}
               onClick={() => {
@@ -65,30 +65,28 @@ export const Conversation = () => {
                 setAppointment(false);
               }}
             >
-              <div className="flex  w-full">
-                <div className="flex items-center gap-2  w-full">
-                  <Button
-                    variant="outline"
-                    className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                  >
-                    {displayAvatar(conversation.senderFullName)}
-                  </Button>
-                  <div className="cursor-pointer">
-                    <p className="text-sm text-neutral-primary">
+              <Button
+                variant="outline"
+                className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+              >
+                {displayAvatar(conversation.senderFullName)}
+              </Button>
+              <div className="flex flex-col w-full overflow-hidden">
+                <div className="flex flex-col">
+                  <div className="flex items-center justify-between w-full">
+                    <p className="text-sm text-neutral-primary truncate overflow-hidden flex-1">
                       {conversation.senderFullName}
                     </p>
-                    <p className="text-sm text-neutral-ternary whitespace-nowrap w-3">
-                      {decryptMessageWithKeyAES(
-                        conversation.lastMessage.encryptedMessage,
-                        conversation.conversation.conversationKey
-                      )}
+                    <p className="text-sm text-neutral-ternary whitespace-nowrap ml-2">{dayjs(conversation.lastMessage.createdAt).format("DD/MM")}</p>
+                  </div>
+                  <div className="w-full">
+                    <p className="text-sm text-ellipsis overflow-hidden whitespace-pre w-full">
+                    {decryptMessageWithKeyAES(
+                      conversation.lastMessage.encryptedMessage,
+                      conversation.conversation.conversationKey
+                    )}
                     </p>
                   </div>
-                 
-                </div>
-                <div className="items-center">
-                  <p className="text-sm text-neutral-ternary">{dayjs(conversation.lastMessage.createdAt).format("DD/MM")}</p>
-                  <p></p>
                 </div>
               </div>
             </div>
