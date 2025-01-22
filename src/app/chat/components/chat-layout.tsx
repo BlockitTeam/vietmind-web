@@ -59,11 +59,6 @@ export function ChatLayout() {
         <ConversationProvider>
           <ResizablePanelGroup
             direction="horizontal"
-            onLayout={(sizes: number[]) => {
-              document.cookie = `react-resizable-panels:layout=${JSON.stringify(
-                sizes
-              )}`;
-            }}
             className="h-full items-stretch"
           >
             <ResizablePanel
@@ -71,11 +66,6 @@ export function ChatLayout() {
               collapsible={false}
               minSize={20}
               maxSize={20}
-              onCollapse={(collapsed?: any) => {
-                document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
-                  collapsed
-                )}`;
-              }}
             >
               <div
                 className={cn("flex h-[56px] items-center justify-center px-2 shadow-md")}
@@ -286,7 +276,7 @@ export function ChatLayout() {
                 </div>
               </div>
             </ResizablePanel>
-            <ResizableHandle withHandle />
+            <ResizableHandle />
             <ResizablePanel defaultSize={60} collapsible={false}>
               {conversationId > 0 && (
                 <>
@@ -323,7 +313,7 @@ export function ChatLayout() {
                 </div>
               )}
             </ResizablePanel>
-            <ResizableHandle withHandle />
+            <ResizableHandle />
             <ResizablePanel
               defaultSize={20}
               collapsible={false}
