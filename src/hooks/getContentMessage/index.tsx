@@ -30,3 +30,16 @@ export const useGetEASHook = (conversationId?: number) => {
     retry: 0
   });
 };
+
+export const useIsReadMessage = (id: string) => {
+  const url = `message/markMessageIsRead/${id}`;
+  return useMutation({
+    mutationKey: ["markMessageIsRead"],
+    mutationFn: () => {
+      return mutationPost<IResponse<any>>({
+        url,
+        body: {},
+      });
+    },
+  });
+};

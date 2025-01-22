@@ -28,6 +28,7 @@ export const Conversation = () => {
 
   const { data: contentConversationId, ...queryConversationId } =
     useContentMessageHook(conversationId);
+
   useEffect(() => {
     if (queryConversationId.isSuccess) {
       setConversationIdContentAtom(contentConversationId?.data);
@@ -39,6 +40,12 @@ export const Conversation = () => {
       queryConversationId.refetch();
     }
   }, [conversationId]);
+
+  const sanitizeString = (input: string) => {
+    // Remove \n, \r, and HTML tags
+    return input.replace(/(\r\n|\n|\r|<br\s*\/?>)/g, "");
+  };
+
   return (
     <>
       {
@@ -74,18 +81,23 @@ export const Conversation = () => {
               <div className="flex flex-col w-full overflow-hidden">
                 <div className="flex flex-col">
                   <div className="flex items-center justify-between w-full">
-                    <p className="text-sm text-neutral-primary truncate overflow-hidden flex-1">
+                    <p className="text-sm text-neutral-primary truncate overflow-hidden flex-1 font-bold">
                       {conversation.senderFullName}
                     </p>
                     <p className="text-sm text-neutral-ternary whitespace-nowrap ml-2">{dayjs(conversation.lastMessage.createdAt).format("DD/MM")}</p>
                   </div>
-                  <div className="w-full">
-                    <p className="text-sm text-ellipsis overflow-hidden whitespace-pre w-full">
-                    {decryptMessageWithKeyAES(
+                  <div className="w-full flex justify-between">
+                    <p className="text-sm text-ellipsis overflow-hidden whitespace-pre w-3/4">
+                    {sanitizeString(decryptMessageWithKeyAES(
                       conversation.lastMessage.encryptedMessage,
                       conversation.conversation.conversationKey
-                    )}
+                    ))}
                     </p>
+                    {
+                      Number(conversation?.unreadMessageCount) > 0 && (
+                        <div className="text-sm bg-regal-green h-5 w-5 text-center rounded">{conversation?.unreadMessageCount}</div>
+                      )
+                    }
                   </div>
                 </div>
               </div>

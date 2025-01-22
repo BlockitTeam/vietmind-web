@@ -29,6 +29,7 @@ export type ConversationData = {
     encryptedMessage: string;
     createdAt: string;
   };
+  unreadMessageCount: number;
   senderFullName: string;
   receiverFullName: string;
 };
