@@ -13,11 +13,11 @@ import {
 } from "@/lib/jotai";
 import { decryptMessageWithKeyAES } from "@/servers/message";
 import { cn } from "@/utils/cn";
-import { useContentMessageHook } from "@/hooks/getContentMessage";
+import { useContentMessageHook, useIsReadMessage } from "@/hooks/getContentMessage";
 import dayjs from "dayjs";
 
 export const Conversation = () => {
-  const { conversations } = useConversationContext();
+  const { conversations, refetchConversation } = useConversationContext();
   // ATOM states
   const [, setUserConversationId] = useAtom(userConversationIdAtom);
   const [, setAppointment] = useAtom(appointmentAtom);
@@ -28,6 +28,9 @@ export const Conversation = () => {
 
   const { data: contentConversationId, ...queryConversationId } =
     useContentMessageHook(conversationId);
+
+  const isReadMessage = useIsReadMessage(conversationId!);
+
 
   useEffect(() => {
     if (queryConversationId.isSuccess) {
@@ -69,6 +72,11 @@ export const Conversation = () => {
                   conversationId: conversation.conversation.conversationId,
                   userId: conversation.conversation.userId,
                 });
+                isReadMessage.mutate({}, {
+                  onSuccess: () => {
+                    refetchConversation();
+                  }
+                });
                 setAppointment(false);
               }}
             >
@@ -88,10 +96,10 @@ export const Conversation = () => {
                   </div>
                   <div className="w-full flex justify-between">
                     <p className="text-sm text-ellipsis overflow-hidden whitespace-pre w-3/4">
-                    {sanitizeString(decryptMessageWithKeyAES(
-                      conversation.lastMessage.encryptedMessage,
-                      conversation.conversation.conversationKey
-                    ))}
+                      {sanitizeString(decryptMessageWithKeyAES(
+                        conversation.lastMessage.encryptedMessage,
+                        conversation.conversation.conversationKey
+                      ))}
                     </p>
                     {
                       Number(conversation?.unreadMessageCount) > 0 && (
