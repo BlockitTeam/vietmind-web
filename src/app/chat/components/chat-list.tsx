@@ -104,30 +104,35 @@ export function ChatList() {
       } else if (newMessage?.type === "unTyping") {
         setUserTyping(false);
       } else if (newMessage?.type === "message") {
-        const decryptedMessage = decryptMessage(newMessage.message, aesKey);
-        isReadMessage.mutate(
-          {},
-          {
-            onSuccess: () => {
-              if (conversations) {
-                let rs = conversations.map((i) => {
-                  if (i.conversation.conversationId === conversationId) {
-                    return { ...i, unreadMessageCount: 0 };
-                  }
-                  return i;
-                });
-                setConversationWs(rs);
-              }
+        try {
+          const decryptedMessage = decryptMessage(newMessage.message, aesKey);
+          isReadMessage.mutate(
+            {},
+            {
+              onSuccess: () => {
+                if (conversations) {
+                  let rs = conversations.map((i) => {
+                    if (i.conversation.conversationId === conversationId) {
+                      return { ...i, unreadMessageCount: 0 };
+                    }
+                    return i;
+                  });
+                  setConversationWs(rs);
+                }
+              },
+            }
+          );
+          setMessagesWS((prevMessages) => [
+            ...prevMessages,
+            {
+              fromMe: false,
+              message: decryptedMessage,
             },
-          }
-        );
-        setMessagesWS((prevMessages) => [
-          ...prevMessages,
-          {
-            fromMe: false,
-            message: decryptedMessage,
-          },
-        ]);
+          ]);
+        } catch {
+          console.log("Error decrypting message");
+        }
+
       }
 
       // if (newMessage?.type === "panel") {
