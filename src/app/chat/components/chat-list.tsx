@@ -12,7 +12,7 @@ import {
   privateKeyAtom,
 } from "@/lib/jotai";
 import { JSEncrypt } from "jsencrypt";
-import { useGetEASHook } from "@/hooks/getContentMessage";
+import { useGetEASHook, useIsReadMessage } from "@/hooks/getContentMessage";
 import { checkSenderFromDoctor, decryptMessage } from "@/servers/message";
 import { useWebSocketContext } from "./webSocketContext";
 import { useConversationContext } from "./conversations-provider";
@@ -30,14 +30,13 @@ export function ChatList() {
   const [, setPublicKey] = useState<string>("");
   const [, setPrivateKeyAtom] = useAtom(privateKeyAtom);
   const [aesKey, setAesKey] = useAtom(aesKeyAtom);
-  const [conversationIdContent] = useAtom(
-    conversationIdContentAtom
-  );
-  const [conversationId] = useAtom(conversationIdAtom);
 
+  const [conversationIdContent] = useAtom(conversationIdContentAtom);
+  const [conversationId] = useAtom(conversationIdAtom);
+  const isReadMessage = useIsReadMessage(conversationId!);
   const [currentUser] = useAtom(currentUserAtom);
   const { lastMessage } = useWebSocketContext();
-  const {refetchConversation} = useConversationContext();
+  const { conversations, setConversationWs } = useConversationContext();
 
   const [, setUserTyping] = useState(false);
   const getAES = useGetEASHook(conversationId);
@@ -106,6 +105,22 @@ export function ChatList() {
         setUserTyping(false);
       } else if (newMessage?.type === "message") {
         const decryptedMessage = decryptMessage(newMessage.message, aesKey);
+        isReadMessage.mutate(
+          {},
+          {
+            onSuccess: () => {
+              if (conversations) {
+                let rs = conversations.map((i) => {
+                  if (i.conversation.conversationId === conversationId) {
+                    return { ...i, unreadMessageCount: 0 };
+                  }
+                  return i;
+                });
+                setConversationWs(rs);
+              }
+            },
+          }
+        );
         setMessagesWS((prevMessages) => [
           ...prevMessages,
           {
@@ -115,9 +130,9 @@ export function ChatList() {
         ]);
       }
 
-      if (newMessage?.type === "panel") {
-        refetchConversation();
-      }
+      // if (newMessage?.type === "panel") {
+      //   refetchConversation();
+      // }
     }
   }, [lastMessage, aesKey, currentUser]);
 

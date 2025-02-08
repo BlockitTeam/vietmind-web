@@ -68,7 +68,9 @@ export function ChatLayout() {
               maxSize={20}
             >
               <div
-                className={cn("flex h-[56px] items-center justify-center px-2 shadow-md")}
+                className={cn(
+                  "flex h-[56px] items-center justify-center px-2 shadow-md"
+                )}
               >
                 <Tabs
                   defaultValue={tab}
@@ -328,38 +330,31 @@ export function ChatLayout() {
                       !appointment ? "justify-start" : "justify-center"
                     )}
                   >
-                    {
-                      !appointment && !queryFutureAppointment.isSuccess && (
-                        <Button
-                          className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
-                          onClick={() => setAppointment(true)}
-                        >
-                          Đặt lịch hẹn
-                          <Calendar className="ml-2" size={20} />
-                        </Button>
-                      )
-                    }
-                    {
-                      !appointment && futureAppointments && queryFutureAppointment.isSuccess && (
-                        <Button
-                          className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
-                        >
+                    {!appointment && !queryFutureAppointment.isSuccess && (
+                      <Button
+                        className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full"
+                        onClick={() => setAppointment(true)}
+                      >
+                        Đặt lịch hẹn
+                        <Calendar className="ml-2" size={20} />
+                      </Button>
+                    )}
+                    {!appointment &&
+                      futureAppointments &&
+                      queryFutureAppointment.isSuccess && (
+                        <Button className="text-neutral-primary border-regal-green bg-regal-green hover:bg-regal-green h-[30px] w-full">
                           Thông tin lịch hẹn
                           <Calendar className="ml-2" size={20} />
                         </Button>
-                      )
-                    }
-                    {
-                      appointment && (
-                        <div
-                          className="font-bold flex items-center w-full cursor-pointer"
-                          onClick={() => setAppointment(false)}
-                        >
-                          <IconArrowLeft size={20} className="mr-2" /> Quay lại
-                        </div>
-                      )
-                    }
-
+                      )}
+                    {appointment && (
+                      <div
+                        className="font-bold flex items-center w-full cursor-pointer"
+                        onClick={() => setAppointment(false)}
+                      >
+                        <IconArrowLeft size={20} className="mr-2" /> Quay lại
+                      </div>
+                    )}
                   </div>
                   <Separator />
 

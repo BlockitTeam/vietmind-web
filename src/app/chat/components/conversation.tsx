@@ -15,6 +15,7 @@ import { decryptMessageWithKeyAES } from "@/servers/message";
 import { cn } from "@/utils/cn";
 import { useContentMessageHook, useIsReadMessage } from "@/hooks/getContentMessage";
 import dayjs from "dayjs";
+import { useWebSocketContext } from "./webSocketContext";
 
 export const Conversation = () => {
   const { conversations, refetchConversation } = useConversationContext();
@@ -25,12 +26,12 @@ export const Conversation = () => {
   const [conversationId, setConversationId] = useAtom(conversationIdAtom);
   const [, setConversationIdContentAtom] = useAtom(conversationIdContentAtom);
   const [, setUserIdTargetUser] = useAtom(userIdTargetUserAtom);
+  const { lastMessage } = useWebSocketContext();
 
   const { data: contentConversationId, ...queryConversationId } =
     useContentMessageHook(conversationId);
 
   const isReadMessage = useIsReadMessage(conversationId!);
-
 
   useEffect(() => {
     if (queryConversationId.isSuccess) {
@@ -38,6 +39,15 @@ export const Conversation = () => {
     }
   }, [contentConversationId]);
 
+  useEffect(() => {
+    if (lastMessage) {
+      const newMessage = JSON.parse(lastMessage.data);
+
+      if (newMessage?.type === "panel") {
+        refetchConversation();
+      }
+    }
+  }, [lastMessage]);
   useEffect(() => {
     if (conversationId > 0) {
       queryConversationId.refetch();
@@ -51,10 +61,10 @@ export const Conversation = () => {
 
   return (
     <>
-      {
-        Array.isArray(conversations) &&
+      {Array.isArray(conversations) &&
         conversations.map((conversation: ConversationData, index: number) => {
-          const isActive = conversation.conversation.conversationId === conversationId;
+          const isActive =
+            conversation.conversation.conversationId === conversationId;
 
           return (
             <div
@@ -72,11 +82,14 @@ export const Conversation = () => {
                   conversationId: conversation.conversation.conversationId,
                   userId: conversation.conversation.userId,
                 });
-                isReadMessage.mutate({}, {
-                  onSuccess: () => {
-                    refetchConversation();
+                isReadMessage.mutate(
+                  {},
+                  {
+                    onSuccess: () => {
+                      refetchConversation();
+                    },
                   }
-                });
+                );
                 setAppointment(false);
               }}
             >
@@ -92,20 +105,28 @@ export const Conversation = () => {
                     <p className="text-sm text-neutral-primary truncate overflow-hidden flex-1 font-bold">
                       {conversation.senderFullName}
                     </p>
-                    <p className="text-sm text-neutral-ternary whitespace-nowrap ml-2">{dayjs(conversation.lastMessage.createdAt).format("DD/MM")}</p>
+                    <p className="text-sm text-neutral-ternary whitespace-nowrap ml-2">
+                      {dayjs(conversation.lastMessage.createdAt).format(
+                        "DD/MM"
+                      )}
+                    </p>
                   </div>
                   <div className="w-full flex justify-between">
                     <p className="text-sm text-ellipsis overflow-hidden whitespace-pre w-3/4">
-                      {sanitizeString(decryptMessageWithKeyAES(
-                        conversation.lastMessage.encryptedMessage,
-                        conversation.conversation.conversationKey
-                      ))}
+                      {sanitizeString(
+                        decryptMessageWithKeyAES(
+                          conversation.lastMessage.encryptedMessage,
+                          conversation.conversation.conversationKey
+                        )
+                      )}
                     </p>
-                    {
-                      Number(conversation?.unreadMessageCount) > 0 && (
-                        <div className="text-sm bg-regal-green h-5 w-5 text-center rounded">{conversation?.unreadMessageCount}</div>
-                      )
-                    }
+                    {Number(conversation?.unreadMessageCount) > 0 &&
+                      conversationId !==
+                        conversation.conversation.conversationId && (
+                        <div className="text-sm bg-regal-green h-5 w-5 text-center rounded">
+                          {conversation?.unreadMessageCount}
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
