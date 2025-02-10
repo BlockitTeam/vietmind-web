@@ -50,7 +50,7 @@ export const Conversation = () => {
   };
 
   return (
-    <>
+    <div className="h-full w-full block">
       {
         Array.isArray(conversations) &&
         conversations.map((conversation: ConversationData, index: number) => {
@@ -59,8 +59,8 @@ export const Conversation = () => {
           return (
             <div
               className={cn(
-                "cursor-pointer p-2 flex flex-row gap-2",
-                isActive && "bg-[#E0E9ED] w-full"
+                "cursor-pointer p-2 flex flex-row gap-2 w-full",
+                isActive && "bg-[#E0E9ED]"
               )}
               key={index}
               onClick={() => {
@@ -88,11 +88,13 @@ export const Conversation = () => {
               </Button>
               <div className="flex flex-col w-full overflow-hidden">
                 <div className="flex flex-col">
-                  <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center justify-between w-full gap-2">
                     <p className="text-sm text-neutral-primary truncate overflow-hidden flex-1 font-bold">
                       {conversation.senderFullName}
                     </p>
-                    <p className="text-sm text-neutral-ternary whitespace-nowrap ml-2">{dayjs(conversation.lastMessage.createdAt).format("DD/MM")}</p>
+                    <p className="text-sm text-neutral-ternary whitespace-nowrap min-w-[45px] text-right">
+                      {dayjs(conversation.lastMessage.createdAt).format("DD/MM")}
+                    </p>
                   </div>
                   <div className="w-full flex justify-between">
                     <p className="text-sm text-ellipsis overflow-hidden whitespace-pre w-3/4">
@@ -112,6 +114,6 @@ export const Conversation = () => {
             </div>
           );
         })}
-    </>
+    </div>
   );
 };

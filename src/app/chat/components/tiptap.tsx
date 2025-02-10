@@ -8,6 +8,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { useAtom } from "jotai";
 import { PlusCircleIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { notification } from "antd";
 
 const MenuBar = ({ editor }: { editor: Editor | null }) => {
 
@@ -174,7 +175,20 @@ const TiptapInput = () => {
             <Button
                 variant={"outline"}
                 className="border-regal-green mt-4 mb-20"
-                onClick={() => mutationNote.mutate({ note: contentEditor })}
+                onClick={() => mutationNote.mutate({ note: contentEditor }, {
+                    onSuccess: () => {
+                        notification.success({
+                            message: "Thêm ghi chú thành công",
+                            placement: "top"
+                        });
+                    },
+                    onError: () => {
+                        notification.error({
+                            message: "Thêm ghi chú thất bại",
+                            placement: "top"
+                        });
+                    }
+                })}
             >
                 <PlusCircleIcon size={15} className="mr-2" /> Thêm ghi chú
             </Button>

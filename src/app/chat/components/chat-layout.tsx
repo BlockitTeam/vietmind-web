@@ -93,186 +93,147 @@ export function ChatLayout() {
                 </Tabs>
               </div>
               <Separator />
-              <div className="w-full">
+              <div className="w-full h-[calc(100vh-112px)] overflow-hidden">
                 <div className="m-2">
                   <SearchConversation />
                 </div>
-                <div className="m-2 mt-6">
-                  {tab === "chat" && <Conversation />}
-                  {tab === "history" && (
-                    <>
-                      <div className="flex items-center mt-3 justify-between">
-                        <div className="flex justify-center items-center gap-2">
-                          <Button
-                            variant="outline"
-                            className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                          >
-                            VT
-                          </Button>
-                          <div className="cursor-pointer">
-                            <p className="text-sm text-neutral-primary">
-                              Việt Trinh
-                            </p>
-                            <p className="text-sm text-neutral-ternary">
-                              Đã kết thúc
-                            </p>
+                <div className="h-[calc(100%-60px)] overflow-y-auto ">
+                  <div className="m-2 mt-6">
+                    {tab === "chat" &&
+                      <Conversation />}
+                    {tab === "history" && (
+                      <>
+                        <div className="flex items-center mt-3 justify-between">
+                          <div className="flex justify-center items-center gap-2">
+                            <Button
+                              variant="outline"
+                              className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                            >
+                              VT
+                            </Button>
+                            <div className="cursor-pointer">
+                              <p className="text-sm text-neutral-primary">
+                                Việt Trinh
+                              </p>
+                              <p className="text-sm text-neutral-ternary">
+                                Đã kết thúc
+                              </p>
+                            </div>
+                          </div>
+                          <div className="items-center">
+                            <p className="text-sm text-neutral-ternary">08/12</p>
+                            <p></p>
                           </div>
                         </div>
-                        <div className="items-center">
-                          <p className="text-sm text-neutral-ternary">08/12</p>
-                          <p></p>
-                        </div>
-                      </div>
-                      <div className="flex items-center mt-3 justify-between">
-                        <div className="flex justify-center items-center gap-2">
-                          <Button
-                            variant="outline"
-                            className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                          >
-                            HH
-                          </Button>
-                          <div className="cursor-pointer">
-                            <p className="text-sm text-neutral-primary">
-                              Huy Hoang
-                            </p>
-                            <p className="text-sm text-neutral-ternary">
-                              Đã kết thúc
-                            </p>
+                        <div className="flex items-center mt-3 justify-between">
+                          <div className="flex justify-center items-center gap-2">
+                            <Button
+                              variant="outline"
+                              className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                            >
+                              HH
+                            </Button>
+                            <div className="cursor-pointer">
+                              <p className="text-sm text-neutral-primary">
+                                Huy Hoang
+                              </p>
+                              <p className="text-sm text-neutral-ternary">
+                                Đã kết thúc
+                              </p>
+                            </div>
+                          </div>
+                          <div className="items-center justify-end">
+                            <p className="text-sm text-neutral-ternary">08/12</p>
+                            <p></p>
                           </div>
                         </div>
-                        <div className="items-center justify-end">
-                          <p className="text-sm text-neutral-ternary">08/12</p>
-                          <p></p>
-                        </div>
-                      </div>
-                      <div className="flex items-center mt-3 justify-between">
-                        <div className="flex justify-center items-center gap-2">
-                          <Button
-                            variant="outline"
-                            className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                          >
-                            TTL
-                          </Button>
-                          <div className="cursor-pointer">
-                            <p className="text-sm text-neutral-primary">
-                              Trần Thuỳ Linh
-                            </p>
-                            <p className="text-sm text-neutral-ternary">
-                              Đã kết thúc
-                            </p>
+                        <div className="flex items-center mt-3 justify-between">
+                          <div className="flex justify-center items-center gap-2">
+                            <Button
+                              variant="outline"
+                              className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                            >
+                              TTL
+                            </Button>
+                            <div className="cursor-pointer">
+                              <p className="text-sm text-neutral-primary">
+                                Trần Thuỳ Linh
+                              </p>
+                              <p className="text-sm text-neutral-ternary">
+                                Đã kết thúc
+                              </p>
+                            </div>
+                          </div>
+                          <div className="items-center justify-end">
+                            <p className="text-sm text-neutral-ternary">08/12</p>
                           </div>
                         </div>
-                        <div className="items-center justify-end">
-                          <p className="text-sm text-neutral-ternary">08/12</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center mt-3 justify-between">
-                        <div className="flex justify-center items-center gap-2">
-                          <Button
-                            variant="outline"
-                            className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                          >
-                            TTL
-                          </Button>
-                          <div className="cursor-pointer">
-                            <p className="text-sm text-neutral-primary">
-                              Nhã Trang
-                            </p>
-                            <p className="text-sm text-neutral-ternary">
-                              Đã kết thúc
-                            </p>
+                        <div className="flex items-center mt-3 justify-between">
+                          <div className="flex justify-center items-center gap-2">
+                            <Button
+                              variant="outline"
+                              className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                            >
+                              TTL
+                            </Button>
+                            <div className="cursor-pointer">
+                              <p className="text-sm text-neutral-primary">
+                                Nhã Trang
+                              </p>
+                              <p className="text-sm text-neutral-ternary">
+                                Đã kết thúc
+                              </p>
+                            </div>
+                          </div>
+                          <div className="items-center justify-end">
+                            <p className="text-sm text-neutral-ternary">08/12</p>
                           </div>
                         </div>
-                        <div className="items-center justify-end">
-                          <p className="text-sm text-neutral-ternary">08/12</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center mt-3 justify-between">
-                        <div className="flex justify-center items-center gap-2">
-                          <Button
-                            variant="outline"
-                            className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                          >
-                            TTL
-                          </Button>
-                          <div className="cursor-pointer">
-                            <p className="text-sm text-neutral-primary">
-                              Nhã Trang
-                            </p>
-                            <p className="text-sm text-neutral-ternary">
-                              Đã kết thúc
-                            </p>
+                        <div className="flex items-center mt-3 justify-between">
+                          <div className="flex justify-center items-center gap-2">
+                            <Button
+                              variant="outline"
+                              className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                            >
+                              TTL
+                            </Button>
+                            <div className="cursor-pointer">
+                              <p className="text-sm text-neutral-primary">
+                                Nhã Trang
+                              </p>
+                              <p className="text-sm text-neutral-ternary">
+                                Đã kết thúc
+                              </p>
+                            </div>
+                          </div>
+                          <div className="items-center justify-end">
+                            <p className="text-sm text-neutral-ternary">08/12</p>
                           </div>
                         </div>
-                        <div className="items-center justify-end">
-                          <p className="text-sm text-neutral-ternary">08/12</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center mt-3 justify-between">
-                        <div className="flex justify-center items-center gap-2">
-                          <Button
-                            variant="outline"
-                            className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                          >
-                            TTL
-                          </Button>
-                          <div className="cursor-pointer">
-                            <p className="text-sm text-neutral-primary">
-                              Nhã Trang
-                            </p>
-                            <p className="text-sm text-neutral-ternary">
-                              Đã kết thúc
-                            </p>
+                        <div className="flex items-center mt-3 justify-between">
+                          <div className="flex justify-center items-center gap-2">
+                            <Button
+                              variant="outline"
+                              className="border-regal-green bg-regal-green w-[40px] h-[40px]"
+                            >
+                              TTL
+                            </Button>
+                            <div className="cursor-pointer">
+                              <p className="text-sm text-neutral-primary">
+                                Nhã Trang
+                              </p>
+                              <p className="text-sm text-neutral-ternary">
+                                Đã kết thúc
+                              </p>
+                            </div>
+                          </div>
+                          <div className="items-center justify-end">
+                            <p className="text-sm text-neutral-ternary">08/12</p>
                           </div>
                         </div>
-                        <div className="items-center justify-end">
-                          <p className="text-sm text-neutral-ternary">08/12</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center mt-3 justify-between">
-                        <div className="flex justify-center items-center gap-2">
-                          <Button
-                            variant="outline"
-                            className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                          >
-                            TTL
-                          </Button>
-                          <div className="cursor-pointer">
-                            <p className="text-sm text-neutral-primary">
-                              Nhã Trang
-                            </p>
-                            <p className="text-sm text-neutral-ternary">
-                              Đã kết thúc
-                            </p>
-                          </div>
-                        </div>
-                        <div className="items-center justify-end">
-                          <p className="text-sm text-neutral-ternary">08/12</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center mt-3 justify-between">
-                        <div className="flex justify-center items-center gap-2">
-                          <Button
-                            variant="outline"
-                            className="border-regal-green bg-regal-green w-[40px] h-[40px]"
-                          >
-                            TTL
-                          </Button>
-                          <div className="cursor-pointer">
-                            <p className="text-sm text-neutral-primary">
-                              Nhã Trang
-                            </p>
-                            <p className="text-sm text-neutral-ternary">
-                              Đã kết thúc
-                            </p>
-                          </div>
-                        </div>
-                        <div className="items-center justify-end">
-                          <p className="text-sm text-neutral-ternary">08/12</p>
-                        </div>
-                      </div>
-                    </>
-                  )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </ResizablePanel>
