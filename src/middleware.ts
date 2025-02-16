@@ -21,11 +21,15 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/chat", req.url));
   }
 
+  if (token && req.nextUrl.pathname === "/login") {
+    return NextResponse.redirect(new URL("/chat", req.url));
+  }
+
   // Allow the request to proceed if authenticated or not accessing protected paths
   return NextResponse.next();
 }
 
 // Apply middleware to the root, /chat, and /appointment paths
 export const config = {
-  matcher: ["/", "/chat/:path*", "/appointment/:path*"],
+  matcher: ["/", "/login" ,"/chat/:path*", "/appointment/:path*"],
 };
