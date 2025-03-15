@@ -134,10 +134,6 @@ export function ChatList() {
         }
 
       }
-
-      // if (newMessage?.type === "panel") {
-      //   refetchConversation();
-      // }
     }
   }, [lastMessage, aesKey, currentUser]);
 

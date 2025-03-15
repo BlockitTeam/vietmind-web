@@ -86,7 +86,7 @@ export function Appointment() {
         futureAppointments?.data.status === "PENDING" ? futureAppointments?.data.note : ""
       );
     }
-  }, [futureAppointments]);
+  }, [futureAppointments, queryFutureAppointment.isSuccess, setAppointmentDetail, setValue]); 
 
   const watchFrom = watch("startTime");
 

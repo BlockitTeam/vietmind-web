@@ -4,7 +4,7 @@ import React from "react";
 
 export function Footer() {
   // const navigation = ["Product", "Features", "Pricing", "Company", "Blog"];
-  const legal = [{text: "Terms and conditions", link: '/privacy'}];
+  const legal = [{text: "Điều khoản và điều kiện", link: "/privacy"}];
   return (
     <div className="relative">
       <div>
@@ -81,7 +81,6 @@ export function Footer() {
           </a>
         </div>
       </div>
-      {/* Do not remove this */}
     </div>
   );
 }
