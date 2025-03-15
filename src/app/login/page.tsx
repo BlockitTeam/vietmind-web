@@ -108,7 +108,7 @@ export default function LoginPage() {
             <Input
               id="email"
               className="border-regal-green"
-              placeholder="Congtv@gmail.com"
+              placeholder="Nhập email đăng nhập"
               type="email"
               {...register("username", { required: "Email is required" })}
             />
