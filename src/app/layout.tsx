@@ -4,7 +4,6 @@ import "./globals.css";
 import { Inter as FontSans } from "next/font/google";
 import React from "react";
 import { cn } from "@/lib/utils";
-import { ThemeProvider } from "next-themes";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -40,12 +39,10 @@ export default function RootLayout({
         )}
         suppressHydrationWarning={true}
       >
-        <ThemeProvider attribute="class">
           <Provider>
             <QueryClientProvider>{children}</QueryClientProvider>
           </Provider>
           <Toaster />
-        </ThemeProvider>
       </body>
     </html>
   );
