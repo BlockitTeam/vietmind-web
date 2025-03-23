@@ -19,10 +19,10 @@ export const Navbar = () => {
         {/* Logo  */}
         <Link href="/">
           <Image
-            src="/image/vmind-logo.svg"
+            src="/image/vietmind.png"
             alt="vmind"
-            width={190}
-            height={65}
+            width={80}
+            height={80}
           />
         </Link>
 

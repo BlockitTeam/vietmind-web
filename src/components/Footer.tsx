@@ -17,10 +17,10 @@ export function Footer() {
                 className="flex items-center space-x-2 text-2xl font-medium text-indigo-500 dark:text-gray-100"
               >
                 <Image
-                  src="/image/vmind-logo.svg"
+                  src="/image/vietmind.png"
                   alt="N"
-                  width="190"
-                  height="60"
+                  width="100"
+                  height="100"
                 />
               </Link>
             </div>

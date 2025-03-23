@@ -6,7 +6,7 @@ export const Hero = () => {
         <div className="flex items-center w-full lg:w-1/2">
           <div className="max-w-2xl mb-8">
             <h1 className="text-4xl font-bold leading-snug tracking-tight text-white lg:text-4xl lg:leading-tight xl:text-6xl xl:leading-tight dark:text-white">
-              vmind hiểu thấu
+              Vietmind hiểu thấu
             </h1>
             <p className="py-5 text-xl leading-normal text-white lg:text-xl xl:text-2xl dark:text-gray-300">
               Liệu pháp tâm lý dễ
@@ -31,10 +31,10 @@ export const Hero = () => {
                 rel="noopener"
                 className="flex items-center space-x-2 text-white dark:text-gray-400">
                 <Image
-                  src="/image/vmind-logo.svg"
+                  src="/image/vietmind-tran.png"
                   alt="vmind"
-                  width={190}
-                  height={65}
+                  width={100}
+                  height={100}
                 />
               </a>
             </div>

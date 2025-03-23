@@ -26,9 +26,9 @@ export default function Home() {
       <Container >
         <SectionTitle
           preTitle="Kết nối với chúng tôi."
-          title="VietMind"
+          title="Vietmind"
         >
-          <div className="mb-5">Chúng tôi rất trân trọng sự ủng hộ của bạn dành cho VietMind với vai trò đối tác, nhà trị liệu hoặc người bạn đồng hành.
+          <div className="mb-5">Chúng tôi rất trân trọng sự ủng hộ của bạn dành cho Vietmind với vai trò đối tác, nhà trị liệu hoặc người bạn đồng hành.
             Chúng tôi luôn tìm kiếm những người mong muốn góp phần vào sứ mệnh của mình – giúp liệu pháp tâm lý trở nên dễ tiếp cận hơn tại Việt Nam.
             Vui lòng liên hệ với chúng tôi qua email: vt.therapy.co@gmail.com</div>
         </SectionTitle>
