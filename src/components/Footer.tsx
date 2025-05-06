@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import React from "react";
+import { Mail } from "lucide-react";
+import { Tooltip } from "antd";
 
 export function Footer() {
   // const navigation = ["Product", "Features", "Pricing", "Company", "Blog"];
@@ -64,7 +66,16 @@ export function Footer() {
                 rel="noopener"
               >
                 <span className="sr-only">Facebook</span>
-                <Facebook />
+                <Facebook  />
+              </a>
+              <a
+                target="_blank"
+                rel="noopener"
+              >
+                <span className="sr-only">Email</span>
+                <Tooltip title="Bạn có thể liên lạc tới chúng tôi để biết thêm thông tin, yêu cầu xóa dữ liệu tại contact@vietmind.co">
+                  <Mail className="text-[#a73944]" />
+                </Tooltip>
               </a>
             </div>
           </div>

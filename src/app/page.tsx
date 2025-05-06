@@ -7,6 +7,7 @@ import { benefitOne } from "@/components/data";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Our } from "@/components/Our";
+import { TherapistsTable } from "@/components/Therapist";
 
 
 export default function Home() {
@@ -33,10 +34,14 @@ export default function Home() {
             Vui lòng liên hệ với chúng tôi qua email: vt.therapy.co@gmail.com</div>
         </SectionTitle>
       </Container>
+      <Container className="bg-gradient-to-r from-[#344e41] to-[#54a57a]">
+        <TherapistsTable />
+      </Container>
       <Container className="bg-gradient-to-r from-[#344e41] to-[#54a57a] p-2 ">
         <h1 className="text-center my-5 text-2xl font-bold text-white w-2/4 mx-auto">Chatbot hỗ trợ bởi AI được thiết kế và chứng nhận bởi các nhà trị liệu chuyên nghiệp.</h1>
         <Testimonials />
       </Container>
+
       <Footer />
     </>
   );
