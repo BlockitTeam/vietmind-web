@@ -29,7 +29,7 @@ const therapists: Therapist[] = [
   {
     name: "Lưu Thị Phương Loan",
     description:
-      "Ths sĩ tâm lý lâm sàng,\nTrung tâm Nghiên cứu và Ứng dụng Tâm lý - Giáo dục Chân Bảo",
+      "Ths sĩ tâm lý lâm sàng, Trung tâm Nghiên cứu và Ứng dụng Tâm lý - Giáo dục Chân Bảo",
   },
 ];
 
