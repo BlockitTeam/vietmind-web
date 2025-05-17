@@ -17,26 +17,15 @@ export const Hero = () => {
 
             <div className="flex flex-col items-start space-y-3 sm:space-x-4 sm:space-y-0 sm:items-center sm:flex-row">
               <a
-                href="#"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSfu2-0PmG83Wsgjp0UhZHtMI82_9SthFdH4qsGuZHtq_R6ufQ/viewform"
                 target="_blank"
                 rel="noopener"
                 className="px-8 py-4 text-lg font-medium text-center text-white bg-[#54A57A] rounded-md flex items-center justify-center space-x-2">
-                <span>Tải ứng dụng ngay</span>
+                <span>Đăng ký ngay</span>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-              </a>
-              <a
-                target="_blank"
-                rel="noopener"
-                className="flex items-center space-x-2 text-white dark:text-gray-400">
-                <Image
-                  src="/image/vietmind-tran.png"
-                  alt="vmind"
-                  width={100}
-                  height={100}
-                />
-              </a>
+              </a>heade
             </div>
           </div>
         </div>

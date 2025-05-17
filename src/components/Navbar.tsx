@@ -21,8 +21,8 @@ export const Navbar = () => {
           <Image
             src="/image/vietmind.png"
             alt="vmind"
-            width={80}
-            height={80}
+            width={120}
+            height={120}
           />
         </Link>
 
