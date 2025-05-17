@@ -9,11 +9,11 @@ const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
-import { Toaster } from "@/components/ui/toaster";
 
 import { Provider } from "jotai";
 import QueryClientProvider from "@/lib/queryClientProvider";
 import Script from "next/script";
+import { Toaster } from "sonner";
 export const metadata: Metadata = {
   title: "Vietmind tư vấn tâm lý",
   description: "",
