@@ -17,18 +17,27 @@ export default function SendMessageForm() {
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const message = formData.get("message") as string;
-    console.log(name, email, message);
+    
     try {
-      await fetch("/api/send-email", {
+      const response = await fetch("/api/send-email", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ name, email, message }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       toast.success("Success!", {
-        description: "Your action was completed successfully",
+        description: "Your message was sent successfully",
       });
-    } catch {
+    } catch (error) {
+      console.error("Error sending message:", error);
       toast.error("Error!", {
-        description: "Your action was not completed successfully",
+        description: "Failed to send message. Please try again later.",
       });
     } finally {
       setIsLoading(false);

@@ -17,8 +17,6 @@ export const Our = () => {
                             <p className="text-2xl mt-5 font-bold">Khue Tran</p>
                             <div className="text-center mt-3">
                                 <p>Founder</p>
-                                <p>Head of Data</p>
-                                <p>@ VNGGames</p>
                             </div>
                         </div>
                     </div>
