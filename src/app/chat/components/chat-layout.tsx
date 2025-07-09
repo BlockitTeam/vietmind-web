@@ -103,7 +103,7 @@ export function ChatLayout() {
                   <div className="m-2 mt-6">
                     {tab === "chat" &&
                       <Conversation />}
-                    {tab === "history" && (
+                    {/* {tab === "history" && (
                       <>
                         <div className="flex items-center mt-3 justify-between">
                           <div className="flex justify-center items-center gap-2">
@@ -234,7 +234,7 @@ export function ChatLayout() {
                           </div>
                         </div>
                       </>
-                    )}
+                    )} */}
                   </div>
                 </div>
               </div>
