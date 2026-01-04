@@ -144,7 +144,10 @@ const ExtensionsCustom = [
 const TiptapInput = () => {
     const [conversationId] = useAtom(conversationIdAtom);
     const [contentEditor, setContentEditor] = useState("");
-    const { data: notes, isSuccess } = useGetNoteConversationId(conversationId!);
+    const { data: notesResponse, isSuccess } = useGetNoteConversationId(conversationId!);
+    
+    // Note endpoint returns data directly in 'data' (not nested data.data)
+    const notes = notesResponse?.data;
 
     const editor = useEditor({
         extensions: ExtensionsCustom,
@@ -158,8 +161,8 @@ const TiptapInput = () => {
     });
 
     useEffect(() => {
-        if (editor && isSuccess) {
-            editor.commands.setContent(notes.data.note);
+        if (editor && isSuccess && notes) {
+            editor.commands.setContent(notes.note || "");
         }
     }, [editor, notes, isSuccess, conversationId]);
 
@@ -178,13 +181,13 @@ const TiptapInput = () => {
                 onClick={() => mutationNote.mutate({ note: contentEditor }, {
                     onSuccess: () => {
                         notification.success({
-                            message: "Thêm ghi chú thành công",
+                            title: "Thêm ghi chú thành công",
                             placement: "top"
                         });
                     },
                     onError: () => {
                         notification.error({
-                            message: "Thêm ghi chú thất bại",
+                            title: "Thêm ghi chú thất bại",
                             placement: "top"
                         });
                     }

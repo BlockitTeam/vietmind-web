@@ -3,14 +3,12 @@ import { useForm } from "react-hook-form";
 import {
   appointmentAtom,
   appointmentDetailAtom,
-  conversationIdAtom,
-  currentUserAtom,
   userConversationIdAtom,
   userIdTargetUserAtom,
 } from "@/lib/jotai";
 import { useAtom } from "jotai";
 import { cn } from "@/lib/utils";
-import { useGetFutureAppointment, useMutationAppointment, usePutMutationAppointmentIdHook } from "@/hooks/appointment";
+import { useGetFutureAppointment, usePutMutationAppointmentIdHook } from "@/hooks/appointment";
 import { useWebSocketContext } from "./webSocketContext";
 import { useEffect } from "react";
 import { notification } from "antd";
@@ -25,19 +23,21 @@ export function Appointment() {
 
   const [, setAppointment] = useAtom(appointmentAtom);
   const [userIdTargetUser,] = useAtom(userIdTargetUserAtom);
-  const [currentUser,] = useAtom(currentUserAtom);
-  const [conversationId,] = useAtom(conversationIdAtom);
   const [, setAppointmentDetail] = useAtom(
     appointmentDetailAtom
   );
-  const { sendMessageWS } = useWebSocketContext();
-  const mutationAppointment = useMutationAppointment();
+  const { sendRawMessage } = useWebSocketContext();
   const {
-    data: futureAppointments,
+    data: futureAppointmentsResponse,
     ...queryFutureAppointment
   } = useGetFutureAppointment(userIdTargetUser!);
+  
+  // Extract the first future appointment from the nested response structure
+  // API returns: { data: { data: [...], auditId }, statusCode }
+  const futureAppointment = (futureAppointmentsResponse?.data as any)?.data?.[0];
+  
   const usePutMutationAppointmentId = usePutMutationAppointmentIdHook(
-    futureAppointments?.data?.userId
+    futureAppointment?.userId
   );
 
   const {
@@ -59,34 +59,33 @@ export function Appointment() {
   });
 
   useEffect(() => {
-    if (futureAppointments?.data && queryFutureAppointment.isSuccess) {
+    if (futureAppointment && queryFutureAppointment.isSuccess) {
       setAppointmentDetail({
-        status: futureAppointments?.data.status,
-        data: futureAppointments?.data
+        status: futureAppointment.status,
+        data: futureAppointment
       });
       setValue(
         "content",
-        futureAppointments?.data.status === "PENDING" ? futureAppointments?.data.content : ""
+        futureAppointment.status === "PENDING" ? futureAppointment.content : ""
       );
       setValue(
         "appointmentDate",
-        futureAppointments?.data.status === "PENDING" &&
-        futureAppointments?.data.appointmentDate
+        futureAppointment.status === "PENDING" && futureAppointment.appointmentDate
       );
       setValue(
         "startTime",
-        futureAppointments?.data.status === "PENDING" && futureAppointments?.data.startTime
+        futureAppointment.status === "PENDING" && futureAppointment.startTime
       );
       setValue(
         "endTime",
-        futureAppointments?.data.status === "PENDING" && futureAppointments?.data.endTime
+        futureAppointment.status === "PENDING" && futureAppointment.endTime
       );
       setValue(
         "note",
-        futureAppointments?.data.status === "PENDING" ? futureAppointments?.data.note : ""
+        futureAppointment.status === "PENDING" ? futureAppointment.note : ""
       );
     }
-  }, [futureAppointments, queryFutureAppointment.isSuccess, setAppointmentDetail, setValue]); 
+  }, [futureAppointment, queryFutureAppointment.isSuccess, setAppointmentDetail, setValue]); 
 
   const watchFrom = watch("startTime");
 
@@ -98,64 +97,57 @@ export function Appointment() {
     );
   };
 
-  const onSubmit = (data: any) => {
-    const body = {
-      ...data,
-      conversationId,
-      doctorId: currentUser?.id,
+  const onSubmit = () => {
+    // Check if there's an existing appointment to update status
+    if (futureAppointment && AppointmentStatus.includes(futureAppointment?.status)) {
+      const appointmentId = futureAppointment?.id || futureAppointment?.appointmentId;
+      
+      if (!appointmentId) {
+        notification.error({
+          title: "Error",
+          description: "No appointment ID found"
+        });
+        return;
+      }
 
-      userId: userIdTargetUser,
-      status: "PENDING"
-    };
-
-    if (futureAppointments?.data && AppointmentStatus.includes(futureAppointments?.data?.status)) {
-      const bodyUpdate = {
-        ...futureAppointments.data,
-        ...data,
-        status: "PENDING",
-      };
-
-      usePutMutationAppointmentId.mutate(bodyUpdate, {
-        onSuccess(data) {
-          if (data.statusCode === 200) {
-            sendMessageWS(
-              JSON.stringify({
+      // Update appointment status to PENDING (reschedule request)
+      usePutMutationAppointmentId.mutate(
+        { appointmentId: String(appointmentId), status: "PENDING" },
+        {
+          onSuccess(responseData) {
+            if (responseData.statusCode === 200) {
+              sendRawMessage("appointment", {
                 type: "appointment",
-                appointmentId: data?.data?.appointmentId,
-                conversationId: data?.data?.conversationId,
+                appointmentId: responseData?.data?.id || responseData?.data?.appointmentId,
+                conversationId: responseData?.data?.conversationId,
                 status: "PENDING",
                 targetUserId: userIdTargetUser.toString().trim(),
-              })
-            );
-            setAppointment(false);
+              });
+              setAppointment(false);
+              notification.success({
+                title: "Success",
+                description: "Appointment status updated"
+              });
+            }
+          },
+          onError: () => {
+            notification.error({
+              title: "Error",
+              description: "Can't update appointment"
+            });
           }
-        },
-      });
+        }
+      );
       return;
     }
 
-    mutationAppointment.mutate(body, {
-      onSuccess(data) {
-        if (data.statusCode === 200) {
-          sendMessageWS(
-            JSON.stringify({
-              type: "appointment",
-              appointmentId: data?.data?.appointmentId,
-              conversationId: data?.data?.conversationId,
-              status: "PENDING",
-              targetUserId: userIdTargetUser.toString().trim(),
-            })
-          );
-          setAppointment(false);
-        }
-      },
-      onError: () => {
-        notification.error({
-          message: "Error",
-          description: "Can't create appointment"
-        });
-      }
+    // Note: Creating new appointments from doctor portal may require a different endpoint
+    // The current API (PATCH /doctors/appointments/:id/status) only supports status updates
+    notification.warning({
+      title: "Info",
+      description: "Please ask the patient to create an appointment from their app"
     });
+    setAppointment(false);
   };
   return (
     <form

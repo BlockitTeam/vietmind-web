@@ -241,7 +241,7 @@ export function ChatLayout() {
             </ResizablePanel>
             <ResizableHandle />
             <ResizablePanel defaultSize={60} collapsible={false}>
-              {conversationId > 0 && (
+              {conversationId && (
                 <>
                   <div
                     className={cn(
@@ -283,7 +283,7 @@ export function ChatLayout() {
               minSize={30}
               maxSize={35}
             >
-              {conversationId > 0 && (
+              {conversationId && (
                 <div className="w-full h-full">
                   <div
                     className={cn(

@@ -57,3 +57,13 @@ export async function mutationPut<T>(obj: IMutation<object>): Promise<T> {
     } as T;
   });
 }
+
+export async function mutationPatch<T>(obj: IMutation<object>): Promise<T> {
+  const { url, body } = obj;
+  return await axiosInstance.patch(url, body).then((response) => {
+    return {
+      data: response.data,
+      statusCode: response.status,
+    } as T;
+  });
+}

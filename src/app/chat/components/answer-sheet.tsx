@@ -5,58 +5,95 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ApiResponse, useAnswerByIdHook } from "@/hooks/answer";
+import { useGetSurveyAnswers } from "@/hooks/answer";
 import { senderFullNameAtom, userIdTargetUserAtom } from "@/lib/jotai";
-import { Table, TableColumnsType } from "antd";
+import { Table, TableColumnsType, Tag } from "antd";
 import { useAtom } from "jotai";
-interface DataType {
-  question: string;
-  answer: string;
-  responseFormat: string
+
+// Interface for survey answer details
+interface AnswerDataType {
+  questionId: string;
+  questionText: string;
+  selectedOptions: string[];
+  textAnswer: string | null;
+  score: number;
 }
-const columns: TableColumnsType<DataType> = [
+
+interface AnswerSheetProps {
+  userSurveyId: string;
+  surveyTitle?: string;
+}
+
+const columns: TableColumnsType<AnswerDataType> = [
   {
-    title: "Question",
-    dataIndex: "question",
-    width: "70%",
-    render: (value, record) => {
-      return <span className={record?.responseFormat === "parent_question" ? "font-bold text-lg" : ""}>{value}</span>;
+    title: "Câu hỏi",
+    dataIndex: "questionText",
+    width: "40%",
+    render: (value) => {
+      return <span className="font-medium">{value}</span>;
     }
   },
   {
-    title: "Answer",
-    dataIndex: "answer",
+    title: "Câu trả lời",
+    dataIndex: "selectedOptions",
+    width: "40%",
+    render: (value, record) => {
+      if (record.textAnswer) {
+        return <span>{record.textAnswer}</span>;
+      }
+      if (value && value.length > 0) {
+        return (
+          <div className="flex flex-wrap gap-1">
+            {value.map((option: string, idx: number) => (
+              <Tag key={idx} color="blue">{option}</Tag>
+            ))}
+          </div>
+        );
+      }
+      return <span className="text-gray-400">-</span>;
+    }
+  },
+  {
+    title: "Điểm",
+    dataIndex: "score",
+    width: "20%",
     render: (value) => {
-      return <span className="font-bold">{value}</span>;
+      return <span className="font-bold">{value ?? '-'}</span>;
     }
   },
 ];
 
-export function AnswerSheet() {
+export function AnswerSheet({ userSurveyId, surveyTitle }: AnswerSheetProps) {
   const [userIdTargetUser,] = useAtom(userIdTargetUserAtom);
   const [senderFullName,] = useAtom(senderFullNameAtom);
 
   const {
-    data: answerData,
+    data: surveyAnswersResponse,
     isSuccess,
-  } = useAnswerByIdHook(userIdTargetUser!);
+  } = useGetSurveyAnswers(userIdTargetUser!, userSurveyId);
+  
+  // Try to extract from response - handle both nested and direct response structures
+  // Some APIs return: { data: { data: {...}, auditId }, statusCode }
+  // Others return: { data: {...}, statusCode }
+  const responseData = surveyAnswersResponse?.data as any;
+  const surveyAnswers = responseData?.data || responseData;
 
-  const formatData = (data: ApiResponse): any[] => {
-    return data.map(({ responseFormat, questionText, answer, options }) => {
-      if (responseFormat === "single_choice") {
-        const answerText =
-          options.find((option) => option.optionId === answer)?.optionText || "";
-        return { responseFormat, question: questionText, answer: answerText };
-      }
-      if (responseFormat === "text_input") {
-        return { responseFormat, question: questionText, answer: answer };
-      }
-      if (responseFormat === "parent_question") {
-        return { responseFormat, question: questionText, answer: answer };
-      }
-    });
+  // Format the survey answers data for the table
+  const formatData = (): AnswerDataType[] => {
+    if (!surveyAnswers?.answers || !Array.isArray(surveyAnswers.answers)) {
+      return [];
+    }
+    
+    return surveyAnswers.answers.map((answer: any) => ({
+      questionId: answer.questionId,
+      questionText: answer.questionText,
+      selectedOptions: answer.options
+        ?.filter((opt: any) => answer.selectedOptionIds?.includes(opt.id))
+        ?.map((opt: any) => opt.optionText) || [],
+      textAnswer: answer.textAnswer,
+      score: answer.score,
+    }));
   };
-
 
   return (
     <Sheet>
@@ -67,17 +104,28 @@ export function AnswerSheet() {
           Xem chi tiết
         </span>
       </SheetTrigger>
-      <SheetContent className="min-w-[1000px]">
+      <SheetContent className="min-w-[800px]">
         <SheetHeader>
-          <SheetTitle>Kết quả sàng lọc của {senderFullName}</SheetTitle>
+          <SheetTitle>
+            {surveyTitle || surveyAnswers?.surveyTitle || "Chi tiết khảo sát"} - {senderFullName}
+          </SheetTitle>
+          {isSuccess && surveyAnswers && (
+            <div className="text-sm text-gray-500 mt-2">
+              <span>Tổng điểm: <b>{surveyAnswers.totalScore}</b> / {surveyAnswers.maxScore}</span>
+              {surveyAnswers.resultType && (
+                <span className="ml-4">Kết quả: <b>{surveyAnswers.resultType}</b></span>
+              )}
+            </div>
+          )}
         </SheetHeader>
         <div className="w-full h-full mt-3">
-          <Table<DataType>
+          <Table<AnswerDataType>
             columns={columns}
             className="h-full"
             pagination={false}
-            scroll={{ y: 1000 }}
-            dataSource={isSuccess ? formatData(answerData.data) : []}
+            scroll={{ y: 600 }}
+            dataSource={isSuccess ? formatData() : []}
+            rowKey="questionId"
           />
         </div>
       </SheetContent>

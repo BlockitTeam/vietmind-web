@@ -108,21 +108,14 @@ export default function HeaderChat() {
             {/* <DropdownMenuItem>Support</DropdownMenuItem> */}
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={async () => {
-                useLogout.mutate(undefined, {
-                  onSuccess(data) {
-                    if (data.statusCode === 200) {
-                      // Clear cookies and user state
-                      setCurrentUser(null);
-                      Cookies.remove("JSESSIONID");
-                      // Redirect to the login or home page
-                      router.push("/");
-                    }
-                  },
-                  onError: (error) => {
-                    console.error("An error occurred:", error);
-                  },
-                });
+              onClick={() => {
+                // Clear client-side state and redirect immediately
+                setCurrentUser(null);
+                Cookies.remove("accessToken");
+                router.push("/");
+                
+                // Notify server in background (fire and forget)
+                useLogout.mutate(undefined);
               }}
             >
               Logout

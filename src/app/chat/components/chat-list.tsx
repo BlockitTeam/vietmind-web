@@ -2,18 +2,15 @@ import { cn } from "@/lib/utils";
 import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import ChatBottombar from "./chat-bottombar";
-import CryptoJS from "crypto-js";
 import { useAtom } from "jotai";
 import {
-  aesKeyAtom,
   conversationIdAtom,
   conversationIdContentAtom,
   currentUserAtom,
-  privateKeyAtom,
+  senderFullNameAtom,
 } from "@/lib/jotai";
-import { JSEncrypt } from "jsencrypt";
-import { useGetEASHook, useIsReadMessage } from "@/hooks/getContentMessage";
-import { checkSenderFromDoctor, decryptMessage } from "@/servers/message";
+import { useIsReadMessage } from "@/hooks/getContentMessage";
+import { checkSenderFromDoctor } from "@/servers/message";
 import { useWebSocketContext } from "./webSocketContext";
 import { useConversationContext } from "./conversations-provider";
 
@@ -26,123 +23,85 @@ export function ChatList() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [loadingMessage, setLoadingMessage] = useState(false);
   const [messagesWS, setMessagesWS] = useState<IChatMessage[]>([]);
-  const [, setPrivateKey] = useState<string | null>("");
-  const [, setPublicKey] = useState<string>("");
-  const [, setPrivateKeyAtom] = useAtom(privateKeyAtom);
-  const [aesKey, setAesKey] = useAtom(aesKeyAtom);
 
   const [conversationIdContent] = useAtom(conversationIdContentAtom);
   const [conversationId] = useAtom(conversationIdAtom);
   const isReadMessage = useIsReadMessage(conversationId!);
   const [currentUser] = useAtom(currentUserAtom);
-  const { lastMessage } = useWebSocketContext();
+  const [senderFullName] = useAtom(senderFullNameAtom);
+  const { lastMessage, isTyping } = useWebSocketContext();
   const { conversations, setConversationWs } = useConversationContext();
 
-  const [, setUserTyping] = useState(false);
-  const getAES = useGetEASHook(conversationId);
-  const JSEncryptLib = new JSEncrypt({ default_key_size: "512" });
-
-  React.useLayoutEffect(() => {
-    setMessagesWS([]);
-    // Generate key pair
-    JSEncryptLib.getKey();
-
-    // Get private and public keys
-    const privateKey = JSEncryptLib.getPrivateKeyB64();
-    const publicKey = JSEncryptLib.getPublicKeyB64();
-    setPrivateKeyAtom(privateKey);
-    setPrivateKey(privateKey);
-    setPublicKey(publicKey);
-
-    if (conversationId) {
-      setLoadingMessage(true);
-      getAES.mutate(publicKey, {
-        onSuccess: async (resp) => {
-          if (resp.statusCode === 200) {
-            const aesKeyDecrypted = JSEncryptLib.decrypt(resp.data);
-            if (typeof aesKeyDecrypted === "string") {
-              const decodedKeyAES: any =
-                CryptoJS.enc.Base64.parse(aesKeyDecrypted);
-              setAesKey(decodedKeyAES);
-              if (conversationIdContent.length > 0 && decodedKeyAES) {
-                conversationIdContent.map((message: any) => {
-                  setMessagesWS((prevMessages) => [
-                    ...prevMessages,
-                    {
-                      fromMe: checkSenderFromDoctor(
-                        currentUser?.id as string,
-                        message.senderId
-                      ),
-                      message: decryptMessage(
-                        message.encryptedMessage,
-                        decodedKeyAES
-                      ),
-                    },
-                  ]);
-                });
-              }
-              setLoadingMessage(false);
-              return;
-            }
-            setAesKey(null);
-            setLoadingMessage(false);
-          }
-        },
-        onError(error) {
-          setLoadingMessage(false);
-          console.log(error);
-        },
-      });
-    }
-  }, [conversationIdContent]);
-
+  // Load messages from conversation content (REST API)
   useEffect(() => {
-    if (lastMessage !== null) {
-      const newMessage = JSON.parse(lastMessage.data);
-      if (newMessage?.type === "typing") {
-        setUserTyping(true);
-      } else if (newMessage?.type === "unTyping") {
-        setUserTyping(false);
-      } else if (newMessage?.type === "message") {
-        try {
-          const decryptedMessage = decryptMessage(newMessage.message, aesKey);
-          isReadMessage.mutate(
-            {},
-            {
-              onSuccess: () => {
-                if (conversations) {
-                  let rs = conversations.map((i) => {
-                    if (i.conversation.conversationId === conversationId) {
-                      return { ...i, unreadMessageCount: 0 };
-                    }
-                    return i;
-                  });
-                  setConversationWs(rs);
-                }
-              },
-            }
-          );
-          setMessagesWS((prevMessages) => [
-            ...prevMessages,
-            {
-              fromMe: false,
-              message: decryptedMessage,
-            },
-          ]);
-        } catch {
-          console.log("Error decrypting message");
-        }
+    setMessagesWS([]);
+    setLoadingMessage(true);
 
-      }
+    if (conversationIdContent && conversationIdContent.length > 0) {
+      const formattedMessages = conversationIdContent.map((message: any) => ({
+        fromMe: checkSenderFromDoctor(currentUser?.id as string, message.senderId),
+        message: message.message || message.encryptedMessage || "",
+      }));
+      setMessagesWS(formattedMessages);
     }
-  }, [lastMessage, aesKey, currentUser]);
+    
+    setLoadingMessage(false);
+  }, [conversationIdContent, currentUser?.id]);
 
+  // Handle incoming WebSocket messages
+  useEffect(() => {
+    if (lastMessage !== null && String(lastMessage.conversationId) === conversationId) {
+      // Mark messages as read
+      isReadMessage.mutate(
+        {},
+        {
+          onSuccess: () => {
+            if (conversations?.data) {
+              const updated = conversations.data.map((i) => {
+                // Handle both new API (id) and legacy API (conversation.conversationId)
+                const convId = i.id || i.conversation?.conversationId?.toString();
+                if (convId === conversationId) {
+                  return { ...i, unreadCount: 0, unreadMessageCount: 0 };
+                }
+                return i;
+              });
+              setConversationWs({ data: updated });
+            }
+          },
+        }
+      );
+
+      // Add the new message to the list
+      setMessagesWS((prevMessages) => [
+        ...prevMessages,
+        {
+          fromMe: false,
+          message: lastMessage.message,
+        },
+      ]);
+    }
+  }, [lastMessage]);
+
+  // Check if the other user is typing in current conversation
+  const showTypingIndicator = isTyping && String(isTyping.conversationId) === conversationId;
+  
+  // Debug typing indicator
+  if (isTyping) {
+    console.log("🔍 Typing check:", { 
+      isTypingConvId: isTyping.conversationId, 
+      currentConvId: conversationId,
+      match: String(isTyping.conversationId) === conversationId,
+      showTypingIndicator 
+    });
+  }
+
+  // Auto-scroll to bottom when new messages arrive or typing indicator shows
   React.useLayoutEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
         messagesContainerRef.current.scrollHeight;
     }
-  }, [messagesWS]);
+  }, [messagesWS, showTypingIndicator]);
 
   return (
     <div className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col">
@@ -159,8 +118,8 @@ export function ChatList() {
         )}
         {!loadingMessage && (
           <AnimatePresence>
-            {messagesWS.length &&
-              messagesWS?.map((message, index) => (
+            {messagesWS.length > 0 &&
+              messagesWS.map((message, index) => (
                 <motion.div
                   key={index}
                   layout
@@ -172,7 +131,6 @@ export function ChatList() {
                     layout: {
                       type: "spring",
                       bounce: 0.3,
-                      // duration: messagesWS.indexOf(message) * 0.05 + 0.2,
                       duration: 0.5,
                     },
                   }}
@@ -186,16 +144,6 @@ export function ChatList() {
                   )}
                 >
                   <div className="flex gap-3 items-center ">
-                    {/* {!message.fromMe && message.message && (
-                      <Avatar className="flex justify-center items-center">
-                        <AvatarImage
-                          src={"/User1.png"}
-                          alt={"hello"}
-                          width={6}
-                          height={6}
-                        />
-                      </Avatar>
-                    )} */}
                     {message.message && (
                       <span
                         className={cn(
@@ -206,20 +154,15 @@ export function ChatList() {
                         {message.message}
                       </span>
                     )}
-                    {/* {message.fromMe && message.message && (
-                      <Avatar className="flex justify-center items-center">
-                        <AvatarImage
-                          src={"/User2.png"}
-                          alt={"hello"}
-                          width={6}
-                          height={6}
-                        />
-                      </Avatar>
-                    )} */}
                   </div>
                 </motion.div>
               ))}
           </AnimatePresence>
+        )}
+        {showTypingIndicator && (
+          <p className="text-xs ml-4 text-gray-500 animate-pulse">
+            {senderFullName} đang nhập...
+          </p>
         )}
       </div>
       <ChatBottombar setMessagesWS={setMessagesWS} />

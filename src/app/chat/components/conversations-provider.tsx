@@ -9,36 +9,39 @@ import React , {
 } from "react";
 import { useDebounce } from "use-debounce";
 
+// API response format for conversations
+export type LastMessage = {
+  messageId: string;
+  conversationId: string;
+  senderId: string;
+  receiverId: string;
+  isRead: boolean;
+  message: string;
+  createdAt: string;
+};
+
 export type ConversationData = {
-  conversation: {
-    conversationId: number;
-    userId: string;
-    doctorId: string;
-    encryptedConversationKey: string;
-    conversationKey: string;
-    createdAt: string;
-    note: string;
-    finished: boolean;
-  };
-  lastMessage: {
-    messageId: number;
-    conversationId: number;
-    senderId: string;
-    receiverId: string;
-    isRead: boolean;
-    encryptedMessage: string;
-    createdAt: string;
-  };
-  unreadMessageCount: number;
-  senderFullName: string;
-  receiverFullName: string;
+  id: string;
+  patientId: string;
+  patientName: string;
+  patientUsername: string;
+  lastMessage?: LastMessage;
+  lastMessageAt?: string;
+  unreadCount: number;
+  note: string;
+  createdAt: string;
+};
+
+// Wrapper type that matches API response structure
+export type ConversationsResponse = {
+  data?: ConversationData[];
 };
 
 type ConversationContextType = {
-  conversations?: ConversationData[];
+  conversations?: ConversationsResponse;
   refetchConversation: () => void;
   isSuccessConversationQuery: boolean;
-  setConversationWs: (_conversations: ConversationData[]) => void;
+  setConversationWs: (_conversations: ConversationsResponse) => void;
   setSearchTerm: (_searchTerm: string) => void;
 };
 
@@ -54,13 +57,15 @@ export const ConversationProvider: React.FC<{ children: ReactNode }> = ({
   const [debouncedSearchTerm] = useDebounce(searchTerm, 200); // 300ms debounce
 
   const { data: conversations, refetch, isSuccess } = useGetConversation(debouncedSearchTerm);
-  const [conversationDataWs, setConversationDataWs] = useState<ConversationData[]>([]);
-  
+  const [conversationDataWs, setConversationDataWs] = useState<ConversationsResponse>({});
+   
   useEffect(() => {
-    if (conversations?.data) {
-      setConversationDataWs(conversations?.data);
+    // API returns nested structure: { data: { data: [...], auditId }, statusCode }
+    const conversationsArray = (conversations?.data as any)?.data;
+    if (Array.isArray(conversationsArray)) {
+      setConversationDataWs({ data: conversationsArray });
     }
-  }, [conversations, isSuccess, setConversationDataWs, conversationDataWs, searchTerm]);
+  }, [conversations, isSuccess]);
 
   
   const value = useMemo(

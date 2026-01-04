@@ -1,8 +1,9 @@
 import { IResponse, getData, mutationPost } from "@/config/api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+// GET /doctors/patients/:userId - Get patient basic info
 export const fetchBasicUser = (id: string | number) => {
-  const url = `user/basic-info/${id}`;
+  const url = `doctors/patients/${id}`;
   return getData<IResponse<any>>(url);
 };
 
@@ -14,11 +15,12 @@ export const useGetUserBasicHook = (id: string | number) => {
   });
 };
 
-export const useResetPassword = () => {
-  const url = "user/reset-password";
+// POST /user/change-password - Change user password
+export const useChangePassword = () => {
+  const url = "user/change-password";
   return useMutation({
-    mutationKey: ["reset-password"],
-    mutationFn: (body: {currentPassword: string, newPassword: string}) => {
+    mutationKey: ["change-password"],
+    mutationFn: (body: { currentPassword: string; newPassword: string }) => {
       return mutationPost<IResponse<any>>({
         url,
         body

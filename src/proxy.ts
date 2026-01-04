@@ -1,10 +1,10 @@
-// middleware.ts
+// proxy.ts - Next.js 16 replacement for middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(req: NextRequest) {
+export default function proxy(req: NextRequest) {
   // Get the authentication token from cookies
-  const token = req.cookies.get("JSESSIONID");
+  const token = req.cookies.get("accessToken");
 
   // Define protected paths
   const protectedPaths = ["/chat", "/appointment"];
@@ -29,7 +29,8 @@ export function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-// Apply middleware to the root, /chat, and /appointment paths
+// Apply proxy to the root, /chat, and /appointment paths
 export const config = {
-  matcher: ["/", "/login" ,"/chat/:path*", "/appointment/:path*"],
+  matcher: ["/", "/login", "/chat/:path*", "/appointment/:path*"],
 };
+

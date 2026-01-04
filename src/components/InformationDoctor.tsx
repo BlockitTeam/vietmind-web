@@ -7,12 +7,12 @@ import {
 } from "@/components/ui/dialog";
 import { useCurrentUserDoctorHook } from "@/hooks/currentUser";
 import { useLogoutHook } from "@/hooks/logout";
-import { useResetPassword } from "@/hooks/user";
+import { useChangePassword } from "@/hooks/user";
 import { currentUserAtom } from "@/lib/jotai";
+import { displayGender } from "@/helper";
 import { Button, Divider, Form, Input, notification } from "antd";
 import { useAtom } from "jotai";
 import { useState } from "react";
-import { deleteCookie } from "cookies-next";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
@@ -25,7 +25,7 @@ export function InformationDoctor() {
   const { data: doctorData, isSuccess } = useCurrentUserDoctorHook();
   const [form] = Form.useForm();
   const [isDisplayChangePassword, setIsDisplayChangePassword] = useState(false);
-  const resetPassword = useResetPassword();
+  const changePassword = useChangePassword();
   const useLogout = useLogoutHook();
   const [, setCurrentUser] = useAtom(currentUserAtom);
   const router = useRouter();
@@ -59,7 +59,7 @@ export function InformationDoctor() {
               <div className="flex">
                 <span className="w-[150px]">Giới tính</span>
                 <span className="font-bold">
-                  {doctorData?.data?.gender === "FEMALE" ? "Nữ" : "Nam"}
+                  {displayGender(doctorData?.data?.gender)}
                 </span>
               </div>
               <div className="flex">
@@ -89,7 +89,7 @@ export function InformationDoctor() {
                 currentPassword: values.currentPassword,
                 newPassword: values.newPassword
               };
-              resetPassword.mutate(body, {
+              changePassword.mutate(body, {
                 onSuccess: () => {
                   setIsDisplayChangePassword(false);
                   form.resetFields();
@@ -97,16 +97,11 @@ export function InformationDoctor() {
                     onSuccess(data) {
                       if (data.statusCode === 200) {
                         setCurrentUser(null);
-                        Cookies.remove("JSESSIONID");
-                        deleteCookie("JSESSIONID", {
-                          path: "/",
-                          domain: "http://91.108.104.57",
-                        });
-                        // Remove the cookie
+                        Cookies.remove("accessToken");
                         // Redirect to the home page or any other page
                         router.push("/");
                         notification.success({
-                          message: "Đổi mật khẩu thành công",
+                          title: "Đổi mật khẩu thành công",
                         });
 
                       } else {

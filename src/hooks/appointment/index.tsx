@@ -1,40 +1,17 @@
-import { IResponse, getData, mutationPost } from "@/config/api";
+import { IResponse, getData, mutationPost, mutationPatch } from "@/config/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-// POST
-export const useMutationAppointment = () => {
+// PATCH /doctors/appointments/:appointmentId/status - Update appointment status
+export const useUpdateAppointmentStatus = () => {
   const queryClient = useQueryClient();
 
-  const url = "appointments/doctor";
   return useMutation({
-    mutationKey: ["create-appointment"],
-    mutationFn: (body: any) => {
-      return mutationPost<IResponse<any>>({
-        url,
-        body
+    mutationKey: ["update-appointment-status"],
+    mutationFn: ({ appointmentId, status }: { appointmentId: string; status: string }) => {
+      return mutationPatch<IResponse<any>>({
+        url: `doctors/appointments/${appointmentId}/status`,
+        body: { status }
       });
-    },
-    onSuccess() {
-      void queryClient.invalidateQueries({
-        queryKey: ["futureAppointment"],
-      });
-    },
-  });
-};
-
-// PUT
-export const usePutMutationAppointmentIdHook = (id: string | number) => {
-  const queryClient = useQueryClient();
-  const url = "appointments/doctor";
-
-  return useMutation({
-    mutationKey: ["put-appointment", id],
-    mutationFn: (body: any) => {
-      const obj = {
-        url,
-        body
-      };
-      return mutationPost<any>(obj);
     },
     onSuccess() {
       void queryClient.invalidateQueries({
@@ -43,13 +20,27 @@ export const usePutMutationAppointmentIdHook = (id: string | number) => {
       void queryClient.invalidateQueries({
         queryKey: ["currentAppointment"],
       });
+      void queryClient.invalidateQueries({
+        queryKey: ["appointment-doctor"],
+      });
     },
   });
 };
 
+// Legacy hook - wraps the new updateAppointmentStatus
+export const useMutationAppointment = () => {
+  return useUpdateAppointmentStatus();
+};
+
+// Legacy hook for updating appointment
+export const usePutMutationAppointmentIdHook = (_id: string | number) => {
+  return useUpdateAppointmentStatus();
+};
+
+// POST /availability - Set doctor availability
 export const useScheduleAppointment = () => {
   const queryClient = useQueryClient();
-  const url = "availabilities";
+  const url = "availability";
   return useMutation({
     mutationKey: ["schedule-appointment"],
     mutationFn: (body: any) => {
@@ -66,8 +57,9 @@ export const useScheduleAppointment = () => {
   });
 };
 
+// GET /availability - Get doctor availability
 export const FetchAvailability = () => {
-  const url = "availabilities";
+  const url = "availability";
   return getData<IResponse<any>>(url);
 };
 
@@ -79,8 +71,9 @@ export const useGetScheduleAppointment = () => {
   });
 };
 
+// GET /doctors/appointments - Get all doctor appointments
 export const FetchAppointmentDoctor = () => {
-  const url = "appointments/doctor";
+  const url = "doctors/appointments";
   return getData<IResponse<any>>(url);
 };
 
@@ -92,22 +85,24 @@ export const useGetAppointmentDoctor = () => {
   });
 };
 
+// GET /doctors/appointments/patient/:userId/current - Get current appointment with patient
 export const useGetCurrentAppointment = (userId: string | number) => {
   return useQuery<IResponse<any>>({
-    queryKey: ["currentAppointment"],
+    queryKey: ["currentAppointment", userId],
     queryFn: () => {
-      return getData<IResponse<any>>(`appointments/doctor/currentAppointment/${userId}`);
+      return getData<IResponse<any>>(`doctors/appointments/patient/${userId}/current`);
     },
     enabled: !!userId,
     retry: false
   });
 };
 
+// GET /doctors/appointments/patient/:userId/future - Get future appointments with patient
 export const useGetFutureAppointment = (userId: string | number) => {
   return useQuery<IResponse<any>>({
-    queryKey: ["futureAppointment"],
+    queryKey: ["futureAppointment", userId],
     queryFn: () => {
-      return getData<IResponse<any>>(`appointments/doctor/futureAppointment/${userId}`);
+      return getData<IResponse<any>>(`doctors/appointments/patient/${userId}/future`);
     },
     enabled: !!userId,
     retry: false

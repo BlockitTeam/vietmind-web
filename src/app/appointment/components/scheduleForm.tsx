@@ -50,8 +50,10 @@ const ScheduleForm: React.FC<{
 
   // Set data from the passed scheduleAppointment
   useEffect(() => {
-    if (visible && scheduleAppointment) {
-      const formData = scheduleAppointment.map((item: Shift) => ({
+    const appointmentData = scheduleAppointment?.data;
+    
+    if (visible && appointmentData && Array.isArray(appointmentData)) {
+      const formData = appointmentData.map((item: Shift) => ({
         dayOfWeek: item.dayOfWeek,
         shiftNumber: item.shiftNumber,
         startTime: item.startTime.substring(0, 5),
@@ -168,7 +170,7 @@ const ScheduleForm: React.FC<{
                 })
                 .sort((a, b) => a.shiftNumber - b.shiftNumber)
                 .map((field) => (
-                  <Space key={field.id} direction="vertical" align="start">
+                  <Space key={field.id} orientation="vertical" align="start">
                     <Space key={field.id} align="center">
                       <Controller
                         control={control}

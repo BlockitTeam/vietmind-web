@@ -1,38 +1,37 @@
 import { IResponse, getData, mutationPost } from "@/config/api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-export const FetchContentMessage = (conversationId?: number) => {
-  const url = `conversation/${conversationId}/content`;
+// GET /doctors/conversations/:conversationId/content - Get conversation messages
+export const FetchContentMessage = (conversationId?: string) => {
+  const url = `doctors/conversations/${conversationId}/content`;
   return getData<IResponse<any>>(url);
 };
 
-
-export const useContentMessageHook = (conversationId?: number) => {
+export const useContentMessageHook = (conversationId?: string) => {
   return useQuery<IResponse<any>>({
     queryKey: ["contentConversationId", conversationId],
     queryFn: () => FetchContentMessage(conversationId),
-    enabled: !!conversationId && conversationId > 0, // Only enable the query if conversationId is greater than 0
+    enabled: !!conversationId && conversationId.length > 0,
   });
 };
 
-export const useGetEASHook = (conversationId?: number) => {
-  const url = `conversation/${conversationId}/encrypt-key`;
+// Note: useGetEASHook is deprecated - server now handles encryption
+// Keeping for backward compatibility but it's no longer needed
+export const useGetEASHook = (conversationId?: string) => {
   return useMutation({
     mutationKey: ["getAES"],
-    mutationFn: (publicKey: string) => {
-      return mutationPost<IResponse<string>>({
-        url,
-        body: {
-          publicKey,
-        },
-      });
+    mutationFn: async (publicKey: string) => {
+      // Deprecated: encryption is now handled server-side
+      console.warn("useGetEASHook is deprecated - encryption is now handled server-side");
+      return { data: "", statusCode: 200 } as IResponse<string>;
     },
     retry: 0
   });
 };
 
-export const useIsReadMessage = (id: number) => {
-  const url = `message/markMessageIsReadByConverId/${id}`;
+// POST /doctors/conversations/:conversationId/mark-read - Mark messages as read
+export const useIsReadMessage = (id: string) => {
+  const url = `doctors/conversations/${id}/mark-read`;
   return useMutation({
     mutationKey: ["markMessageIsRead"],
     mutationFn: (body: {}) => {
@@ -41,6 +40,5 @@ export const useIsReadMessage = (id: number) => {
         body,
       });
     },
-    
   });
 };

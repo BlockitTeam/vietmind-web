@@ -11,7 +11,6 @@ import {
   userConversationIdAtom,
   userIdTargetUserAtom,
 } from "@/lib/jotai";
-import { decryptMessageWithKeyAES } from "@/servers/message";
 import { cn } from "@/utils/cn";
 import { useContentMessageHook, useIsReadMessage } from "@/hooks/getContentMessage";
 import dayjs from "dayjs";
@@ -35,37 +34,52 @@ export const Conversation = () => {
 
   useEffect(() => {
     if (queryConversationId.isSuccess) {
-      setConversationIdContentAtom(contentConversationId?.data);
+      // Extract from nested response: { data: { data: [...], auditId }, statusCode }
+      const messages = (contentConversationId?.data as any)?.data;
+      setConversationIdContentAtom(messages || []);
     }
-  }, [contentConversationId]);
+  }, [contentConversationId, queryConversationId.isSuccess, setConversationIdContentAtom]);
 
+  // Refetch conversations when receiving new messages
   useEffect(() => {
     if (lastMessage) {
-      const newMessage = JSON.parse(lastMessage.data);
-
-      if (newMessage?.type === "panel") {
-        refetchConversation();
-      }
+      // Refresh conversation list to update last message preview
+      refetchConversation();
     }
-  }, [lastMessage]);
+  }, [lastMessage, refetchConversation]);
+
   useEffect(() => {
-    if (conversationId > 0) {
+    if (conversationId) {
       queryConversationId.refetch();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId]);
 
-  const sanitizeString = (input: string) => {
-    // Remove \n, \r, and HTML tags
-    return input.replace(/(\r\n|\n|\r|<br\s*\/?>)/g, "");
+  // Sanitize message content - remove newlines and HTML tags
+  const sanitizeMessage = (message: string): string => {
+    return message.replace(/(\r\n|\n|\r|<br\s*\/?>)/g, " ").trim();
+  };
+
+  // Get display message
+  const getDisplayMessage = (conversation: ConversationData): string => {
+    if (!conversation.lastMessage?.message) {
+      return "Bắt đầu cuộc trò chuyện...";
+    }
+    
+    return sanitizeMessage(conversation.lastMessage.message);
+  };
+
+  // Get display date - prefer lastMessageAt, fallback to createdAt
+  const getDisplayDate = (conversation: ConversationData): string => {
+    return conversation.lastMessageAt || conversation.lastMessage?.createdAt || conversation.createdAt;
   };
 
   return (
     <div className="h-full w-full block">
       {
-        Array.isArray(conversations) &&
-        conversations.map((conversation: ConversationData, index: number) => {
-          const isActive =
-            conversation.conversation.conversationId === conversationId;
+        Array.isArray(conversations?.data) && conversations.data.length > 0 ? (
+        conversations.data.map((conversation: ConversationData, index: number) => {
+          const isActive = conversation.id === conversationId;
 
           return (
             <div
@@ -73,15 +87,15 @@ export const Conversation = () => {
                 "cursor-pointer p-2 flex flex-row gap-2 w-full",
                 isActive && "bg-[#E0E9ED]"
               )}
-              key={index}
+              key={conversation.id || index}
               onClick={() => {
-                setSenderFullName(conversation.senderFullName);
-                setConversationId(conversation.conversation.conversationId);
-                setUserIdTargetUser(conversation.conversation.userId);
+                setSenderFullName(conversation.patientName);
+                setConversationId(conversation.id);
+                setUserIdTargetUser(conversation.patientId);
                 setUserConversationId({
-                  senderFullName: conversation.senderFullName,
-                  conversationId: conversation.conversation.conversationId,
-                  userId: conversation.conversation.userId,
+                  senderFullName: conversation.patientName,
+                  conversationId: conversation.id,
+                  userId: conversation.patientId,
                 });
                 isReadMessage.mutate(
                   {},
@@ -98,40 +112,39 @@ export const Conversation = () => {
                 variant="outline"
                 className="border-regal-green bg-regal-green w-[40px] h-[40px]"
               >
-                {displayAvatar(conversation.senderFullName)}
+                {displayAvatar(conversation.patientName)}
               </Button>
               <div className="flex flex-col w-full overflow-hidden">
                 <div className="flex flex-col">
                   <div className="flex items-center justify-between w-full gap-2">
                     <p className="text-sm text-neutral-primary truncate overflow-hidden flex-1 font-bold">
-                      {conversation.senderFullName}
+                      {conversation.patientName}
                     </p>
                     <p className="text-sm text-neutral-ternary whitespace-nowrap min-w-[45px] text-right">
-                      {dayjs(conversation.lastMessage.createdAt).format("DD/MM")}
+                      {dayjs(getDisplayDate(conversation)).format("DD/MM")}
                     </p>
                   </div>
                   <div className="w-full flex justify-between">
                     <p className="text-sm text-ellipsis overflow-hidden whitespace-pre w-3/4">
-                      {sanitizeString(
-                        decryptMessageWithKeyAES(
-                          conversation.lastMessage.encryptedMessage,
-                          conversation.conversation.conversationKey
-                        )
-                      )}
+                      {getDisplayMessage(conversation)}
                     </p>
-                    {Number(conversation?.unreadMessageCount) > 0 &&
-                      conversationId !==
-                        conversation.conversation.conversationId && (
-                        <div className="text-sm bg-regal-green h-5 w-5 text-center rounded">
-                          {conversation?.unreadMessageCount}
-                        </div>
-                      )}
+                    {conversation.unreadCount > 0 && conversationId !== conversation.id && (
+                      <div className="text-sm bg-regal-green h-5 w-5 text-center rounded">
+                        {conversation.unreadCount}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
           );
-        })}
+        })
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-sm text-neutral-primary">Không tìm thấy cuộc trò chuyện</p>
+          </div>
+        )}
+        
     </div>
   );
 };

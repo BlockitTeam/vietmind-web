@@ -2,13 +2,15 @@ import { ConversationData } from "@/app/chat/components/conversations-provider";
 import { IResponse, getData, mutationPost } from "@/config/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+// GET /doctors/conversations?senderName={name} - List doctor conversations
 export const FetchConversation = (senderName: string) => {
-  const url = `conversation?senderName=${senderName}`;
+  const url = `doctors/conversations?senderName=${senderName}`;
   return getData<IResponse<ConversationData[]>>(url);
 };
 
+// GET /doctors/conversations/:conversationId/note - Get conversation note
 export const FetchNoteConversationId = (id: string | number) => {
-  const url = `conversation/${id}/note`;
+  const url = `doctors/conversations/${id}/note`;
   return getData<IResponse<any>>(url);
 };
 
@@ -27,11 +29,11 @@ export const useGetNoteConversationId = (id: string | number) => {
   });
 };
 
-// POST
+// POST /doctors/conversations/:conversationId/note - Update conversation note
 export const usePutNoteConversationId = (id: string | number) => {
   const queryClient = useQueryClient();
 
-  const url = `conversation/${id}/note`;
+  const url = `doctors/conversations/${id}/note`;
   return useMutation({
     mutationKey: ["postConversationId"],
     mutationFn: (body: any) => {

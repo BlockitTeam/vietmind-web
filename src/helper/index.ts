@@ -33,3 +33,14 @@ export const displayAvatar = (fullName: string) => {
 
   return "NN";
 };
+
+export const displayGender = (gender: string) => {
+  switch (gender) {
+    case "MALE":
+      return "Nam";
+    case "FEMALE":
+      return "Nữ";
+    default:
+      return "Khác";
+  }
+};
