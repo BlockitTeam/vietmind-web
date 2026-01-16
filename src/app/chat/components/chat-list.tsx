@@ -58,10 +58,8 @@ export function ChatList() {
           onSuccess: () => {
             if (conversations?.data) {
               const updated = conversations.data.map((i) => {
-                // Handle both new API (id) and legacy API (conversation.conversationId)
-                const convId = i.id || i.conversation?.conversationId?.toString();
-                if (convId === conversationId) {
-                  return { ...i, unreadCount: 0, unreadMessageCount: 0 };
+                if (i.id === conversationId) {
+                  return { ...i, unreadCount: 0 };
                 }
                 return i;
               });
